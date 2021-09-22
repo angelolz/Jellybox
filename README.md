@@ -1,17 +1,16 @@
-## Team Name: TBD
+## Team Name: Team 23
 
-## Project Name: TBD
+## Project Name: Discord Music Bot
 
 ## Project Description:
-TBD (e.g., build a TBD app for TBD)
+Building a Music Player Bot for Discord to listen to music together with other users.
 
 ## Team Members:
 
 Last Name       | First Name      | GitHub Username    | Scrum Role
 --------------- | --------------- | ------------------ | ---------------
-TBD             | TBD             | TBD                | TBDDeveloper
-TBD             | TBD             | TBD                | TBDScrum Master
-TBD             | TBD             | TBD                | TBDProduct Owner
+TBD             | TBD             | TBD                | TBD
+Legaspi         | Angel           | angelolz1          | Product Owner
 TBD             | TBD             | TBD                | TBD
 
 ## :eyes: :memo: Scrum Linter Reports:
