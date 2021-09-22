@@ -11,7 +11,7 @@ Last Name       | First Name      | GitHub Username    | Scrum Role
 --------------- | --------------- | ------------------ | ---------------
 TBD             | TBD             | TBD                | TBD
 Legaspi         | Angel           | angelolz1          | Product Owner
-TBD             | TBD             | TBD                | TBD
+Villarmero      | Daniel          | shadowbladerx1     | Scrum Master
 
 ## :eyes: :memo: Scrum Linter Reports:
 Access the [Scrum Linter Report](http://cs.boisestate.edu/~bdit/ScrumLinter/CS471F21ScrumLinterReports/CS471-F21-Team23_4DFt51eUgmMCupzruZYmlCFBA656hp18jVPacp3H/). A new report will be automatically generated every few hours.
