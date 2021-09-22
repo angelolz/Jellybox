@@ -9,7 +9,7 @@ Building a Music Player Bot for Discord to listen to music together with other u
 
 Last Name       | First Name      | GitHub Username    | Scrum Role
 --------------- | --------------- | ------------------ | ---------------
-TBD             | TBD             | TBD                | TBD
+Carlson         | Andrew          | AndrewCarlson1996  | Developer
 Legaspi         | Angel           | angelolz1          | Product Owner
 Villarmero      | Daniel          | shadowbladerx1     | Scrum Master
 
