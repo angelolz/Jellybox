@@ -9,6 +9,7 @@ import java.util.Queue;
  */
 public class MusicQueue<T> implements Queue{
 
+    
     private int size;
     private boolean isEmpty;
     private Queue<Object> queue;
@@ -46,7 +47,6 @@ public class MusicQueue<T> implements Queue{
         }
         return false;
     }
-
 
     @Override
     public Iterator<Object> iterator() {
