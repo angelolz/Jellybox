@@ -9,6 +9,7 @@ pipeline
             steps
             {
                 echo 'Building..'
+                echo 'Insert maven commands here..'
             }
         }
 
