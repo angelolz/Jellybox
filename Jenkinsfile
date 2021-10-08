@@ -1,7 +1,11 @@
 pipeline
 {
     agent any
-
+    tools
+    {
+        maven 'Team23 - Maven'
+        jdk 'Team23 - OpenJDK'
+    }
     stages
     {
         stage('Build')
