@@ -29,4 +29,12 @@ pipeline
             }
         }
     }
+
+    post
+    {
+        success
+        {
+            sh 'echo "hello world"'
+        }
+    }
 }
