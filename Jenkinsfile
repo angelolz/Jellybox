@@ -14,7 +14,7 @@ pipeline
             {
                 expression
                 {
-                    return fileExists ('$WORKSPACE/config.properties')
+                    return fileExists ('config.properties')
                 }   
             }
             
