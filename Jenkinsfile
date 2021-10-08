@@ -37,7 +37,7 @@ pipeline
             sh '''
                     curl "https://api.github.com/repos/BoiseState/CS471-F21-Team23/commits/$GIT_COMMIT/status" \
                     -H "Content-Type: application/json, Authorization: token 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" \
-                    -X POST \
+                    -X GET \
                     -d "{\"state\": \"success\",\"context\": \"continuous-integration/jenkins\", \"description\": \"Jenkins\", \"target_url\": \"https://jenkins.testground.dev/job/Team23-Jenkins-Builder-Test/$BUILD_NUMBER/console\" }"
                '''
         }
