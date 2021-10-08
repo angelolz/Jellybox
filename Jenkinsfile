@@ -3,8 +3,8 @@ pipeline
     agent any
     tools
     {
-        maven "Team23 - Maven"
-        jdk "Team23 - OpenJDK"
+        maven 'Team23 - Maven'
+        jdk 'Team23 - OpenJDK'
     }
     stages
     {
