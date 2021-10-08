@@ -35,7 +35,7 @@ pipeline
         success
         {
             sh '''
-                    curl "https://api.github.com/repos/BoiseState/CS471-F21-Team23/commits/$GIT_COMMIT/status" \
+                    curl "https://api.github.com/repos/BoiseState/CS471-F21-Team23/statuses/$GIT_COMMIT" \
                     -H "Content-Type: application/json" \
                     -u shadowbladerx1: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 \
                     -X POST \
