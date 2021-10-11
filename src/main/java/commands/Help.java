@@ -15,7 +15,6 @@ public class Help extends Command
         this.name = "help";
         this.help = "Shows you a list of the bot's commands.";
         this.cooldown = 3;
-        this.children = new Command[] {/* add subcommands here */};
     }
 
     @Override
