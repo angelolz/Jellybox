@@ -44,6 +44,7 @@ pipeline
             steps
             {
                 echo 'Testing..'
+                sh 'mvn clean test'
             }
         }
 
