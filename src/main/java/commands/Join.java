@@ -28,7 +28,6 @@ public class Join extends Command
 
         else
         {
-            System.out.println("if");
             if(!userVoiceState.inVoiceChannel())
             {
                 commandEvent.reply(":x: | You must be in a voice channel in order to use this command!");
@@ -43,8 +42,9 @@ public class Join extends Command
 
                 else
                 {
+                    commandEvent.getGuild().getAudioManager().setSelfDeafened(true); //this is for privacy reasons and saves on bandwidth
                     commandEvent.getGuild().getAudioManager().openAudioConnection(userVoiceState.getChannel());
-                    commandEvent.replyFormatted("\uD83D\uDD0A | Connecting to **%s**!", userVoiceState.getChannel().getName());
+                    commandEvent.replyFormatted(":loud_sound: | Connecting to **%s**!", userVoiceState.getChannel().getName());
                 }
             }
         }
