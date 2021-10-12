@@ -27,15 +27,16 @@ public class TestPing {
 
     @Test
     public void pingSuccessTest(){
-        // TODO
-        // Create a mock of a MessageChannel
-        // Create a mock of an Author
         ArgumentCaptor<String> textChannelArgumentCaptor = ArgumentCaptor.forClass(String.class);
         TextChannel mockTestChannel = createMockTextChannel(textChannelArgumentCaptor);
 
+        User mockUser = mock(User.class);
+        when(mockUser.getAsMention()).thenReturn("<@189690228292845568>");
+
         CommandEvent mockCommandEvent = mock(CommandEvent.class);
+
         when(mockCommandEvent.getChannel()).thenReturn(mockTestChannel);
-        when(mockCommandEvent.getAuthor()).thenReturn("A User"); //THIS DOESNT FUCKING WORK
+        when(mockCommandEvent.getAuthor()).thenReturn(mockUser);
 
         Ping testPing = new Ping();
         testPing.execute(mockCommandEvent);
