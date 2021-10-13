@@ -21,7 +21,12 @@ public class Add extends Command{
     @Override
     protected void execute(CommandEvent commandEvent)
     {
-        mQueue.add(song);
+        if(!mQueue.add(song)){
+            commandEvent.reply(":x: | No song was found matching that name!");
+        }
+        else{
+            commandEvent.reply(":white_check_mark: | Song was added to queue!");
+        }
     }
 }
 
