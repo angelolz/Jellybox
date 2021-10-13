@@ -2,6 +2,7 @@ package structure;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Queue;
+import java.net.URL;
 
 /**
  * 
@@ -104,7 +105,11 @@ public class MusicQueue implements Queue<Song>{
 
     @Override
     public boolean add(Song e) {
-        // TODO Auto-generated method stub
+        String url = e.GetUrl();
+        if(isValid(url)){
+            queue.add(e);
+            return true;
+        }
         return false;
     }
 
@@ -138,4 +143,13 @@ public class MusicQueue implements Queue<Song>{
         return null;
     }
     
+    public boolean isValid(String url){
+        try{
+            new URL(url).toURI();
+            return true;
+        }
+        catch(Exception e){
+            return false;
+        }
+    }
 }
