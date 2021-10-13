@@ -7,12 +7,20 @@ import java.util.Queue;
  * 
  * @author Andrew Carlson
  */
-public class MusicQueue<T> implements Queue{
+public class MusicQueue implements Queue<Song>{
 
     
     private int size;
     private boolean isEmpty;
-    private Queue<Object> queue;
+    private Queue<Song> queue;
+
+
+    public MusicQueue(){
+        this.size = 0;
+        this.isEmpty = true;
+        this.queue = null;
+
+    }
 
     /**
      * Returns the current size of the queue.
@@ -49,7 +57,7 @@ public class MusicQueue<T> implements Queue{
     }
 
     @Override
-    public Iterator<Object> iterator() {
+    public Iterator<Song> iterator() {
         return queue.iterator();
     }
 
@@ -80,8 +88,8 @@ public class MusicQueue<T> implements Queue{
     }
 
     @Override
-    public boolean removeAll(Collection c) {
-        return queue.removeAll(c);
+    public boolean removeAll(Collection E) {
+        return queue.removeAll(E);
     }
 
     @Override
@@ -95,38 +103,39 @@ public class MusicQueue<T> implements Queue{
     }
 
     @Override
-    public boolean add(Object e) {
-        isEmpty = false;
-        return queue.add(e);
+    public boolean add(Song e) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     @Override
-    public boolean offer(Object e) {
-        return offer(e);
+    public boolean offer(Song e) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     @Override
-    public Object remove() {
-        if(size <= 1){
-            isEmpty = true;
-        }
-        size--;
-        return queue.remove();
+    public Song remove() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
-    public Object poll() {
-        return queue.poll();
+    public Song poll() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
-    public Object element() {
-        return queue.element();
+    public Song element() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
-    public Object peek() {
-        return queue.peek();
+    public Song peek() {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }
