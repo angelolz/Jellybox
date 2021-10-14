@@ -57,7 +57,8 @@ public class Jukebox
             new Ping(),
             new Join(),
             new Leave(),
-            new Play()
+            new Play(),
+            new Stop()
         );
 
         try

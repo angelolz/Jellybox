@@ -2,6 +2,8 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import utils.URLUtils;
@@ -9,6 +11,7 @@ import utils.URLUtils;
 import javax.print.URIException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.LinkedList;
 
 public class Play extends Command
 {
@@ -48,11 +51,37 @@ public class Play extends Command
                 commandEvent.replyFormatted(":loud_sound: | Connecting to **%s**!", userVoiceState.getChannel().getName());
             }
 
-            String link = "";
-            if(!URLUtils.isURI(commandEvent.getArgs()))
-                PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), "ytsearch: " + commandEvent.getArgs());
+            if(commandEvent.getArgs().isEmpty())
+            {
+                AudioPlayer player = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer();
+                LinkedList<AudioTrack> queue = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getQueue();
+
+                if(player.isPaused())
+                {
+                    player.setPaused(false);
+                    commandEvent.reply(":arrow_forward: | Resumed playback!");
+                }
+
+                else
+                {
+                    if(queue.isEmpty())
+                        commandEvent.reply(":x: | There's nothing to play because the queue is empty!");
+
+                    else
+                    {
+                        player.playTrack(queue.poll());
+                        commandEvent.reply(":arrow_forward: | Resumed playback!");
+                    }
+                }
+            }
+
             else
-                PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getArgs());
+            {
+                if(!URLUtils.isURI(commandEvent.getArgs()))
+                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), "ytsearch: " + commandEvent.getArgs());
+                else
+                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getArgs());
+            }
         }
     }
 }
