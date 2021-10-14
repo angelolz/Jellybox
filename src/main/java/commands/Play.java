@@ -4,6 +4,11 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import utils.URLUtils;
+
+import javax.print.URIException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class Play extends Command
 {
@@ -43,8 +48,11 @@ public class Play extends Command
                 commandEvent.replyFormatted(":loud_sound: | Connecting to **%s**!", userVoiceState.getChannel().getName());
             }
 
-            //TODO this only accepts urls atm, but it should also accept search queries
-            PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getArgs());
+            String link = "";
+            if(!URLUtils.isURI(commandEvent.getArgs()))
+                PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), "ytsearch: " + commandEvent.getArgs());
+            else
+                PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getArgs());
         }
     }
 }
