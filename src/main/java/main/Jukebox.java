@@ -57,7 +57,8 @@ public class Jukebox
             new Help(),
             new Ping(),
             new Join(),
-            new Leave()
+            new Leave(),
+            new Play()
         );
 
         try
@@ -95,18 +96,8 @@ public class Jukebox
         return logger;
     }
 
-    public static String getUptime()
+    public static long getUptime()
     {
-        long ms = System.currentTimeMillis() - uptime;
-        int days, hours, minutes, seconds;
-        String result;
-
-        seconds = (int) ((ms / 1000) % 60);
-        minutes = (int) ((ms / (1000*60)) % 60);
-        hours = (int) ((ms / (1000*60*60)) % 24);
-        days = (int) ((ms / (1000*60*60*24)));
-
-        result = days + " days, " + hours + " hours, " + minutes + " minutes, and " + seconds + " seconds";
-        return result;
+        return uptime;
     }
 }
