@@ -39,9 +39,13 @@ public class Lyrics extends Command
     protected void execute(CommandEvent event)
     {
         MessageChannel channel = event.getChannel();
-        String[] lyrics = lyricsGetter.search("Lose Yourself").get(0).getText().split(System.lineSeparator());
         StringBuilder sb = new StringBuilder();
-        System.out.println("Start");
+
+        String search = event.getArgs();
+        if(search.equals("")){
+            search = "lose yourself";
+        }
+        String[] lyrics = lyricsGetter.search(search).get(0).getText().split(System.lineSeparator());
         for(String line: lyrics)
         {
             if((sb.length() + line.length()) > 1900)
