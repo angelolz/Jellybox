@@ -38,14 +38,25 @@ public class Lyrics extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        MessageChannel channel = event.getChannel();
-        StringBuilder sb = new StringBuilder();
-
-        String search = event.getArgs();
-        if(search.equals("")){
-            search = "lose yourself";
+        try{
+            MessageChannel channel = event.getChannel();
+            String search = event.getArgs();
+            if(search.equals("")){
+                search = "lose yourself";
+            }
+            String[] lyrics = lyricsGetter.search(search).get(0).getText().split(System.lineSeparator());
+            formatLyrics(channel, lyrics);
         }
-        String[] lyrics = lyricsGetter.search(search).get(0).getText().split(System.lineSeparator());
+        catch (IndexOutOfBoundsException e)
+        {
+            MessageChannel channel = event.getChannel();
+            channel.sendMessage("Could not find the song!").queue();
+        }
+    }
+
+    private void formatLyrics(MessageChannel channel, String[] lyrics)
+    {
+        StringBuilder sb = new StringBuilder();
         for(String line: lyrics)
         {
             if((sb.length() + line.length()) > 1900)
@@ -59,10 +70,9 @@ public class Lyrics extends Command
             }
         }
 
-        if(!sb.toString().equals("")){
+        if(!sb.toString().equals(""))
+        {
             channel.sendMessage(sb).queue();
         }
     }
-
-
 }
