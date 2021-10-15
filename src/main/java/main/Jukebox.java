@@ -53,7 +53,10 @@ public class Jukebox
 
         //add commands
         client.addCommands(
-            new Ping()
+            new Help(),
+            new Ping(),
+            new Join(),
+            new Leave()
         );
 
         try
