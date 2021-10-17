@@ -58,7 +58,8 @@ public class Jukebox
             new Join(),
             new Leave(),
             new Play(),
-            new Stop()
+            new Stop(),
+            new Pause()
         );
 
         try

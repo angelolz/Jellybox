@@ -25,7 +25,6 @@ public class Play extends Command
     @Override
     protected void execute(CommandEvent commandEvent)
     {
-        System.out.println(PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer().getPlayingTrack() == null);
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
 
