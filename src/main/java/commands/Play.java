@@ -25,6 +25,7 @@ public class Play extends Command
     @Override
     protected void execute(CommandEvent commandEvent)
     {
+        System.out.println(PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer().getPlayingTrack() == null);
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
 
@@ -35,10 +36,12 @@ public class Play extends Command
 
         else
         {
+            AudioPlayer player = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer();
+            LinkedList<AudioTrack> queue = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getQueue();
+
             //if bot is in a different channel
             if(selfVoiceState.inVoiceChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
             {
-                //TODO if the bot isn't playing music, it will just transfer to another voice channel
                 commandEvent.reply(":x: | I'm already in another voice channel!");
                 return;
             }
@@ -53,9 +56,6 @@ public class Play extends Command
 
             if(commandEvent.getArgs().isEmpty())
             {
-                AudioPlayer player = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer();
-                LinkedList<AudioTrack> queue = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getQueue();
-
                 if(player.isPaused())
                 {
                     player.setPaused(false);
