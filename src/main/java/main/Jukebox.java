@@ -56,6 +56,7 @@ public class Jukebox
             new Help(),
             new Ping(),
             new Join(),
+            new Lyrics(),
             new Leave()
         );
 
