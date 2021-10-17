@@ -56,10 +56,11 @@ public class Jukebox
             new Help(),
             new Ping(),
             new Join(),
-            new Leave(),
             new Play(),
             new Stop(),
             new Pause()
+            new Lyrics(),
+            new Leave()
         );
 
         try

@@ -39,6 +39,12 @@
     </repositories>
 
     <dependencies>
+        <!-- Genius Lyrics API -->
+        <dependency>
+            <groupId>com.github.LowLevelSubmarine</groupId>
+            <artifactId>GeniusLyricsAPI</artifactId>
+            <version>master</version>
+        </dependency>
         <!-- Mockito -->
         <dependency>
             <groupId>org.mockito</groupId>
