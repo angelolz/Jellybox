@@ -20,6 +20,16 @@ Access the [Scrum Linter Report](http://cs.boisestate.edu/~bdit/ScrumLinter/CS47
 - Aim to obtain :thumbsup: in all the sections of the linter report
 
 ## [Optional] Miscellaneous information
-TBD: The last part of the `README.md` file is optional, and the team can remove it or use it as they see fit.
+### Protected Branch
+The `master` branch is currently protected and has the following requirements:
+- One reviewer
+- Passes build tests in [Jenkins](http://jenkins.testground.dev)
+### Jenkins
+The Jenkins build server is accessible through [here](http://jenkins.testground.dev). 
+Make sure there is a `Jenkinsfile` in your branch's root directory to allow the build server to perform the tests.<br />
+<br />
+If you need access to the build server, please let me know through Discord. Please also inform me of any changes you plan to make.
 
-The team can add new sections if needed.
+### Tests
+In this project, we are using `JUnit5` and `Mockito` to perform unit tests. 
+Feel free to use these tools as the dependencies have already been added.
