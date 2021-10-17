@@ -58,7 +58,7 @@ public class Jukebox
             new Join(),
             new Play(),
             new Stop(),
-            new Pause()
+            new Pause(),
             new Lyrics(),
             new Leave()
         );
