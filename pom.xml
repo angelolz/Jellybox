@@ -99,6 +99,13 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.6</version>
         </dependency>
+
+        <!-- music player library -->
+        <dependency>
+            <groupId>com.sedmelluq</groupId>
+            <artifactId>lavaplayer</artifactId>
+            <version>1.3.77</version>
+        </dependency>
     </dependencies>
 
     <build>
