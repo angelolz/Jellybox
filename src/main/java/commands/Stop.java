@@ -43,12 +43,21 @@ public class Stop extends Command
 
             // add the track back into the queue so that it can be replayed again
             AudioTrack lastTrack = musicManager.getScheduler().getPlayer().getPlayingTrack();
-            musicManager.getScheduler().getQueue().add(0, lastTrack.makeClone());
 
-            //stop the track
-            musicManager.getScheduler().getPlayer().stopTrack();
+            if(lastTrack != null)
+            {
+                musicManager.getScheduler().getQueue().add(0, lastTrack.makeClone());
 
-            commandEvent.reply(":stop_button: | The currently playing track has been stopped.");
+                //stop the track
+                musicManager.getScheduler().getPlayer().stopTrack();
+
+                commandEvent.reply(":stop_button: | The currently playing track has been stopped.");
+            }
+
+            else
+            {
+                commandEvent.reply(":x: | There is no song playing!");
+            }
         }
     }
 }
