@@ -44,7 +44,7 @@ public class Lyrics extends Command
             if(search.equals("")){
                 search = "lose yourself";
             }
-            String[] lyrics = lyricsGetter.search(search).get(0).getText().split(System.lineSeparator());
+            String[] lyrics = lyricsGetter.search(search).get(0).getText().split("\n");
             formatLyrics(channel, lyrics);
         }
         catch (IndexOutOfBoundsException e)
