@@ -10,8 +10,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.Jukebox;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import utils.ConvertLong;
-import utils.URLUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class PlayerManager
     {
         return musicManagers.computeIfAbsent(guild.getIdLong(),
             (guildId) -> {
-                final GuildMusicManager guildMusicManager = new GuildMusicManager(playerManager);
+                final GuildMusicManager guildMusicManager = new GuildMusicManager(playerManager, null);
 
                 guild.getAudioManager().setSendingHandler(guildMusicManager.getHandler());
 
@@ -43,7 +43,7 @@ public class PlayerManager
         });
     }
 
-    public void loadAndPlay(TextChannel channel, String trackUrl)
+    public void loadAndPlay(TextChannel channel, User requester, Guild guild, String trackUrl)
     {
         final GuildMusicManager guildMusicManager = getMusicManager(channel.getGuild());
 
@@ -53,7 +53,7 @@ public class PlayerManager
                 @Override
                 public void trackLoaded(AudioTrack audioTrack)
                 {
-                    if(guildMusicManager.getScheduler().queue(audioTrack))
+                    if(guildMusicManager.getScheduler().queue(audioTrack, requester, guild))
                     {
                         channel.sendMessageFormat(":notes: Added to queue: `%s - %s` **[%s]**",
                             audioTrack.getInfo().author, audioTrack.getInfo().title,
@@ -62,9 +62,13 @@ public class PlayerManager
 
                     else
                     {
+                        PlayerManager.getInstance().getMusicManager(guild).setRequester(requester);
+
                         channel.sendMessageFormat(":musical_note: Now Playing: `%s - %s` **[%s]**",
                             audioTrack.getInfo().author, audioTrack.getInfo().title,
                             ConvertLong.convertLongToTrackTime(audioTrack.getInfo().length)).queue();
+
+
                     }
                 }
 
@@ -72,15 +76,13 @@ public class PlayerManager
                 public void playlistLoaded(AudioPlaylist audioPlaylist)
                 {
                     if(audioPlaylist.isSearchResult())
-                    {
                        trackLoaded(audioPlaylist.getTracks().get(0));
-                    }
 
                     else
                     {
                         for(AudioTrack track: audioPlaylist.getTracks())
                         {
-                            guildMusicManager.getScheduler().queue(track);
+                            guildMusicManager.getScheduler().queue(track, requester, guild);
                         }
 
                         channel.sendMessageFormat(":notes: Added **%d** songs to the queue!", audioPlaylist.getTracks().size()).queue();
@@ -90,14 +92,14 @@ public class PlayerManager
                 @Override
                 public void noMatches()
                 {
-
+                    channel.sendMessage(":x: | Sorry, we couldn't find a matching result for your request!").queue();
                 }
 
                 @Override
                 public void loadFailed(FriendlyException e)
                 {
                     channel.sendMessage(":x: | There was an error trying to play your song.").queue();
-                    Jukebox.getLogger().error("Error occurred when playing song: {}: ", e.getClass().getName(), e.getMessage());
+                    Jukebox.getLogger().error("Error occurred when playing song: {}: {}", e.getClass().getName(), e.getMessage());
                 }
             });
     }
