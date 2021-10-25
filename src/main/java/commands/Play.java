@@ -8,9 +8,6 @@ import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import utils.URLUtils;
 
-import javax.print.URIException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.LinkedList;
 
 public class Play extends Command
@@ -18,7 +15,8 @@ public class Play extends Command
     public Play()
     {
         this.name = "play";
-        this.help = "Plays a song from a URL."; //TODO improve this help lol
+        this.aliases = new String[] {"p"};
+        this.help = "Plays a song from a URL or search query.";
         this.cooldown = 3;
     }
 
