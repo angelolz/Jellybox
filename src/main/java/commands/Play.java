@@ -75,15 +75,10 @@ public class Play extends Command
             else
             {
                 if(!URLUtils.isURI(commandEvent.getArgs()))
-                {
-                    PlayerManager.getInstance()
-                        .loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), commandEvent.getGuild(),
-                            "ytsearch: " + commandEvent.getArgs());
-                }
+                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), "ytsearch: " + commandEvent.getArgs());
 
                 else
-                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), commandEvent.getGuild(),
-                        commandEvent.getArgs());
+                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), commandEvent.getArgs());
             }
         }
     }
