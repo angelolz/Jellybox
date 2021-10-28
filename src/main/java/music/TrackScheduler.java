@@ -4,9 +4,12 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import structure.MusicTrack;
+import utils.ConvertLong;
 
 import java.util.LinkedList;
 
@@ -53,12 +56,19 @@ public class TrackScheduler extends AudioEventAdapter
     private void nextTrack()
     {
         MusicTrack nextTrack = queue.poll();
+        AudioTrackInfo nextTrackInfo = nextTrack.getTrack().getInfo();
         if(nextTrack != null)
         {
             player.startTrack(nextTrack.getTrack(), false);
-            PlayerManager.getInstance()
-                .getMusicManager(nextTrack.getGuild())
-                .setRequester(nextTrack.getRequester());
+            GuildMusicManager player = PlayerManager.getInstance().getMusicManager(nextTrack.getGuild());
+
+            player.setRequester(nextTrack.getRequester());
+
+            EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
+            embed.setTitle("Now Playing");
+            embed.setDescription(String.format("%s `(%s)` [%s]",
+                nextTrackInfo.title, ConvertLong.convertLongToTrackTime(nextTrackInfo.length), nextTrack.getRequester().getAsMention()));
+            player.getNotifChannel().sendMessageEmbeds(embed.build()).queue();
         }
     }
 }

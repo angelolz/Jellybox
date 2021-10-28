@@ -47,6 +47,8 @@ public class Play extends Command
                 commandEvent.getGuild().getAudioManager().setSelfDeafened(true); //this is for privacy reasons and saves on bandwidth
                 commandEvent.getGuild().getAudioManager().openAudioConnection(userVoiceState.getChannel());
                 commandEvent.replyFormatted(":loud_sound: | Connecting to **%s**!", userVoiceState.getChannel().getName());
+
+                PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).setNotifChannel(commandEvent.getTextChannel());
             }
 
             if(commandEvent.getArgs().isEmpty())

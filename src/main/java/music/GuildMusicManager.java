@@ -2,7 +2,9 @@ package music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import org.w3c.dom.Text;
 
 public class GuildMusicManager
 {
@@ -10,6 +12,7 @@ public class GuildMusicManager
     private final TrackScheduler scheduler;
     private final AudioPlayerSendHandler handler;
     private User currentSongRequester;
+    private TextChannel notifChannel;
 
     public GuildMusicManager(AudioPlayerManager manager, User requester)
     {
@@ -39,5 +42,13 @@ public class GuildMusicManager
     public void setRequester(User requester)
     {
         this.currentSongRequester = requester;
+    }
+
+    public TextChannel getNotifChannel() { return notifChannel; }
+
+    public void setNotifChannel(TextChannel channel)
+    {
+        if(notifChannel == null)
+            this.notifChannel = channel;
     }
 }
