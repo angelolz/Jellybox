@@ -61,7 +61,13 @@ public class Play extends Command
 
                 else
                 {
-                    if(queue.isEmpty())
+                    if(player.getPlayingTrack() != null)
+                    {
+                        commandEvent.reply(":x: | There's already a song playing! If you want to add a song to the queue, " +
+                            "please give me a search query or URL!");
+                    }
+
+                    else if(queue.isEmpty())
                         commandEvent.reply(":x: | There's nothing to play because the queue is empty!");
 
                     else

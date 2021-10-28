@@ -94,7 +94,6 @@ public class PlayerManager
                         embed.setTitle("Now Playing");
                         embed.setDescription(String.format("%s `[%s]` (%s)",
                             trackInfo.title, ConvertLong.convertLongToTrackTime(trackInfo.length), requester.getAsMention()));
-
                     }
 
                     channel.sendMessageEmbeds(embed.build()).queue();
