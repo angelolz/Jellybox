@@ -2,6 +2,7 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import music.PlayerManager;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
@@ -28,6 +29,7 @@ public class Leave extends Command
         else
         {
             selfVoiceState.getGuild().getAudioManager().closeAudioConnection();
+            PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer().destroy();
             commandEvent.reply(":wave: Goodbye!");
         }
     }
