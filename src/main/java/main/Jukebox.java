@@ -60,6 +60,7 @@ public class Jukebox
             new Stop(),
             new Pause(),
             new Lyrics(),
+            new NowPlaying(),
             new Leave()
         );
 
