@@ -47,6 +47,7 @@ public class Join extends Command
                     commandEvent.getGuild().getAudioManager().openAudioConnection(userVoiceState.getChannel());
                     PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).setNotifChannel(commandEvent.getTextChannel());
                     commandEvent.replyFormatted(":loud_sound: | Connecting to **%s**!", userVoiceState.getChannel().getName());
+                    PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getTimer().startTimer();
                 }
             }
         }

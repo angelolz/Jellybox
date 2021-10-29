@@ -77,6 +77,11 @@ public class TrackScheduler extends AudioEventAdapter
         this.notifChannel = channel;
     }
 
+    public TextChannel getNotifChannel()
+    {
+        return notifChannel;
+    }
+
     private void nextTrack()
     {
         if(queue.peek() != null)
