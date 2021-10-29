@@ -2,6 +2,7 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
@@ -31,8 +32,23 @@ public class Pause extends Command
 
         else
         {
-            PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer().setPaused(true);
-            commandEvent.reply(":pause_button: | Paused playback!");
+            AudioPlayer player = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer();
+            if(player.getPlayingTrack() != null)
+            {
+                if(player.isPaused())
+                    commandEvent.reply(":x: | I'm already paused! Type `!p` or `!play` to continue playback!");
+
+                else
+                {
+                    player.setPaused(true);
+                    commandEvent.reply(":pause_button: | Paused playback!");
+                }
+            }
+
+            else
+            {
+                commandEvent.reply(":x: | There's nothing playing!");
+            }
         }
     }
 }

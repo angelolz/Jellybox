@@ -66,7 +66,7 @@ public class PlayerManager
                     AudioPlayer player = guildMusicManager.getScheduler().getPlayer();
 
 
-                    if(guildMusicManager.getScheduler().queue(audioTrack, requester, channel.getGuild()))
+                    if(guildMusicManager.getScheduler().queue(audioTrack, requester))
                     {
                         embed.setTitle("Added to Queue!");
                         embed.addField("Artist", trackInfo.author, true);
@@ -110,7 +110,7 @@ public class PlayerManager
                         long playlistDuration = 0;
                         for(AudioTrack track: audioPlaylist.getTracks())
                         {
-                            guildMusicManager.getScheduler().queue(track, requester, channel.getGuild());
+                            guildMusicManager.getScheduler().queue(track, requester);
                             playlistDuration += track.getDuration();
                         }
 

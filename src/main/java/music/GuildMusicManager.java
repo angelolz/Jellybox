@@ -4,11 +4,9 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import org.w3c.dom.Text;
 
 public class GuildMusicManager
 {
-    private final AudioPlayer player;
     private final TrackScheduler scheduler;
     private final AudioPlayerSendHandler handler;
     private User currentSongRequester;
@@ -16,7 +14,7 @@ public class GuildMusicManager
 
     public GuildMusicManager(AudioPlayerManager manager, User requester)
     {
-        this.player = manager.createPlayer();
+        AudioPlayer player = manager.createPlayer();
         this.scheduler = new TrackScheduler(player);
         this.handler = new AudioPlayerSendHandler(player);
         this.currentSongRequester = requester;
@@ -49,6 +47,9 @@ public class GuildMusicManager
     public void setNotifChannel(TextChannel channel)
     {
         if(notifChannel == null)
+        {
             this.notifChannel = channel;
+            scheduler.setNotifChannel(notifChannel);
+        }
     }
 }

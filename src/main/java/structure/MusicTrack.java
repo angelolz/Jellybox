@@ -13,16 +13,13 @@ public class MusicTrack
 {
     private AudioTrack track;
     private User requester;
-    private Guild guild;
 
-    public MusicTrack(AudioTrack track, User requester, Guild guild)
+    public MusicTrack(AudioTrack track, User requester)
     {
         this.track = track;
         this.requester = requester;
-        this.guild = guild;
     }
 
     public AudioTrack getTrack() { return track; }
     public User getRequester() { return requester; }
-    public Guild getGuild() { return guild; }
 }

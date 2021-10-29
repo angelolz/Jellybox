@@ -38,7 +38,7 @@ public class Stop extends Command
 
             // add the track back into the queue so that it can be replayed again
             AudioTrack track = musicManager.getScheduler().getPlayer().getPlayingTrack();
-            MusicTrack lastRequestTrack = new MusicTrack(track, musicManager.getRequester(), commandEvent.getGuild());
+            MusicTrack lastRequestTrack = new MusicTrack(track.makeClone(), musicManager.getRequester());
 
             if(track != null)
             {
