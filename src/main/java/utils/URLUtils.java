@@ -2,18 +2,20 @@ package utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 public class URLUtils
 {
-    public static boolean isURI(String url)
+    public static boolean isURI(String urlString)
     {
         try
         {
-            new URI(url);
+            URL url = new URL(urlString);
+            url.toURI();
             return true;
         }
 
-        catch(URISyntaxException e)
+        catch(Exception e)
         {
             return false;
         }
