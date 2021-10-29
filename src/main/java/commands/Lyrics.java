@@ -6,8 +6,10 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import core.GLA;
+import main.Jukebox;
 import music.GuildMusicManager;
 import music.PlayerManager;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import structure.VideoMetadata;
 
@@ -106,23 +108,38 @@ public class Lyrics extends Command
 
     private void formatLyrics(MessageChannel channel, String[] lyrics)
     {
-        StringBuilder sb = new StringBuilder();
+        EmbedBuilder lyricsChunk = new EmbedBuilder();
+        StringBuilder lyricsChunkDescription = lyricsChunk.getDescriptionBuilder();
+        String currentTitle = "";
         for(String line: lyrics)
         {
-            if((sb.length() + line.length()) > 1900)
+            if((lyricsChunk.length() + line.length()) > 3900 || line.equals("")) // Determines when a new embed needs to be made
             {
-                channel.sendMessage(sb.toString()).queue();
-                sb = new StringBuilder();
+                if(lyricsChunkDescription.length() > 0)
+                {
+                    channel.sendMessageEmbeds(lyricsChunk.build()).queue(); // Add embed to a collection
+                }
+                lyricsChunk = new EmbedBuilder(); // Creates a new embed
+                lyricsChunkDescription = lyricsChunk.getDescriptionBuilder(); // Gets a reference to the description string builder
+                lyricsChunk.setTitle(currentTitle); // Sets the title to the previous title (in case the block is too long)
             }
-            else
+            else // Constructs the embed
             {
-                sb.append(line).append("\n");
+                // Constructs one embed per lyric block
+                if(line.charAt(0) == '[' && line.charAt(line.length() - 1) == ']')
+                {
+                    currentTitle = line;
+                    lyricsChunk.setTitle(currentTitle);
+                }
+                else
+                {
+                    lyricsChunkDescription.append(line).append("\n");
+                }
             }
         }
-
-        if(!sb.toString().equals(""))
+        if(lyricsChunk.isValidLength())
         {
-            channel.sendMessage(sb).queue();
+            channel.sendMessageEmbeds(lyricsChunk.build()).queue();
         }
     }
 }
