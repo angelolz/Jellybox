@@ -3,7 +3,7 @@ package commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import music.PlayerManager;
-import net.dv8tion.jda.api.Permission;
+import music.TrackScheduler;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
 public class Leave extends Command
@@ -22,14 +22,17 @@ public class Leave extends Command
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
 
         if(!selfVoiceState.inVoiceChannel())
-        {
             commandEvent.reply(":x: | I'm not in a voice channel!");
-        }
 
         else
         {
             selfVoiceState.getGuild().getAudioManager().closeAudioConnection();
-            PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer().destroy();
+
+            TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
+            scheduler.getPlayer().stopTrack();
+            scheduler.getQueue().clear();
+            scheduler.getPlayer().setPaused(false);
+
             commandEvent.reply(":wave: Goodbye!");
         }
     }
