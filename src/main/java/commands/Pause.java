@@ -33,6 +33,7 @@ public class Pause extends Command
         else
         {
             AudioPlayer player = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer();
+
             if(player.getPlayingTrack() != null)
             {
                 if(player.isPaused())
@@ -46,9 +47,7 @@ public class Pause extends Command
             }
 
             else
-            {
                 commandEvent.reply(":x: | There's nothing playing!");
-            }
         }
     }
 }
