@@ -57,6 +57,7 @@ public class Lyrics extends Command
 
             MessageChannel channel = event.getChannel();
             String search = event.getArgs();
+            channel.sendTyping().queue();
             if(search.equals("")){
                 search = currentSongQuery(track);
             }
