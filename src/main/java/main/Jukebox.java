@@ -61,7 +61,8 @@ public class Jukebox
             new Pause(),
             new Lyrics(),
             new NowPlaying(),
-            new Leave()
+            new Leave(),
+            new Queue()
         );
 
         try
