@@ -6,7 +6,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import core.GLA;
-import main.Jukebox;
 import music.GuildMusicManager;
 import music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -89,7 +88,7 @@ public class Lyrics extends Command
     private String currentSongQuery(AudioTrack track) throws IOException
     {
 
-        String parsedQuery = URLEncoder.encode(track.getInfo().title, StandardCharsets.UTF_8).replaceAll("%23", "#");
+        String parsedQuery = URLEncoder.encode(track.getInfo().title.toLowerCase().replaceAll("[(\\[].*?[)\\]]",""), StandardCharsets.UTF_8).replaceAll("%23", "#");
         String fullURL = "https://metadata-filter.vercel.app/api/youtube?track=" + parsedQuery;
 
         URL jsonURL = new URL(fullURL);
