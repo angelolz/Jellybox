@@ -49,6 +49,7 @@ public class Play extends Command
                 commandEvent.replyFormatted(":loud_sound: | Connecting to **%s**!", userVoiceState.getChannel().getName());
 
                 PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).setNotifChannel(commandEvent.getTextChannel());
+                PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getTimer().startTimer();
             }
 
             if(commandEvent.getArgs().isEmpty())
