@@ -31,7 +31,7 @@ public class Lyrics extends Command
         this.name = "lyrics";
         this.help = "Returns lyrics for any song";
         this.cooldown = 3;
-        this.arguments = "!lyrics <song-name> - Returns <song-name>'s lyrics";
+        this.arguments = "!lyrics <song-name> - Returns <song-name>'s lyrics\n!lyrics - Returns current song's lyrics";
 
         // Set up for Genius Lyrics API
         try
