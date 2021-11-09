@@ -65,7 +65,7 @@ public class Play extends Command
                     if(player.getPlayingTrack() != null)
                     {
                         commandEvent.reply(":x: | There's already a song playing! If you want to add a song to the queue, " +
-                            "please give me a search query or URL!");
+                                "please give me a search query or URL!");
                     }
 
                     else if(queue.isEmpty())
@@ -81,11 +81,13 @@ public class Play extends Command
 
             else
             {
-                if(!URLUtils.isURI(commandEvent.getArgs()))
-                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), "ytsearch: " + commandEvent.getArgs());
-
+                String query;
+                if (commandEvent.getArgs().charAt(0) == '<' && commandEvent.getArgs().endsWith(">"))
+                    query = commandEvent.getArgs().substring(1, commandEvent.getArgs().length() - 1);
                 else
-                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), commandEvent.getArgs());
+                    query = commandEvent.getArgs();
+
+                PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), query);
 
                 if(player.isPaused())
                     commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, then type `!p` or `!play`!");

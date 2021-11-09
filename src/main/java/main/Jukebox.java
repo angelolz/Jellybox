@@ -1,9 +1,13 @@
 package main;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.SpotifyHttpManager;
 import com.zaxxer.hikari.HikariDataSource;
 import commands.*;
+import listeners.ScheduledTasks;
 import listeners.ButtonListener;
+
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -29,6 +33,9 @@ public class Jukebox
     //mysql database (might need it?)
     private static HikariDataSource ds;
 
+    //apis
+    private static SpotifyApi spotifyApi;
+
     public static void main(String[] args) throws IOException, IllegalArgumentException
     {
         //logger
@@ -42,6 +49,9 @@ public class Jukebox
         String token = prop.getProperty("bot_token");
         String ownerId = prop.getProperty("angel_id");
         String[] coOwnerIds = new String[] {prop.getProperty("andrew_id"), prop.getProperty("daniel_id")};
+
+        String spClientId = prop.getProperty("spotify_client_id");
+        String spClientSecret = prop.getProperty("spotify_client_secret");
 
         //create builder for adding commands and listeners
         CommandClientBuilder client = new CommandClientBuilder();
@@ -73,12 +83,22 @@ public class Jukebox
             //start tracking uptime
             uptime = System.currentTimeMillis();
 
+            //build spotify api
+            spotifyApi = new SpotifyApi.Builder()
+                    .setClientId(spClientId)
+                    .setClientSecret(spClientSecret)
+                    .build();
+            logger.info("Finished loading Spotify API.");
+
             //start building bot
             JDABuilder.createDefault(token)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.listening("loading!! | !help"))
                 .addEventListeners(client.build(), new ButtonListener())
                 .build();
+
+            //run scheduled tasks
+            ScheduledTasks.init();
         }
 
         catch(LoginException e)
@@ -107,4 +127,6 @@ public class Jukebox
     {
         return uptime;
     }
+
+    public static SpotifyApi getSpotifyApi() { return spotifyApi; }
 }
