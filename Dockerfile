@@ -1,4 +1,4 @@
-FROM openjdk:11
+FROM openjdk:16
 RUN mkdir /opt/jukebox
 COPY target/Jukebox-1.0.jar /opt/jukebox
 COPY config.properties .
