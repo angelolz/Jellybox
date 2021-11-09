@@ -2,10 +2,14 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import music.GuildMusicManager;
 import music.PlayerManager;
 import music.TrackScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
 import structure.MusicTrack;
 import utils.ConvertLong;
 
@@ -13,6 +17,8 @@ import java.util.LinkedList;
 
 public class Queue extends Command
 {
+    private static final int MAX_ITEMS = 10;
+
     public Queue()
     {
         this.name = "queue";
@@ -39,18 +45,29 @@ public class Queue extends Command
         {
             EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
             embed.setTitle("Current Songs in Queue");
-            int trackNumber = 1;
 
-            for(MusicTrack mTrack : queue)
+            int maxPages = queue.size() % MAX_ITEMS == 0 ? queue.size() / MAX_ITEMS : (queue.size() / MAX_ITEMS) + 1;
+            embed.setFooter(String.format("Page 1 of %s | Total Songs in Queue: %s", maxPages, queue.size()));
+
+            int trackNumber = 1;
+            for(int i = 0; i < MAX_ITEMS; i++)
             {
+                MusicTrack track = queue.get(i);
+
                 embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n",
-                        trackNumber, mTrack.getTrack().getInfo().title,
-                        ConvertLong.convertLongToTrackTime(mTrack.getTrack().getDuration()),
-                        mTrack.getRequester().getAsMention()));
+                        trackNumber, track.getTrack().getInfo().title,
+                        ConvertLong.convertLongToTrackTime(track.getTrack().getDuration()),
+                        track.getRequester().getAsMention()));
                 trackNumber++;
             }
 
-            event.reply(embed.build());
+            event.getChannel().sendMessageEmbeds(embed.build()).setActionRow(
+                    Button.secondary("disabled", Emoji.fromUnicode("U+2B05")).asDisabled(),
+                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                            event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
+                    Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
+                            event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+27A1"))
+            ).queue();
         }
 
         else if(args[0].equalsIgnoreCase("remove")) //If user uses "remove" sub-command.
@@ -119,6 +136,85 @@ public class Queue extends Command
         else
         {
             event.reply(":x: | Invalid argument(s), type `!help` to see list of commands!");
+        }
+    }
+
+    public static void getEmbed(ButtonClickEvent event, int pageNum, String guildId)
+    {
+        LinkedList<MusicTrack> queue = PlayerManager.getInstance()
+                .getMusicManager(event.getJDA().getGuildById(guildId)).getScheduler().getQueue();
+        int maxPages = queue.size() % MAX_ITEMS == 0 ? queue.size() / MAX_ITEMS : (queue.size() / MAX_ITEMS) + 1;
+        int currentPage = pageNum;
+
+        if(currentPage < 1)
+        {
+            currentPage = 1;
+        }
+
+        else if(currentPage > maxPages)
+        {
+            currentPage = maxPages;
+        }
+
+        EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
+        embed.setTitle("Current Songs in Queue");
+        int trackNumber = ((currentPage - 1) * MAX_ITEMS) + 1;
+
+        embed.setFooter(String.format("Page %s of %s | Total Songs in Queue: %s", currentPage, maxPages, queue.size()));
+
+        for(int i = (currentPage - 1) * MAX_ITEMS; i < Math.min((currentPage * MAX_ITEMS), queue.size()); i++)
+        {
+            MusicTrack track = queue.get(i);
+            embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n",
+                    trackNumber, track.getTrack().getInfo().title,
+                    ConvertLong.convertLongToTrackTime(track.getTrack().getDuration()),
+                    track.getRequester().getAsMention()));
+            trackNumber++;
+        }
+
+        //button checks
+        if(currentPage == maxPages && maxPages == 1)
+        {
+            event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                    Button.secondary("disabled", Emoji.fromUnicode("U+2B05")).asDisabled(),
+                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                            event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
+                    Button.secondary("disabled", Emoji.fromUnicode("U+27A1")).asDisabled()
+            ).queue();
+        }
+
+        else if(currentPage == 1 && maxPages > 1)
+        {
+            event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                    Button.secondary("disabled", Emoji.fromUnicode("U+2B05")).asDisabled(),
+                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                            event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
+                    Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
+                            event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+27A1"))
+            ).queue();
+        }
+
+        else if(currentPage == maxPages)
+        {
+            event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                    Button.secondary(String.format("%s:pagination:queue:left:%s:%s",
+                            event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+2B05")),
+                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                            event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
+                    Button.secondary("disabled", Emoji.fromUnicode("U+27A1")).asDisabled()
+            ).queue();
+        }
+
+        else
+        {
+            event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                    Button.secondary(String.format("%s:pagination:queue:left:%s:%s",
+                            event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+2B05")),
+                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                            event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
+                    Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
+                            event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+27A1"))
+            ).queue();
         }
     }
 }
