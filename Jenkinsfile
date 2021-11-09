@@ -31,7 +31,6 @@ pipeline
             }
             steps
             {
-                sh 'curl \"https://api.github.com/repos/BoiseState/CS471-F21-Team23/statuses/$GIT_COMMIT\" -H \"Content-Type: application/json\" -u \"shadowbladerx1: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\" -X POST -d "{\\"state\\": \\"pending\\",\\"context\\": \\"continuous-integration/jenkins\\", \\"description\\": \\"Jenkins\\", \\"target_url\\": \\"https://jenkins.testground.dev/job/Team23-Jenkins-Builder-Test/$BUILD_NUMBER/console\\" }\"'
                 echo 'Building..'
                 echo 'Insert maven commands here..'
                 sh 'cp \$SECRET_FILE_ID $WORKSPACE'
@@ -39,33 +38,37 @@ pipeline
             }
         }
 
-        stage('Test')
-        {
-            steps
-            {
-                echo 'Testing..'
-                sh 'mvn clean test'
-            }
-        }
-
         stage('Deploy')
         {
-            steps
+            when
             {
-                echo 'Deploying..'
+                expression
+                {
+                    return env.BRANCH_NAME == 'master'
+                }
             }
-        }
-    }
-
-    post
-    {
-        success
-        {
-            sh 'curl \"https://api.github.com/repos/BoiseState/CS471-F21-Team23/statuses/$GIT_COMMIT\" -H \"Content-Type: application/json\" -u \"shadowbladerx1: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\" -X POST -d "{\\"state\\": \\"success\\",\\"context\\": \\"continuous-integration/jenkins\\", \\"description\\": \\"Jenkins\\", \\"target_url\\": \\"https://jenkins.testground.dev/job/Team23-Jenkins-Builder-Test/$BUILD_NUMBER/console\\" }\"'
-        }
-        failure
-        {
-            sh 'curl \"https://api.github.com/repos/BoiseState/CS471-F21-Team23/statuses/$GIT_COMMIT\" -H \"Content-Type: application/json\" -u \"shadowbladerx1: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\" -X POST -d "{\\"state\\": \\"failure\\",\\"context\\": \\"continuous-integration/jenkins\\", \\"description\\": \\"Jenkins\\", \\"target_url\\": \\"https://jenkins.testground.dev/job/Team23-Jenkins-Builder-Test/$BUILD_NUMBER/console\\" }\"'
+            steps([$class: 'BapSshPromotionPublisherPlugin'])
+            {
+                sshPublisher(
+                    continueOnError: false, failOnError: true,
+                    publishers: [
+                        sshPublisherDesc(
+                            configName: "MacMini",
+                            verbose: true,
+                            transfers: [
+                                sshTransfer(execCommand: 'rm -rf /home/team23/target; rm -rf /home/team23/Dockerfile; rm -rf /home/team23/config.properties'),
+                                sshTransfer(execCommand: 'if docker ps -a | grep jukebox; then docker rm $(docker stop $(docker ps -a -q --filter name="jukebox" --format="{{.ID}}")); fi'),
+                                sshTransfer(execCommand: 'if docker image list | grep jukebox; then docker image rm jukebox:latest; fi'),
+                                sshTransfer(sourceFiles: 'target/Jukebox-1.0.jar'),
+                                sshTransfer(sourceFiles: 'config.properties'),
+                                sshTransfer(sourceFiles: 'Dockerfile'),
+                                sshTransfer(execCommand: 'docker build -t jukebox .'),
+                                sshTransfer(execCommand: 'docker run -d --network host --restart always --name jukebox jukebox:latest')
+                            ]
+                        )
+                    ]
+                )
+            }
         }
     }
 }

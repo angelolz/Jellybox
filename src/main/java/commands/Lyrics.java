@@ -6,6 +6,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import core.GLA;
+import main.Jukebox;
 import music.GuildMusicManager;
 import music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -60,6 +61,7 @@ public class Lyrics extends Command
             if(search.equals("")){
                 search = currentSongQuery(track);
             }
+            Jukebox.getLogger().info(lyricsGetter.search("hello").get(0).getText());
             String[] lyrics = lyricsGetter.search(search).get(0).getText().split("\n");
             formatLyrics(channel, lyrics);
         }
@@ -72,6 +74,8 @@ public class Lyrics extends Command
         {
             MessageChannel channel = event.getChannel();
             channel.sendMessage("There is no song currently playing!\nUse !lyrics <song-name> to search for a specific song.").queue();
+            Jukebox.getLogger().error("Null Pointer");
+            e.printStackTrace();
         }
         catch (RuntimeException e)
         {
