@@ -61,6 +61,7 @@ public class Jukebox
             new Play(),
             new Stop(),
             new Pause(),
+            new Skip(),
             new Lyrics(),
             new NowPlaying(),
             new Leave(),

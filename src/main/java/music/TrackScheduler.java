@@ -82,7 +82,7 @@ public class TrackScheduler extends AudioEventAdapter
         return notifChannel;
     }
 
-    private void nextTrack()
+    public void nextTrack()
     {
         if(queue.peek() != null)
         {
