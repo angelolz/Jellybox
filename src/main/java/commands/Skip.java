@@ -40,7 +40,11 @@ public class Skip extends Command
 
             else
             {
-                scheduler.nextTrack();
+                if(scheduler.getQueue().peek() != null)
+                    scheduler.nextTrack();
+                else
+                    scheduler.getPlayer().stopTrack();
+
                 commandEvent.reply(":next_track: | The track has been skipped.");
             }
         }
