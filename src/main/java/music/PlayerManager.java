@@ -42,13 +42,13 @@ public class PlayerManager
     public GuildMusicManager getMusicManager(Guild guild)
     {
         return musicManagers.computeIfAbsent(guild.getIdLong(),
-            (guildId) -> {
-                final GuildMusicManager guildMusicManager = new GuildMusicManager(playerManager, null, guild.getAudioManager());
+                (guildId) -> {
+                    final GuildMusicManager guildMusicManager = new GuildMusicManager(playerManager, null, guild.getAudioManager());
 
-                guild.getAudioManager().setSendingHandler(guildMusicManager.getHandler());
+                    guild.getAudioManager().setSendingHandler(guildMusicManager.getHandler());
 
-                return guildMusicManager;
-        });
+                    return guildMusicManager;
+                });
     }
 
     public void loadAndPlay(TextChannel channel, User requester, String trackUrl)
@@ -56,86 +56,101 @@ public class PlayerManager
         final GuildMusicManager guildMusicManager = getMusicManager(channel.getGuild());
 
         playerManager.loadItemOrdered(guildMusicManager, trackUrl,
-            new AudioLoadResultHandler()
-            {
-                final EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
-
-                @Override
-                public void trackLoaded(AudioTrack audioTrack)
+                new AudioLoadResultHandler()
                 {
-                    AudioTrackInfo trackInfo = audioTrack.getInfo();
-                    LinkedList<MusicTrack> queue = guildMusicManager.getScheduler().getQueue();
-                    AudioPlayer player = guildMusicManager.getScheduler().getPlayer();
+                    final EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
 
-
-                    if(guildMusicManager.getScheduler().queue(audioTrack, requester))
+                    @Override
+                    public void trackLoaded(AudioTrack audioTrack)
                     {
-                        embed.setTitle("Added to Queue!");
-                        embed.addField("Artist", trackInfo.author, true);
-                        embed.addField("Title", trackInfo.title, true);
-                        embed.addField("Length",  ConvertLong.convertLongToTrackTime(trackInfo.length), true);
+                        AudioTrackInfo trackInfo = audioTrack.getInfo();
+                        LinkedList<MusicTrack> queue = guildMusicManager.getScheduler().getQueue();
+                        AudioPlayer player = guildMusicManager.getScheduler().getPlayer();
 
-                        embed.addField("Requested by:", requester.getAsMention(), true);
-                        embed.addField("Position in queue", String.valueOf(queue.size()), true);
 
-                        //calculate time left before song plays
-                        long totalQueueLength = 0;
-                        totalQueueLength += player.getPlayingTrack().getPosition();
-                        for(MusicTrack track : queue)
+                        if(guildMusicManager.getScheduler().queue(audioTrack, requester))
                         {
-                            totalQueueLength += track.getTrack().getDuration();
+                            embed.setTitle("Added to Queue!");
+                            embed.addField("Artist", trackInfo.author, true);
+                            embed.addField("Title", trackInfo.title, true);
+                            embed.addField("Length",  ConvertLong.convertLongToTrackTime(trackInfo.length), true);
+
+                            embed.addField("Requested by:", requester.getAsMention(), true);
+                            embed.addField("Position in queue", String.valueOf(queue.size()), true);
+
+                            //calculate time left before song plays
+                            long totalQueueLength = 0;
+                            totalQueueLength += player.getPlayingTrack().getPosition();
+                            for(MusicTrack track : queue)
+                            {
+                                totalQueueLength += track.getTrack().getDuration();
+                            }
+
+                            embed.addField("Time before song plays", ConvertLong.convertLongToTrackTime(totalQueueLength),true);
                         }
 
-                        embed.addField("Time before song plays", ConvertLong.convertLongToTrackTime(totalQueueLength),true);
-                    }
-
-                    else
-                    {
-                        PlayerManager.getInstance().getMusicManager(channel.getGuild()).setRequester(requester);
-
-                        embed.setTitle("Now Playing");
-                        embed.setDescription(String.format("%s `[%s]` (%s)",
-                            trackInfo.title, ConvertLong.convertLongToTrackTime(trackInfo.length), requester.getAsMention()));
-                    }
-
-                    channel.sendMessageEmbeds(embed.build()).queue();
-                }
-
-                @Override
-                public void playlistLoaded(AudioPlaylist audioPlaylist)
-                {
-                    if(audioPlaylist.isSearchResult())
-                       trackLoaded(audioPlaylist.getTracks().get(0));
-
-                    else
-                    {
-                        long playlistDuration = 0;
-                        for(AudioTrack track: audioPlaylist.getTracks())
+                        else
                         {
-                            guildMusicManager.getScheduler().queue(track, requester);
-                            playlistDuration += track.getDuration();
+                            PlayerManager.getInstance().getMusicManager(channel.getGuild()).setRequester(requester);
+
+                            embed.setTitle("Now Playing");
+                            embed.setDescription(String.format("%s `[%s]` (%s)",
+                                    trackInfo.title, ConvertLong.convertLongToTrackTime(trackInfo.length), requester.getAsMention()));
                         }
 
-                        embed.setDescription(String.format(":notes: Added **%d** songs to the queue!", audioPlaylist.getTracks().size()));
-                        embed.addField("Total time added:", ConvertLong.convertLongToTrackTime(playlistDuration), true);
-                        embed.addField("Requested by:", requester.getAsMention(), true);
                         channel.sendMessageEmbeds(embed.build()).queue();
                     }
-                }
 
-                @Override
-                public void noMatches()
-                {
-                    channel.sendMessage(":x: | Sorry, we couldn't find a matching result for your request!").queue();
-                }
+                    @Override
+                    public void playlistLoaded(AudioPlaylist audioPlaylist)
+                    {
+                        if(audioPlaylist.isSearchResult())
+                            trackLoaded(audioPlaylist.getTracks().get(0));
 
-                @Override
-                public void loadFailed(FriendlyException e)
-                {
-                    channel.sendMessage(":x: | There was an error trying to play your song.").queue();
-                    Jukebox.getLogger().error("Error occurred when playing song: {}: {}", e.getClass().getName(), e.getMessage());
-                }
-            });
+                        else
+                        {
+                            long playlistDuration = 0;
+                            int songsAdded = 0;
+                            for(AudioTrack track: audioPlaylist.getTracks())
+                            {
+                                if(songsAdded < 250)
+                                {
+                                    guildMusicManager.getScheduler().queue(track, requester);
+                                    playlistDuration += track.getDuration();
+                                    songsAdded++;
+                                }
+
+                                else
+                                    break;
+                            }
+
+                            embed.setDescription(String.format(":notes: Added **%d** songs to the queue!", songsAdded));
+                            embed.addField("Total time added:", ConvertLong.convertLongToTrackTime(playlistDuration), true);
+                            embed.addField("Requested by:", requester.getAsMention(), true);
+
+                            if(songsAdded <= 250 && audioPlaylist.getTracks().size() > 250)
+                            {
+                                embed.appendDescription("\n\nThe playlist you've added is too large, so I've added only the first **250** songs " +
+                                        "to the queue.");
+                            }
+
+                            channel.sendMessageEmbeds(embed.build()).queue();
+                        }
+                    }
+
+                    @Override
+                    public void noMatches()
+                    {
+                        channel.sendMessage(":x: | Sorry, we couldn't find a matching result for your request!").queue();
+                    }
+
+                    @Override
+                    public void loadFailed(FriendlyException e)
+                    {
+                        channel.sendMessage(":x: | There was an error trying to play your song.").queue();
+                        Jukebox.getLogger().error("Error occurred when playing song: {}: {}", e.getClass().getName(), e.getMessage());
+                    }
+                });
     }
 
     public static PlayerManager getInstance()
