@@ -87,7 +87,10 @@ public class Play extends Command
                 else
                     query = commandEvent.getArgs();
 
-                PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), query);
+                if(URLUtils.isURI(query))
+                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), query);
+                else
+                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), "ytmsearch: " + query);
 
                 if(player.isPaused())
                     commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, then type `!p` or `!play`!");
