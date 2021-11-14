@@ -27,7 +27,7 @@ public class Shuffle extends Command
 
         else if(selfVoiceState.inVoiceChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
             commandEvent.reply(":x: | You need to be in the same voice channel as me for this command to work!");
-            
+
         else{
             TrackScheduler scheduler  = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
 
@@ -37,6 +37,11 @@ public class Shuffle extends Command
             else if(scheduler.getQueue().size() == 1){
                 commandEvent.reply(":x: | There is only one song in the queue!");
             }
+
+            else if(scheduler.getQueue().size() < 1){
+                commandEvent.reply(":x: | There are no songs in the queue to shuffle!");
+            }
+
             else{
                 commandEvent.reply("error");
             }
