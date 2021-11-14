@@ -112,7 +112,15 @@
             <artifactId>spotify-web-api-java</artifactId>
             <version>6.5.4</version>
         </dependency>
+
+        <!-- Caching API -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.0.4</version>
+        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>

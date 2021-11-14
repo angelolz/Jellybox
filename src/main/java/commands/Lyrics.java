@@ -10,8 +10,12 @@ import main.Jukebox;
 import music.GuildMusicManager;
 import music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
 import structure.VideoMetadata;
+import utils.LyricsFetcher;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,38 +36,44 @@ public class Lyrics extends Command
         this.help = "Returns lyrics for any song";
         this.cooldown = 3;
         this.arguments = "!lyrics <song-name> - Returns <song-name>'s lyrics\n!lyrics - Returns current song's lyrics";
-
-        // Set up for Genius Lyrics API
-        try
-        {
-            // Set up for GLA
-            Properties prop = new Properties();
-            FileInputStream propFile = new FileInputStream("config.properties");
-            prop.load(propFile);
-            lyricsGetter = new GLA(prop.getProperty("gla_id"), prop.getProperty("gla_access_token"));
-        }
-        catch (IOException e)
-        {
-            System.out.println("Config file error!");
-        }
     }
     @Override
     protected void execute(CommandEvent event)
     {
-        try{
-            GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getGuild());
-            AudioPlayer player = manager.getScheduler().getPlayer();
-            AudioTrack track = player.getPlayingTrack();
-
+        try
+        {
+            AudioTrack track = PlayerManager.getInstance().getMusicManager(event.getGuild()).getScheduler().getPlayer().getPlayingTrack();
             MessageChannel channel = event.getChannel();
-            String search = event.getArgs();
+            final String search;
+
             channel.sendTyping().queue();
-            if(search.equals("")){
-                search = currentSongQuery(track);
-            }
-            Jukebox.getLogger().info(lyricsGetter.search("hello").get(0).getText());
-            String[] lyrics = lyricsGetter.search(search).get(0).getText().split("\n");
-            formatLyrics(channel, lyrics);
+
+            if(event.getArgs().isEmpty())
+                search = currentSongQuery(track).replaceAll(":", " ");
+            else
+                search = event.getArgs().replaceAll(":", " ");
+
+            Jukebox.getCache().get(search).whenComplete((formattedLyrics, e) -> {
+                if(e == null)
+                {
+                    // Creates the first page
+                    EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5).setTitle("Lyrics Lookup");
+                    embed.setDescription(formattedLyrics.get(0));
+                    if(formattedLyrics.size() == 1)
+                    {
+                        event.reply(embed.build());
+                    }
+                    else
+                    {
+                        channel.sendMessageEmbeds(embed.build()).setActionRow(
+                                Button.secondary("disabled", Emoji.fromUnicode("U+2B05")).asDisabled(),
+                                Button.secondary(String.format("%s:pagination:lyrics:right:%s:%s",
+                                        event.getMember().getId(), 1, search), Emoji.fromUnicode("U+27A1"))
+                        ).queue();
+                    }
+                }
+
+            });
         }
         catch (IndexOutOfBoundsException e)
         {
@@ -91,7 +101,6 @@ public class Lyrics extends Command
 
     private String currentSongQuery(AudioTrack track) throws IOException
     {
-
         String parsedQuery = URLEncoder.encode(track.getInfo().title.toLowerCase().replaceAll("[(\\[].*?[)\\]]",""), StandardCharsets.UTF_8).replaceAll("%23", "#");
         String fullURL = "https://metadata-filter.vercel.app/api/youtube?track=" + parsedQuery;
 
@@ -110,40 +119,39 @@ public class Lyrics extends Command
         return query.getData();
     }
 
-    private void formatLyrics(MessageChannel channel, String[] lyrics)
+    public static void getEmbed(ButtonClickEvent event, int index, String search)
     {
-        EmbedBuilder lyricsChunk = new EmbedBuilder();
-        StringBuilder lyricsChunkDescription = lyricsChunk.getDescriptionBuilder();
-        String currentTitle = "";
-        for(String line: lyrics)
-        {
-            if((lyricsChunk.length() + line.length()) > 3900 || line.equals("")) // Determines when a new embed needs to be made
+        Jukebox.getCache().get(search).whenComplete((formattedLyrics, e) -> {
+            if (e == null)
             {
-                if(lyricsChunkDescription.length() > 0)
-                {
-                    channel.sendMessageEmbeds(lyricsChunk.build()).queue(); // Add embed to a collection
+                EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5).setTitle("Lyrics Lookup");
+                embed.setDescription(formattedLyrics.get(index));
+
+                //button checks
+                if (index == 0 && formattedLyrics.size() > 1) {
+                    event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                            Button.secondary("disabled", Emoji.fromUnicode("U+2B05")).asDisabled(),
+                            Button.secondary(String.format("%s:pagination:lyrics:right:%s:%s",
+                                    event.getMember().getId(), index, search), Emoji.fromUnicode("U+27A1"))
+                    ).queue();
+                } else if (index == formattedLyrics.size() - 1) {
+                    event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                            Button.secondary(String.format("%s:pagination:lyrics:left:%s:%s",
+                                    event.getMember().getId(), index, search), Emoji.fromUnicode("U+2B05")),
+                            Button.secondary("disabled", Emoji.fromUnicode("U+27A1")).asDisabled()
+                    ).queue();
+                } else {
+
+                    event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                            Button.secondary(String.format("%s:pagination:lyrics:left:%s:%s",
+                                    event.getMember().getId(), index, search), Emoji.fromUnicode("U+2B05")),
+                            Button.secondary(String.format("%s:pagination:lyrics:right:%s:%s",
+                                    event.getMember().getId(), index, search), Emoji.fromUnicode("U+27A1"))
+                    ).queue();
                 }
-                lyricsChunk = new EmbedBuilder(); // Creates a new embed
-                lyricsChunkDescription = lyricsChunk.getDescriptionBuilder(); // Gets a reference to the description string builder
-                lyricsChunk.setTitle(currentTitle); // Sets the title to the previous title (in case the block is too long)
             }
-            else // Constructs the embed
-            {
-                // Constructs one embed per lyric block
-                if(line.charAt(0) == '[' && line.charAt(line.length() - 1) == ']')
-                {
-                    currentTitle = line;
-                    lyricsChunk.setTitle(currentTitle);
-                }
-                else
-                {
-                    lyricsChunkDescription.append(line).append("\n");
-                }
-            }
-        }
-        if(lyricsChunk.isValidLength())
-        {
-            channel.sendMessageEmbeds(lyricsChunk.build()).queue();
-        }
+        });
+
+        Jukebox.getLogger().info(String.valueOf(Jukebox.getCache().synchronous().stats().missCount()));
     }
 }
