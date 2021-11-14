@@ -33,6 +33,7 @@ public class Shuffle extends Command
 
             if(scheduler.getQueue().size() > 1){
                 Collections.shuffle(scheduler.getQueue());
+                commandEvent.reply(":white_check_mark: | The queue has been shuffled.");
             }
             else if(scheduler.getQueue().size() == 1){
                 commandEvent.reply(":x: | There is only one song in the queue!");
@@ -41,9 +42,8 @@ public class Shuffle extends Command
             else if(scheduler.getQueue().size() < 1){
                 commandEvent.reply(":x: | There are no songs in the queue to shuffle!");
             }
-
             else{
-                commandEvent.reply("error");
+                commandEvent.reply(":x: | An unknown error has occured!");
             }
         }
     }
