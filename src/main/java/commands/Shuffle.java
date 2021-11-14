@@ -27,17 +27,17 @@ public class Shuffle extends Command
 
         else if(selfVoiceState.inVoiceChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
             commandEvent.reply(":x: | You need to be in the same voice channel as me for this command to work!");
-
-        else
-        {
+            
+        else{
             TrackScheduler scheduler  = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
 
-            if(scheduler.getQueue().size() > 1)
-            {
+            if(scheduler.getQueue().size() > 1){
                 Collections.shuffle(scheduler.getQueue());
             }
-            else
-            {
+            else if(scheduler.getQueue().size() == 1){
+                commandEvent.reply(":x: | There is only one song in the queue!");
+            }
+            else{
                 commandEvent.reply("error");
             }
         }
