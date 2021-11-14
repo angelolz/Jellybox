@@ -133,7 +133,32 @@ public class Queue extends Command
                 event.reply(":x: | You need to provide a track number and what position you want to move it to!");
             }
         }
+        else if(args[0].equalsIgnoreCase("next"))
+        {
+            if(args.length == 2)
+            {
+                try
+                {
+                    MusicTrack track = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1); //Save the track to be moved.
+                    scheduler.getQueue().remove(Integer.parseInt(args[1]) - 1); //Remove track from original position.
+                    scheduler.getQueue().add(0, track); //Move track to front of queue
 
+                    event.reply(String.format(":white_check_mark: | Moved **%s** to next song", track.getTrack().getInfo().title));
+                }
+                catch(IndexOutOfBoundsException e)
+                {
+                    event.reply(":x: | That track number!");
+                }
+                catch(NumberFormatException e)
+                {
+                    event.reply(":x: | You've entered an invalid number!");
+                }
+            }
+            else
+            {
+                event.reply(":x: | You need to provide the track number that you want played next!");
+            }      
+        }
         else
         {
             event.reply(":x: | Invalid argument(s), type `!help` to see list of commands!");
