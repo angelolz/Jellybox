@@ -12,7 +12,7 @@ public class Skip extends Command
     public Skip()
     {
         this.name = "skip";
-        this.help = "Skips the currently playing song (if any).";
+        this.help = "Skips the current track.";
         this.cooldown = 3;
     }
     @Override

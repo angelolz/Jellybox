@@ -11,7 +11,7 @@ public class Pause extends Command
     public Pause()
     {
         this.name = "pause";
-        this.help = "Pauses the currently playing song at its position";
+        this.help = "Pauses the current track.";
         this.cooldown = 3;
     }
 

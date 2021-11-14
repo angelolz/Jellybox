@@ -23,8 +23,8 @@ public class Queue extends Command
     public Queue()
     {
         this.name = "queue";
-        this.help = "`!queue`, `!queue`: Returns list of song in the queue";
         this.aliases = new String[] {"q"};
+        this.help = "Returns all the tracks that are in the queue.";
         this.cooldown = 3;
     }
 

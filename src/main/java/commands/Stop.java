@@ -13,7 +13,7 @@ public class Stop extends Command
     public Stop()
     {
         this.name = "stop";
-        this.help = "Stops any currently playing song.";
+        this.help = "Stops any current track.";
         this.cooldown = 3;
     }
 

@@ -33,7 +33,8 @@ public class Lyrics extends Command
     public Lyrics()
     {
         this.name = "lyrics";
-        this.help = "Returns lyrics for any song";
+        this.arguments = "[query]";
+        this.help = "Returns lyrics for a track.";
         this.cooldown = 3;
         this.arguments = "!lyrics <song-name> - Returns <song-name>'s lyrics\n!lyrics - Returns current song's lyrics";
     }

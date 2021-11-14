@@ -11,7 +11,7 @@ public class Join extends Command
     public Join()
     {
         this.name = "join";
-        this.help = "Join the same voice channel as you.";
+        this.help = "Joins the same voice channel as you.";
         this.cooldown = 3;
     }
 

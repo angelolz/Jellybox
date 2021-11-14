@@ -16,6 +16,7 @@ public class Play extends Command
     {
         this.name = "play";
         this.aliases = new String[] {"p"};
+        this.arguments = "[url or query]";
         this.help = "Plays a song from a URL or search query.";
         this.cooldown = 3;
     }

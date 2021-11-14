@@ -17,6 +17,7 @@ public class NowPlaying extends Command
     {
         this.name = "nowplaying";
         this.aliases = new String[] {"np"};
+        this.help = "Displays info about the current playing song.";
         this.cooldown = 3;
     }
 
