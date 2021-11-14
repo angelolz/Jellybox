@@ -91,6 +91,7 @@ public class Jukebox
             new Stop(),
             new Pause(),
             new Skip(),
+            new Repeat(),
             new Lyrics(),
             new NowPlaying(),
             new Leave(),

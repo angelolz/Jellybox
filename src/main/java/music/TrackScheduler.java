@@ -21,11 +21,13 @@ public class TrackScheduler extends AudioEventAdapter
     private final AudioPlayer player;
     private final LinkedList<MusicTrack> queue;
     private TextChannel notifChannel;
+    private LoopState loopState;
 
     public TrackScheduler(AudioPlayer player)
     {
          this.player = player;
          this.queue = new LinkedList<>();
+         this.loopState = LoopState.DISABLED;
     }
 
     public boolean queue(AudioTrack track, User requester)
@@ -44,7 +46,16 @@ public class TrackScheduler extends AudioEventAdapter
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason)
     {
-        if(endReason.mayStartNext) nextTrack();
+        //TODO remove this once musictrack is gone
+        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(notifChannel.getGuild());
+
+        if(loopState == LoopState.SONG)
+            musicManager.getScheduler().getQueue().addFirst(new MusicTrack(track.makeClone(), musicManager.getRequester()));
+        else if(loopState == LoopState.QUEUE)
+            musicManager.getScheduler().getQueue().addLast(new MusicTrack(track.makeClone(), musicManager.getRequester()));
+
+        if(endReason.mayStartNext)
+            nextTrack();
     }
 
     @Override
@@ -100,5 +111,15 @@ public class TrackScheduler extends AudioEventAdapter
                 nextTrackInfo.title, ConvertLong.convertLongToTrackTime(nextTrackInfo.length), nextTrack.getRequester().getAsMention()));
             notifChannel.sendMessageEmbeds(embed.build()).queue();
         }
+    }
+
+    public void setLoopState(LoopState loopState)
+    {
+        this.loopState = loopState;
+    }
+
+    public LoopState getLoopState()
+    {
+        return loopState;
     }
 }

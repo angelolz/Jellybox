@@ -77,6 +77,7 @@ public class Timeout extends AudioEventAdapter
                 audioManager.closeAudioConnection(); // Disconnect from the channel
                 scheduler.getPlayer().stopTrack(); // Stops the track
                 scheduler.getPlayer().setPaused(false); // Unpauses the player
+                scheduler.setLoopState(LoopState.DISABLED);
                 scheduler.getQueue().clear(); // Clears the queue
 
                 scheduler.getNotifChannel().sendMessage(":zzz: | Leaving due to inactivity.").queue();
