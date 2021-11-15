@@ -1,7 +1,6 @@
 package music.sources.spotify;
 
 import com.google.gson.Gson;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -22,7 +21,8 @@ public class SpotifyAudioTrack extends YoutubeAudioTrack
     private final SpotifyAudioSourceManager sourceManager;
     private String youtubeId;
 
-    public SpotifyAudioTrack(AudioTrackInfo trackInfo, SpotifyAudioSourceManager sourceManager) {
+    public SpotifyAudioTrack(AudioTrackInfo trackInfo, SpotifyAudioSourceManager sourceManager)
+    {
         super(trackInfo, sourceManager.youtubeAudioSourceManager);
         this.sourceManager = sourceManager;
     }
@@ -69,7 +69,7 @@ public class SpotifyAudioTrack extends YoutubeAudioTrack
 
         catch (NoSuchFieldException | IllegalAccessException e)
         {
-            throw new FriendlyException("Failed to look up youtube track", FriendlyException.Severity.SUSPICIOUS, e);
+            throw new FriendlyException("Failed to look up YouTube track!", FriendlyException.Severity.SUSPICIOUS, e);
         }
     }
 

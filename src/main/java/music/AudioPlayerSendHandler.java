@@ -16,7 +16,7 @@ public class AudioPlayerSendHandler implements AudioSendHandler
     public AudioPlayerSendHandler(AudioPlayer audioPlayer)
     {
         this.player = audioPlayer;
-        this.buffer = ByteBuffer.allocate(2048); //if this uses too much cpu resources, feel free to lower down to 1024
+        this.buffer = ByteBuffer.allocate(2048);
         this.frame = new MutableAudioFrame();
         this.frame.setBuffer(buffer);
     }
@@ -27,7 +27,8 @@ public class AudioPlayerSendHandler implements AudioSendHandler
     }
 
     @Override
-    public ByteBuffer provide20MsAudio() {
+    public ByteBuffer provide20MsAudio()
+    {
         Buffer tmp = ((Buffer) buffer).flip();
         return (ByteBuffer) tmp;
     }

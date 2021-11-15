@@ -13,7 +13,7 @@ public class Repeat extends Command
     {
         this.name = "repeat";
         this.aliases = new String[] {"loop"};
-        this.help = "Repeat the currently playing song or current queue.";
+        this.help = "Repeat the currently playing track or current queue.";
         this.cooldown = 3;
     }
 
@@ -24,10 +24,10 @@ public class Repeat extends Command
         TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
         EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
 
-        if(args[0].equalsIgnoreCase("song"))
+        if(args[0].equalsIgnoreCase("track"))
         {
-            scheduler.setLoopState(LoopState.SONG);
-            embed.setDescription(":white_check_mark: I will now repeat the **current playing song**.");
+            scheduler.setLoopState(LoopState.TRACK);
+            embed.setDescription(":white_check_mark: | I will now repeat the **current track**.");
         }
 
         else if(args[0].equalsIgnoreCase("queue"))
@@ -47,14 +47,14 @@ public class Repeat extends Command
             switch (scheduler.getLoopState())
             {
                 case DISABLED -> embed.setDescription("I am not currently **not repeating anything**.");
-                case SONG     -> embed.setDescription("I am repeating the **current playing song**.");
+                case TRACK -> embed.setDescription("I am repeating the **current track**.");
                 case QUEUE    -> embed.setDescription("I am repeating the **current state of the queue**.");
             }
 
             embed.appendDescription("\n\nIf you'd like to change the repeat state, please choose one of the following options:");
-            embed.addField("!repeat song", "Repeats the currently playing song.", false);
+            embed.addField("!repeat track", "Repeats the current track.", false);
             embed.addField("!repeat queue", "Repeats the currently state of the queue. " +
-                    "After a song has played, it will be re-added to the end of the queue.", false);
+                    "After a track has been played, it will be re-added to the end of the queue.", false);
             embed.addField("!repeat off", "Disables the repeat function.", false);
         }
 

@@ -2,7 +2,6 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import music.PlayerManager;
 import music.TrackScheduler;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -22,7 +21,7 @@ public class Skip extends Command
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
 
         if(!selfVoiceState.inVoiceChannel())
-            commandEvent.reply(":x: | I'm not even in a voice channel!");
+            commandEvent.reply(":x: | I'm not in a voice channel!");
 
         else if(!userVoiceState.inVoiceChannel())
             commandEvent.reply(":x: | You need to be in a voice channel to use this command!");
@@ -34,9 +33,7 @@ public class Skip extends Command
         {
             TrackScheduler scheduler  = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
             if(scheduler.getPlayer().getPlayingTrack() == null)
-            {
-                commandEvent.reply(":x: | There's no song playing!");
-            }
+                commandEvent.reply(":x: | There's no track playing!");
 
             else
             {

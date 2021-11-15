@@ -19,7 +19,6 @@ public class Leave extends Command
     @Override
     protected void execute(CommandEvent commandEvent)
     {
-        //this is only here to make code look nicer lol
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
 
         if(!selfVoiceState.inVoiceChannel())
@@ -28,6 +27,7 @@ public class Leave extends Command
         else
         {
             selfVoiceState.getGuild().getAudioManager().closeAudioConnection();
+
             TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
             scheduler.getPlayer().stopTrack();
             scheduler.getQueue().clear();

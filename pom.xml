@@ -44,19 +44,6 @@
             <artifactId>GeniusLyricsAPI</artifactId>
             <version>master</version>
         </dependency>
-        <!-- Mockito -->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-
-        <!-- JUnit -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.8.1</version>
-        </dependency>
         <!-- main JDA lib -->
         <dependency>
             <groupId>net.dv8tion</groupId>
@@ -71,18 +58,6 @@
             <version>1.22.0</version>
             <scope>compile</scope>
             <type>pom</type>
-        </dependency>
-
-        <!-- mysql dependencies -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.26</version>
         </dependency>
 
         <!-- JSON parser -->

@@ -1,9 +1,17 @@
 package structure;
 
-import java.util.List;
-
 public class VideoMetadata
 {
+    static class Data
+    {
+        private String track;
+
+        public String getTrack()
+        {
+            return track;
+        }
+    }
+
     private String status;
     private Data data;
     private String message;
@@ -21,15 +29,5 @@ public class VideoMetadata
     public String getMessage()
     {
         return message;
-    }
-}
-
-class Data
-{
-    private String track;
-
-    public String getTrack()
-    {
-        return track;
     }
 }

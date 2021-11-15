@@ -5,11 +5,11 @@ import commands.Queue;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.util.Locale;
-
-public class ButtonListener extends ListenerAdapter {
+public class ButtonListener extends ListenerAdapter
+{
     @Override
-    public void onButtonClick(ButtonClickEvent event) {
+    public void onButtonClick(ButtonClickEvent event)
+    {
         String[] args = event.getComponentId().split(":");
         if(event.getUser().getId().equals(args[0]))
         {

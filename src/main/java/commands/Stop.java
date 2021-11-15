@@ -2,8 +2,7 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import music.GuildMusicManager;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
@@ -23,7 +22,7 @@ public class Stop extends Command
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
 
         if(!selfVoiceState.inVoiceChannel())
-            commandEvent.reply(":x: | I'm not even in a voice channel!");
+            commandEvent.reply(":x: | I'm not in a voice channel!");
 
         else if(!userVoiceState.inVoiceChannel())
             commandEvent.reply(":x: | You need to be in a voice channel to use this command!");
@@ -33,23 +32,17 @@ public class Stop extends Command
 
         else
         {
-            GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild());
-
-            // add the track back into the queue so that it can be replayed again
-            AudioTrack track = musicManager.getScheduler().getPlayer().getPlayingTrack();
-
-            if(track != null)
+            AudioPlayer player = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer();
+            
+            if(player.getPlayingTrack() != null)
             {
-                musicManager.getScheduler().getQueue().add(0, track.makeClone());
-
-                //stop the track
-                musicManager.getScheduler().getPlayer().stopTrack();
-
+                player.getPlayingTrack().setPosition(0);
+                player.setPaused(true);
                 commandEvent.reply(":stop_button: | The currently playing track has been stopped.");
             }
 
             else
-                commandEvent.reply(":x: | There is no song playing!");
+                commandEvent.reply(":x: | There is no track playing!");
         }
     }
 }

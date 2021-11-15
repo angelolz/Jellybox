@@ -11,10 +11,10 @@ import java.util.TimerTask;
 
 public class Timeout extends AudioEventAdapter
 {
-    private AudioManager audioManager;
-    private TrackScheduler scheduler;
-    private Timer countdown;
+    private final AudioManager audioManager;
+    private final TrackScheduler scheduler;
     private final long DELAY;
+    private Timer countdown;
 
     public Timeout(AudioManager audioManager, TrackScheduler scheduler)
     {
@@ -75,10 +75,11 @@ public class Timeout extends AudioEventAdapter
             {
                 // Disconnect if its not playing anything
                 audioManager.closeAudioConnection(); // Disconnect from the channel
+
                 scheduler.getPlayer().stopTrack(); // Stops the track
                 scheduler.getPlayer().setPaused(false); // Unpauses the player
-                scheduler.setLoopState(LoopState.DISABLED);
                 scheduler.getQueue().clear(); // Clears the queue
+                scheduler.setLoopState(LoopState.DISABLED);
 
                 scheduler.getNotifChannel().sendMessage(":zzz: | Leaving due to inactivity.").queue();
             }

@@ -48,7 +48,7 @@ public class TrackScheduler extends AudioEventAdapter
     {
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(notifChannel.getGuild());
 
-        if(loopState == LoopState.SONG)
+        if(loopState == LoopState.TRACK)
             musicManager.getScheduler().getQueue().addFirst(track.makeClone());
         else if(loopState == LoopState.QUEUE)
             musicManager.getScheduler().getQueue().addLast(track.makeClone());
@@ -63,12 +63,12 @@ public class TrackScheduler extends AudioEventAdapter
         EmbedBuilder embed = new EmbedBuilder().setColor(Color.red);
         embed.setTitle("Error!");
         embed.setDescription(":x: Couldn't play track!");
-        embed.addField("Song", track.getInfo().title, false);
+        embed.addField("Track", track.getInfo().title, false);
 
         embed.addField("Requested By", track.getUserData(User.class).getAsMention(), false);
 
         notifChannel.sendMessageEmbeds(embed.build()).queue();
-        Jukebox.getLogger().error("Error occurred when playing song: {}: {}", e.getClass().getName(), e.getMessage());
+        Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
     }
 
     public AudioPlayer getPlayer()

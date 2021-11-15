@@ -76,7 +76,7 @@ public class PlayerManager
                             embed.addField("Requested by:", requester.getAsMention(), true);
                             embed.addField("Position in queue", String.valueOf(queue.size()), true);
 
-                            //calculate time left before song plays
+                            //calculate time left before track plays
                             long totalQueueLength = 0;
                             totalQueueLength += player.getPlayingTrack().getPosition();
                             for(AudioTrack track : queue)
@@ -84,7 +84,7 @@ public class PlayerManager
                                 totalQueueLength += track.getDuration();
                             }
 
-                            embed.addField("Time before song plays", ConvertLong.convertLongToTrackTime(totalQueueLength),true);
+                            embed.addField("Time before track plays", ConvertLong.convertLongToTrackTime(totalQueueLength),true);
                         }
 
                         else
@@ -106,27 +106,27 @@ public class PlayerManager
                         else
                         {
                             long playlistDuration = 0;
-                            int songsAdded = 0;
+                            int tracksAdded = 0;
                             for(AudioTrack track: audioPlaylist.getTracks())
                             {
-                                if(songsAdded < 250)
+                                if(tracksAdded < 250)
                                 {
                                     guildMusicManager.getScheduler().queue(track, requester);
                                     playlistDuration += track.getDuration();
-                                    songsAdded++;
+                                    tracksAdded++;
                                 }
 
                                 else
                                     break;
                             }
 
-                            embed.setDescription(String.format(":notes: Added **%d** songs to the queue!", songsAdded));
+                            embed.setDescription(String.format(":notes: Added **%d** tracks to the queue!", tracksAdded));
                             embed.addField("Total time added:", ConvertLong.convertLongToTrackTime(playlistDuration), true);
                             embed.addField("Requested by:", requester.getAsMention(), true);
 
-                            if(songsAdded <= 250 && audioPlaylist.getTracks().size() > 250)
+                            if(tracksAdded <= 250 && audioPlaylist.getTracks().size() > 250)
                             {
-                                embed.appendDescription("\n\nThe playlist you've added is too large, so I've added only the first **250** songs " +
+                                embed.appendDescription("\n\nThe playlist you've added is too large, so I've added only the first **250** tracks " +
                                         "to the queue.");
                             }
 
@@ -143,8 +143,8 @@ public class PlayerManager
                     @Override
                     public void loadFailed(FriendlyException e)
                     {
-                        channel.sendMessage(":x: | There was an error trying to play your song.").queue();
-                        Jukebox.getLogger().error("Error occurred when playing song: {}: {}", e.getClass().getName(), e.getMessage());
+                        channel.sendMessage(":x: | There was an error trying to play your track.").queue();
+                        Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
                     }
                 });
     }

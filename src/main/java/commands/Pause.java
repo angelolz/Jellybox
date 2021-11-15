@@ -22,7 +22,7 @@ public class Pause extends Command
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
 
         if(!selfVoiceState.inVoiceChannel())
-            commandEvent.reply(":x: | I'm not even in a voice channel!");
+            commandEvent.reply(":x: | I'm not in a voice channel!");
 
         else if(!userVoiceState.inVoiceChannel())
             commandEvent.reply(":x: | You need to be in a voice channel to use this command!");

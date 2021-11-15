@@ -4,8 +4,6 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.wrapper.spotify.SpotifyApi;
-import com.wrapper.spotify.SpotifyHttpManager;
-import com.zaxxer.hikari.HikariDataSource;
 import commands.*;
 import core.GLA;
 import listeners.ScheduledTasks;
@@ -19,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import utils.LyricsFetcher;
 
 import javax.security.auth.login.LoginException;
-import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -35,9 +32,6 @@ public class Jukebox
 
     //logger
     private static Logger logger;
-
-    //mysql database (might need it?)
-    private static HikariDataSource ds;
 
     //apis
     private static SpotifyApi spotifyApi;
@@ -92,6 +86,7 @@ public class Jukebox
             new Pause(),
             new Skip(),
             new Repeat(),
+            new Shuffle(),
             new Lyrics(),
             new NowPlaying(),
             new Leave(),

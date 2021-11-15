@@ -72,7 +72,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
 
         catch(Exception e)
         {
-            throw new FriendlyException("Unable to load Spotify item", FriendlyException.Severity.SUSPICIOUS, e);
+            throw new FriendlyException("Unable to load Spotify item!", FriendlyException.Severity.SUSPICIOUS, e);
         }
     }
 
@@ -114,7 +114,6 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
 
     private AudioItem getSpotifyPlaylist(String id)
     {
-
         try
         {
             int totalItems, itemsProcessed;
@@ -145,9 +144,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
             }
 
             if (playlist.isEmpty())
-            {
-                throw new FriendlyException("This playlist does not contain playable tracks (podcasts cannot be played)", FriendlyException.Severity.COMMON, null);
-            }
+                throw new FriendlyException("This playlist does not contain playable tracks (podcasts cannot be played)!", FriendlyException.Severity.COMMON, null);
 
             //TODO might need name
             return new BasicAudioPlaylist("", playlist, null, false);

@@ -17,7 +17,7 @@ public class NowPlaying extends Command
     {
         this.name = "nowplaying";
         this.aliases = new String[] {"np"};
-        this.help = "Displays info about the current playing song.";
+        this.help = "Displays info about the current playing track.";
         this.cooldown = 3;
     }
 
@@ -29,7 +29,7 @@ public class NowPlaying extends Command
         AudioTrack track = player.getPlayingTrack();
 
         if(track == null)
-            commandEvent.reply(":x: | There is no song playing!");
+            commandEvent.reply(":x: | There is no track playing!");
 
         else
         {
@@ -47,9 +47,9 @@ public class NowPlaying extends Command
             AudioTrack nextTrack = manager.getScheduler().getQueue().peek();
 
             if(nextTrack != null)
-                embed.addField("Next Song",nextTrack.getInfo().title, true);
+                embed.addField("Next Track",nextTrack.getInfo().title, true);
             else
-                embed.addField("Next Song", "*None*", true);
+                embed.addField("Next Track", "*None*", true);
 
             commandEvent.reply(embed.build());
         }

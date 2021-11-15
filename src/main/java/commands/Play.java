@@ -17,7 +17,7 @@ public class Play extends Command
         this.name = "play";
         this.aliases = new String[] {"p"};
         this.arguments = "[url or query]";
-        this.help = "Plays a song from a URL or search query.";
+        this.help = "Plays a track from a URL or search query.";
         this.cooldown = 3;
     }
 
@@ -65,7 +65,7 @@ public class Play extends Command
                 {
                     if(player.getPlayingTrack() != null)
                     {
-                        commandEvent.reply(":x: | There's already a song playing! If you want to add a song to the queue, " +
+                        commandEvent.reply(":x: | There's already a track playing! If you want to add a track to the queue, " +
                                 "please give me a search query or URL!");
                     }
 
