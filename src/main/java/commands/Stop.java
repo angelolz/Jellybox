@@ -6,7 +6,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import music.GuildMusicManager;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import structure.MusicTrack;
 
 public class Stop extends Command
 {
@@ -38,11 +37,10 @@ public class Stop extends Command
 
             // add the track back into the queue so that it can be replayed again
             AudioTrack track = musicManager.getScheduler().getPlayer().getPlayingTrack();
-            MusicTrack lastRequestTrack = new MusicTrack(track.makeClone(), musicManager.getRequester());
 
             if(track != null)
             {
-                musicManager.getScheduler().getQueue().add(0, lastRequestTrack);
+                musicManager.getScheduler().getQueue().add(0, track.makeClone());
 
                 //stop the track
                 musicManager.getScheduler().getPlayer().stopTrack();

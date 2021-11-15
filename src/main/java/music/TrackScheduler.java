@@ -10,7 +10,6 @@ import main.Jukebox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import structure.MusicTrack;
 import utils.ConvertLong;
 
 import java.awt.*;
@@ -19,7 +18,7 @@ import java.util.LinkedList;
 public class TrackScheduler extends AudioEventAdapter
 {
     private final AudioPlayer player;
-    private final LinkedList<MusicTrack> queue;
+    private final LinkedList<AudioTrack> queue;
     private TextChannel notifChannel;
     private LoopState loopState;
 
@@ -32,10 +31,11 @@ public class TrackScheduler extends AudioEventAdapter
 
     public boolean queue(AudioTrack track, User requester)
     {
+        track.setUserData(requester);
+
         if(!this.player.startTrack(track, true))
         {
-            MusicTrack requestTrack = new MusicTrack(track, requester);
-            queue.offer(requestTrack);
+            queue.offer(track);
             return true;
         }
 
@@ -46,13 +46,12 @@ public class TrackScheduler extends AudioEventAdapter
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason)
     {
-        //TODO remove this once musictrack is gone
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(notifChannel.getGuild());
 
         if(loopState == LoopState.SONG)
-            musicManager.getScheduler().getQueue().addFirst(new MusicTrack(track.makeClone(), musicManager.getRequester()));
+            musicManager.getScheduler().getQueue().addFirst(track.makeClone());
         else if(loopState == LoopState.QUEUE)
-            musicManager.getScheduler().getQueue().addLast(new MusicTrack(track.makeClone(), musicManager.getRequester()));
+            musicManager.getScheduler().getQueue().addLast(track.makeClone());
 
         if(endReason.mayStartNext)
             nextTrack();
@@ -66,8 +65,7 @@ public class TrackScheduler extends AudioEventAdapter
         embed.setDescription(":x: Couldn't play track!");
         embed.addField("Song", track.getInfo().title, false);
 
-        //TODO use this code when MusicTrack gets removed
-//        embed.addField("Requested By", track.getUserData(User.class).getAsMention(), false);
+        embed.addField("Requested By", track.getUserData(User.class).getAsMention(), false);
 
         notifChannel.sendMessageEmbeds(embed.build()).queue();
         Jukebox.getLogger().error("Error occurred when playing song: {}: {}", e.getClass().getName(), e.getMessage());
@@ -78,7 +76,7 @@ public class TrackScheduler extends AudioEventAdapter
         return player;
     }
 
-    public LinkedList<MusicTrack> getQueue()
+    public LinkedList<AudioTrack> getQueue()
     {
         return queue;
     }
@@ -97,18 +95,15 @@ public class TrackScheduler extends AudioEventAdapter
     {
         if(queue.peek() != null)
         {
-            MusicTrack nextTrack = queue.poll();
-            AudioTrackInfo nextTrackInfo = nextTrack.getTrack().getInfo();
+            AudioTrack nextTrack = queue.poll();
+            AudioTrackInfo nextTrackInfo = nextTrack.getInfo();
 
-            GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(notifChannel.getGuild());
-            musicManager.setRequester(nextTrack.getRequester());
-
-            player.startTrack(nextTrack.getTrack(), false);
+            player.startTrack(nextTrack, false);
 
             EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
             embed.setTitle("Now Playing");
             embed.setDescription(String.format("%s `(%s)` [%s]",
-                nextTrackInfo.title, ConvertLong.convertLongToTrackTime(nextTrackInfo.length), nextTrack.getRequester().getAsMention()));
+                nextTrackInfo.title, ConvertLong.convertLongToTrackTime(nextTrackInfo.length), nextTrack.getUserData(User.class).getAsMention()));
             notifChannel.sendMessageEmbeds(embed.build()).queue();
         }
     }

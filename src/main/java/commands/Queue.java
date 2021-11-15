@@ -8,9 +8,9 @@ import music.PlayerManager;
 import music.TrackScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
-import structure.MusicTrack;
 import utils.ConvertLong;
 
 import java.awt.*;
@@ -33,7 +33,7 @@ public class Queue extends Command
     {
         GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getGuild());
         TrackScheduler scheduler = manager.getScheduler();
-        LinkedList<MusicTrack> queue = manager.getScheduler().getQueue(); //Linked list containing the current queue
+        LinkedList<AudioTrack> queue = manager.getScheduler().getQueue(); //Linked list containing the current queue
 
         String[] args = event.getArgs().split("\\s+"); //Split arguments into array of strings
 
@@ -53,12 +53,12 @@ public class Queue extends Command
             int trackNumber = 1;
             for(int i = 0; i < Math.min(MAX_ITEMS, queue.size()); i++)
             {
-                MusicTrack track = queue.get(i);
+                AudioTrack track = queue.get(i);
 
                 embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n",
-                        trackNumber, track.getTrack().getInfo().title,
-                        ConvertLong.convertLongToTrackTime(track.getTrack().getDuration()),
-                        track.getRequester().getAsMention()));
+                        trackNumber, track.getInfo().title,
+                        ConvertLong.convertLongToTrackTime(track.getDuration()),
+                        track.getUserData(User.class).getAsMention()));
                 trackNumber++;
             }
 
@@ -77,7 +77,7 @@ public class Queue extends Command
             {
                 try
                 {
-                    String trackName = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1).getTrack().getInfo().title;
+                    String trackName = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1).getInfo().title;
                     scheduler.getQueue().remove(Integer.parseInt(args[1]) - 1);
                     event.reply(":wastebasket: | Song removed from queue: " + trackName);
                 }
@@ -110,11 +110,11 @@ public class Queue extends Command
             {
                 try
                 {
-                    MusicTrack track = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1); //Save the track to be moved.
+                    AudioTrack track = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1); //Save the track to be moved.
                     scheduler.getQueue().remove(Integer.parseInt(args[1]) - 1); //Remove track from original position.
                     scheduler.getQueue().add(Integer.parseInt(args[2]) - 1, track); //Move track to new position.
 
-                    event.reply(String.format(":white_check_mark: | Moved **%s** to position **%s**", track.getTrack().getInfo().title, args[2]));
+                    event.reply(String.format(":white_check_mark: | Moved **%s** to position **%s**", track.getInfo().title, args[2]));
                 }
 
                 catch(IndexOutOfBoundsException e)
@@ -139,11 +139,11 @@ public class Queue extends Command
             {
                 try
                 {
-                    MusicTrack track = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1); //Save the track to be moved.
+                    AudioTrack track = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1); //Save the track to be moved.
                     scheduler.getQueue().remove(Integer.parseInt(args[1]) - 1); //Remove track from original position.
                     scheduler.getQueue().add(0, track); //Move track to front of queue
 
-                    event.reply(String.format(":white_check_mark: | Moved **%s** to next song", track.getTrack().getInfo().title));
+                    event.reply(String.format(":white_check_mark: | Moved **%s** to next song", track.getInfo().title));
                 }
                 catch(IndexOutOfBoundsException e)
                 {
@@ -167,7 +167,7 @@ public class Queue extends Command
 
     public static void getEmbed(ButtonClickEvent event, int pageNum, String guildId)
     {
-        LinkedList<MusicTrack> queue = PlayerManager.getInstance()
+        LinkedList<AudioTrack> queue = PlayerManager.getInstance()
                 .getMusicManager(event.getJDA().getGuildById(guildId)).getScheduler().getQueue();
         int maxPages = queue.size() % MAX_ITEMS == 0 ? queue.size() / MAX_ITEMS : (queue.size() / MAX_ITEMS) + 1;
         int currentPage = pageNum;
@@ -202,11 +202,11 @@ public class Queue extends Command
 
             for(int i = (currentPage - 1) * MAX_ITEMS; i < Math.min((currentPage * MAX_ITEMS), queue.size()); i++)
             {
-                MusicTrack track = queue.get(i);
+                AudioTrack track = queue.get(i);
                 embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n",
-                        trackNumber, track.getTrack().getInfo().title,
-                        ConvertLong.convertLongToTrackTime(track.getTrack().getDuration()),
-                        track.getRequester().getAsMention()));
+                        trackNumber, track.getInfo().title,
+                        ConvertLong.convertLongToTrackTime(track.getDuration()),
+                        track.getUserData(User.class).getAsMention()));
                 trackNumber++;
             }
 

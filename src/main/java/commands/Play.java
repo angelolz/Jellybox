@@ -3,9 +3,9 @@ package commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import structure.MusicTrack;
 import utils.URLUtils;
 
 import java.util.LinkedList;
@@ -33,7 +33,7 @@ public class Play extends Command
         else
         {
             AudioPlayer player = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer();
-            LinkedList<MusicTrack> queue = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getQueue();
+            LinkedList<AudioTrack> queue = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getQueue();
 
             //if bot is in a different channel
             if(selfVoiceState.inVoiceChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
@@ -74,7 +74,7 @@ public class Play extends Command
 
                     else
                     {
-                        player.playTrack(queue.poll().getTrack());
+                        player.playTrack(queue.poll());
                         commandEvent.reply(":arrow_forward: | Resumed playback!");
                     }
                 }

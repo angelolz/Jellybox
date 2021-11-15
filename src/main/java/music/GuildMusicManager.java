@@ -11,15 +11,13 @@ public class GuildMusicManager
     private final TrackScheduler scheduler;
     private final AudioPlayerSendHandler handler;
     private final Timeout timeout;
-    private User currentSongRequester;
     private TextChannel notifChannel;
 
-    public GuildMusicManager(AudioPlayerManager manager, User requester, AudioManager audioManager)
+    public GuildMusicManager(AudioPlayerManager manager, AudioManager audioManager)
     {
         AudioPlayer player = manager.createPlayer();
         this.scheduler = new TrackScheduler(player);
         this.handler = new AudioPlayerSendHandler(player);
-        this.currentSongRequester = requester;
         this.timeout = new Timeout(audioManager, this.scheduler); // Add timeout object for timeout
         player.addListener(scheduler);
         player.addListener(timeout); // Adds listener to timer
@@ -33,16 +31,6 @@ public class GuildMusicManager
     public TrackScheduler getScheduler()
     {
         return scheduler;
-    }
-
-    public User getRequester()
-    {
-        return currentSongRequester;
-    }
-
-    public void setRequester(User requester)
-    {
-        this.currentSongRequester = requester;
     }
 
     public Timeout getTimer(){

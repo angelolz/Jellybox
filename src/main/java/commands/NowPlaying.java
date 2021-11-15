@@ -8,7 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import music.GuildMusicManager;
 import music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import structure.MusicTrack;
+import net.dv8tion.jda.api.entities.User;
 import utils.ConvertLong;
 
 public class NowPlaying extends Command
@@ -42,12 +42,12 @@ public class NowPlaying extends Command
             embed.addField("Length",  String.format("`%s` / `%s`",
                 ConvertLong.convertLongToTrackTime(track.getPosition()),
                 ConvertLong.convertLongToTrackTime(track.getDuration())), true);
-            embed.addField("Requested by", manager.getRequester().getAsMention(), true);
+            embed.addField("Requested by", track.getUserData(User.class).getAsMention(), true);
 
-            MusicTrack nextTrack = manager.getScheduler().getQueue().peek();
+            AudioTrack nextTrack = manager.getScheduler().getQueue().peek();
 
             if(nextTrack != null)
-                embed.addField("Next Song",nextTrack.getTrack().getInfo().title, true);
+                embed.addField("Next Song",nextTrack.getInfo().title, true);
             else
                 embed.addField("Next Song", "*None*", true);
 

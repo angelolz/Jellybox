@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import structure.MusicTrack;
 import utils.ConvertLong;
 
 import java.util.HashMap;
@@ -43,7 +42,7 @@ public class PlayerManager
     {
         return musicManagers.computeIfAbsent(guild.getIdLong(),
                 (guildId) -> {
-                    final GuildMusicManager guildMusicManager = new GuildMusicManager(playerManager, null, guild.getAudioManager());
+                    final GuildMusicManager guildMusicManager = new GuildMusicManager(playerManager, guild.getAudioManager());
 
                     guild.getAudioManager().setSendingHandler(guildMusicManager.getHandler());
 
@@ -64,9 +63,8 @@ public class PlayerManager
                     public void trackLoaded(AudioTrack audioTrack)
                     {
                         AudioTrackInfo trackInfo = audioTrack.getInfo();
-                        LinkedList<MusicTrack> queue = guildMusicManager.getScheduler().getQueue();
+                        LinkedList<AudioTrack> queue = guildMusicManager.getScheduler().getQueue();
                         AudioPlayer player = guildMusicManager.getScheduler().getPlayer();
-
 
                         if(guildMusicManager.getScheduler().queue(audioTrack, requester))
                         {
@@ -81,9 +79,9 @@ public class PlayerManager
                             //calculate time left before song plays
                             long totalQueueLength = 0;
                             totalQueueLength += player.getPlayingTrack().getPosition();
-                            for(MusicTrack track : queue)
+                            for(AudioTrack track : queue)
                             {
-                                totalQueueLength += track.getTrack().getDuration();
+                                totalQueueLength += track.getDuration();
                             }
 
                             embed.addField("Time before song plays", ConvertLong.convertLongToTrackTime(totalQueueLength),true);
@@ -91,8 +89,6 @@ public class PlayerManager
 
                         else
                         {
-                            PlayerManager.getInstance().getMusicManager(channel.getGuild()).setRequester(requester);
-
                             embed.setTitle("Now Playing");
                             embed.setDescription(String.format("%s `[%s]` (%s)",
                                     trackInfo.title, ConvertLong.convertLongToTrackTime(trackInfo.length), requester.getAsMention()));
