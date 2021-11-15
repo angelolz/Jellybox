@@ -69,7 +69,7 @@ public class Lyrics extends Command
                         channel.sendMessageEmbeds(embed.build()).setActionRow(
                                 Button.secondary("disabled", Emoji.fromUnicode("U+2B05")).asDisabled(),
                                 Button.secondary(String.format("%s:pagination:lyrics:right:%s:%s",
-                                        event.getMember().getId(), 1, search), Emoji.fromUnicode("U+27A1"))
+                                        event.getMember().getId(), 0, search), Emoji.fromUnicode("U+27A1"))
                         ).queue();
                     }
                 }
