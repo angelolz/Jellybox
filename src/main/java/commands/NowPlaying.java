@@ -39,9 +39,14 @@ public class NowPlaying extends Command
             embed.setTitle("Now Playing", trackInfo.uri);
             embed.addField("Artist", trackInfo.author, true);
             embed.addField("Title", trackInfo.title, true);
-            embed.addField("Length",  String.format("`%s` / `%s`",
-                ConvertLong.convertLongToTrackTime(track.getPosition()),
-                ConvertLong.convertLongToTrackTime(track.getDuration())), true);
+            if(track.getInfo().isStream)
+                embed.addField("Time Elapsed", String.valueOf(ConvertLong.convertLongToTrackTime(track.getPosition())), true);
+            else
+            {
+                embed.addField("Length",  String.format("`%s` / `%s`",
+                    ConvertLong.convertLongToTrackTime(track.getPosition()),
+                    ConvertLong.convertLongToTrackTime(track.getDuration())), true);
+            }
             embed.addField("Requested by", track.getUserData(User.class).getAsMention(), true);
 
             AudioTrack nextTrack = manager.getScheduler().getQueue().peek();

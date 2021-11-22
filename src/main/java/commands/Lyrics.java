@@ -40,6 +40,12 @@ public class Lyrics extends Command
             MessageChannel channel = event.getChannel();
             final String search;
 
+            if(track.getInfo().isStream)
+            {
+                event.reply(":x: | Searching for lyrics aren't supported for live streams.");
+                return;
+            }
+
             channel.sendTyping().queue();
 
             if(event.getArgs().isEmpty())

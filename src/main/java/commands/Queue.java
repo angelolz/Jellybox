@@ -143,10 +143,18 @@ public class Queue extends Command
                 {
                     AudioTrack track = queue.get(i);
 
-                    embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n",
-                            trackNumber, track.getInfo().title,
-                            ConvertLong.convertLongToTrackTime(track.getDuration()),
-                            track.getUserData(User.class).getAsMention()));
+                    if(!track.getInfo().isStream)
+                    {
+                        embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n", trackNumber, track.getInfo().title,
+                                ConvertLong.convertLongToTrackTime(track.getDuration()), track.getUserData(User.class).getAsMention()));
+                    }
+
+                    else
+                    {
+                        embed.appendDescription(String.format("**%d)** %s (%s)\n\n", trackNumber, track.getInfo().title,
+                                track.getUserData(User.class).getAsMention()));
+                    }
+                    
                     trackNumber++;
                 }
 

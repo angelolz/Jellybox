@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -36,6 +37,7 @@ public class PlayerManager
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
         playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
         playerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager()));
+        playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
     }
 
     public GuildMusicManager getMusicManager(Guild guild)
@@ -71,27 +73,50 @@ public class PlayerManager
                             embed.setTitle("Added to Queue!");
                             embed.addField("Artist", trackInfo.author, true);
                             embed.addField("Title", trackInfo.title, true);
-                            embed.addField("Length",  ConvertLong.convertLongToTrackTime(trackInfo.length), true);
+                            if(!trackInfo.isStream)
+                            {
+                                embed.addField("Length",  ConvertLong.convertLongToTrackTime(trackInfo.length), true);
+                            }
 
                             embed.addField("Requested by:", requester.getAsMention(), true);
                             embed.addField("Position in queue", String.valueOf(queue.size()), true);
 
                             //calculate time left before track plays
                             long totalQueueLength = 0;
-                            totalQueueLength += player.getPlayingTrack().getPosition();
+                            boolean hasStream = false;
+
+                            if(!player.getPlayingTrack().getInfo().isStream)
+                                totalQueueLength += player.getPlayingTrack().getDuration() - player.getPlayingTrack().getPosition();
+                            else
+                                hasStream = true;
+
                             for(AudioTrack track : queue)
                             {
-                                totalQueueLength += track.getDuration();
+                                if(!track.getInfo().isStream)
+                                    totalQueueLength += track.getDuration();
+                                else
+                                    hasStream = true;
                             }
 
-                            embed.addField("Time before track plays", ConvertLong.convertLongToTrackTime(totalQueueLength),true);
+                            if(hasStream)
+                            {
+                                embed.addField("Time before track plays*", ConvertLong.convertLongToTrackTime(totalQueueLength),true);
+                                embed.setFooter("* This does not include the livestreams that are currently playing and/or added in the queue.");
+                            }
+
+                            else
+                            {
+                                embed.addField("Time before track plays", ConvertLong.convertLongToTrackTime(totalQueueLength),true);
+                            }
                         }
 
                         else
                         {
                             embed.setTitle("Now Playing");
-                            embed.setDescription(String.format("%s `[%s]` (%s)",
-                                    trackInfo.title, ConvertLong.convertLongToTrackTime(trackInfo.length), requester.getAsMention()));
+                            if(trackInfo.isStream)
+                                embed.setDescription(String.format("%s (%s)", trackInfo.title, requester.getAsMention()));
+                            else
+                                embed.setDescription(String.format("%s `[%s]` (%s)", trackInfo.title, ConvertLong.convertLongToTrackTime(trackInfo.length), requester.getAsMention()));
                         }
 
                         channel.sendMessageEmbeds(embed.build()).queue();
