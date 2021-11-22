@@ -17,6 +17,7 @@ public class ScheduledTasks
 
     private static void refreshToken()
     {
+        //refresh spotify token
         SpotifyApi api = Jukebox.getSpotifyApi();
         ClientCredentialsRequest clientCredentialsRequest = api.clientCredentials().build();
         try
@@ -30,5 +31,8 @@ public class ScheduledTasks
         {
             Jukebox.getLogger().error("Failed to get new access token: {}", e.toString());
         }
+
+        //refresh twitch token
+        Jukebox.getTwitchApi().updateAccessToken();
     }
 }

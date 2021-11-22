@@ -10,6 +10,7 @@ import music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import utils.ConvertLong;
+import utils.ThumbnailGrabber;
 
 public class NowPlaying extends Command
 {
@@ -48,6 +49,7 @@ public class NowPlaying extends Command
                     ConvertLong.convertLongToTrackTime(track.getDuration())), true);
             }
             embed.addField("Requested by", track.getUserData(User.class).getAsMention(), true);
+            embed.setThumbnail(ThumbnailGrabber.getThumbnail(track));
 
             AudioTrack nextTrack = manager.getScheduler().getQueue().peek();
 

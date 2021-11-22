@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import structure.TwitchApi;
 import utils.LyricsFetcher;
 
 import javax.security.auth.login.LoginException;
@@ -36,6 +37,7 @@ public class Jukebox
     //apis
     private static SpotifyApi spotifyApi;
     private static GLA geniusApi;
+    private static TwitchApi twitchApi;
 
     //Cache
     private static AsyncLoadingCache<String, List<String>> cache; // Cache a list of descriptions
@@ -59,6 +61,9 @@ public class Jukebox
 
         String geniusId = prop.getProperty("gla_id");
         String geniusToken = prop.getProperty("gla_access_token");
+
+        String twitchClientId = prop.getProperty("twitch_client_id");
+        String twitchClientSecret = prop.getProperty("twitch_client_secret");
 
         //create builder for adding commands and listeners
         CommandClientBuilder client = new CommandClientBuilder();
@@ -110,6 +115,11 @@ public class Jukebox
 
             logger.info("Finished loading Spotify API.");
 
+            //build twitch api
+            twitchApi = new TwitchApi(twitchClientId, twitchClientSecret);
+            getTwitchApi().updateAccessToken();
+            logger.info("Finished getting Twitch API refresh token.");
+
             //start building bot
             JDABuilder.createDefault(token)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
@@ -151,6 +161,8 @@ public class Jukebox
     public static SpotifyApi getSpotifyApi() { return spotifyApi; }
 
     public static GLA getGeniusApi() { return geniusApi; }
+
+    public static TwitchApi getTwitchApi() { return twitchApi; }
 
     public static AsyncLoadingCache<String, List<String>> getCache() { return cache; }
 }

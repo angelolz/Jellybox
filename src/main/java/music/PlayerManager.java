@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import utils.ConvertLong;
+import utils.ThumbnailGrabber;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -71,6 +72,7 @@ public class PlayerManager
                         if(guildMusicManager.getScheduler().queue(audioTrack, requester))
                         {
                             embed.setTitle("Added to Queue!");
+                            embed.setThumbnail(ThumbnailGrabber.getThumbnail(audioTrack));
                             embed.addField("Artist", trackInfo.author, true);
                             embed.addField("Title", trackInfo.title, true);
                             if(!trackInfo.isStream)
@@ -113,6 +115,7 @@ public class PlayerManager
                         else
                         {
                             embed.setTitle("Now Playing");
+                            embed.setThumbnail(ThumbnailGrabber.getThumbnail(audioTrack));
                             if(trackInfo.isStream)
                                 embed.setDescription(String.format("%s (%s)", trackInfo.title, requester.getAsMention()));
                             else

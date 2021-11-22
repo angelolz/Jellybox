@@ -1,6 +1,7 @@
 package music.sources.spotify;
 
 import com.google.gson.Gson;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -55,6 +56,12 @@ public class SpotifyAudioTrack extends YoutubeAudioTrack
         }
 
         return youtubeId;
+    }
+
+    @Override
+    public AudioSourceManager getSourceManager()
+    {
+        return this.sourceManager;
     }
 
     private void setIdentifier(String videoId)
