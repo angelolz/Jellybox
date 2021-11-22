@@ -11,12 +11,12 @@ public class LyricsFetcher
         String[] lyrics = Jukebox.getGeniusApi().search(key).get(0).getText().split("\n");
         ArrayList<String> formattedLyrics = new ArrayList<>();
         StringBuilder lyricsChunk = new StringBuilder();
-
+        boolean isSectionOnly = true; // Keeps track if a section name is the only content of a chunk
         for(String line: lyrics)
         {
             if((lyricsChunk.length() + line.length()) > 3900 || line.isEmpty()) //Trigger when the line length is too long or there is a break in the lyrics
             {
-                if(lyricsChunk.length() > 0)
+                if(lyricsChunk.length() > 0 && !isSectionOnly) // A chunk must not only contain a section name
                 {
                     formattedLyrics.add(lyricsChunk.toString());
                 }
@@ -32,13 +32,14 @@ public class LyricsFetcher
                     {
                         formattedLyrics.add(lyricsChunk.toString());
                     }
-
+                    isSectionOnly = true; // Reset the check
                     lyricsChunk = new StringBuilder(); // Create a new string builder to handle the
                     lyricsChunk.append("**").append(line).append("**").append("\n");
                 }
 
                 else
                 {
+                    isSectionOnly = false; // Set the boolean to false since there is more than the section name
                     lyricsChunk.append(line).append("\n");
                 }
             }
