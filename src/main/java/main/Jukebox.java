@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class Jukebox
 {
     //bot setup
-    private static final String prefix = "!";
+    private static final String prefix = "+";
     private static final String version = "1.0";
     private static long uptime;
 
@@ -79,7 +79,7 @@ public class Jukebox
         client.setPrefix(prefix);
         client.setOwnerId(ownerId);
         client.setCoOwnerIds(coOwnerIds[0], coOwnerIds[1]);
-        client.setActivity(Activity.listening("music!"));
+        client.setActivity(Activity.listening("music! | +help"));
 
         //add commands
         client.addCommands(
