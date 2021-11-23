@@ -70,9 +70,9 @@ public class Jukebox
 
         // Initialize cache
         cache = Caffeine.newBuilder()
-                .maximumSize(20)
-                .expireAfterWrite(3, TimeUnit.MINUTES)
-                .buildAsync(LyricsFetcher::get);
+            .maximumSize(20)
+            .expireAfterWrite(3, TimeUnit.MINUTES)
+            .buildAsync(LyricsFetcher::get);
 
         //bot config
         client.useHelpBuilder(false);
@@ -98,6 +98,11 @@ public class Jukebox
             new Queue()
         );
 
+        //admin/hidden commands
+        client.addCommands(
+            new Invite()
+        );
+
         try
         {
             //start tracking uptime
@@ -109,9 +114,9 @@ public class Jukebox
 
             //build spotify api
             spotifyApi = new SpotifyApi.Builder()
-                    .setClientId(spClientId)
-                    .setClientSecret(spClientSecret)
-                    .build();
+                .setClientId(spClientId)
+                .setClientSecret(spClientSecret)
+                .build();
 
             logger.info("Finished loading Spotify API.");
 
