@@ -6,6 +6,10 @@ pipeline
         maven 'Team23 - Maven'
         jdk 'Team23 - OpenJDK'
     }
+    options
+    {
+        disableConcurrentBuilds()
+    }
     stages
     {
         stage('Clean')
