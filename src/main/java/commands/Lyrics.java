@@ -43,16 +43,29 @@ public class Lyrics extends Command
             MessageChannel channel = event.getChannel();
             final String search;
 
-            if(track.getInfo().isStream)
-            {
-                event.reply(":x: | Searching for lyrics aren't supported for live streams.");
-                return;
-            }
-
             channel.sendTyping().queue();
 
             if(event.getArgs().isEmpty())
-                search = currentTrackQuery(track).replaceAll(":", " ");
+            {
+                if(track != null)
+                {
+                    if(track.getInfo().isStream)
+                    {
+                        event.reply(":x: | Searching for lyrics aren't supported for live streams. Please add a query to search for lyrics!");
+                        return;
+                    }
+
+                    else
+                        search = currentTrackQuery(track).replaceAll(":", " ");
+                }
+
+                else
+                {
+                    event.reply(":x: | There is no track currently playing!\nUse !lyrics <track-name> to search for a specific track.");
+                    return;
+                }
+            }
+
             else
                 search = event.getArgs().replaceAll(":", " ");
 
@@ -68,9 +81,7 @@ public class Lyrics extends Command
                     embed.setDescription(formattedLyrics.get(0));
 
                     if(formattedLyrics.size() == 1)
-                    {
                         event.reply(embed.build());
-                    }
 
                     else
                     {
@@ -82,25 +93,31 @@ public class Lyrics extends Command
                     }
                 }
 
+                else
+                {
+                    switch(e.getCause().getClass().getSimpleName())
+                    {
+                        case "IndexOutOfBoundsException":
+                            event.reply(":x: | Couldn't find the lyrics for the requested track!");
+                            break;
+                        case "RuntimeException":
+                            event.reply(":x: | " + e.getMessage());
+                            break;
+                        default:
+                            event.reply(":x: | An error has occurred! Please try again later.");
+                            Jukebox.getLogger().error("{} Error: {}", e.getCause().getClass().getSimpleName(), e.getMessage());
+                            break;
+                    }
+                }
             });
-        }
-
-        catch (IndexOutOfBoundsException e)
-        {
-            event.reply(":x: | Couldn't find the lyrics for the requested track!");
         }
 
         catch (NullPointerException e)
         {
-            event.reply(":x: | There is no track currently playing!\nUse !lyrics <track-name> to search for a specific track.");
+            event.reply(":x: | There is no track currently playing! Use !lyrics <track-name> to search for a specific track.");
         }
 
-        catch (RuntimeException e)
-        {
-            event.reply(":x: | " + e.getMessage());
-        }
-
-        catch(IOException e)
+        catch(Exception e)
         {
             event.reply(":x: | An error has occurred! Please try again later.");
         }
