@@ -14,6 +14,8 @@ public class Leave extends Command
         this.name = "leave";
         this.help = "Leaves the currently joined voice channel.";
         this.cooldown = 3;
+
+        this.category = new Category("Bot");
     }
 
     @Override

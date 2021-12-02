@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
+import org.checkerframework.checker.units.qual.C;
 import structure.VideoMetadata;
 
 import java.io.IOException;
@@ -29,6 +30,8 @@ public class Lyrics extends Command
         this.arguments = "[query]";
         this.help = "Returns lyrics for a track.";
         this.cooldown = 3;
+
+        this.category = new Category("Tools");
     }
 
     @Override

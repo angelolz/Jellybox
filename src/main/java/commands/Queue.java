@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
+import org.checkerframework.checker.units.qual.C;
 import utils.ConvertLong;
 
 import java.awt.*;
@@ -27,6 +28,8 @@ public class Queue extends Command
         this.aliases = new String[] {"q"};
         this.help = "Returns all the tracks that are in the queue.";
         this.cooldown = 3;
+
+        this.category = new Category("Tools");
     }
 
     @Override

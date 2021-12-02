@@ -4,34 +4,42 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import main.Jukebox;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Help extends Command
 {
+
     public Help()
     {
         this.name = "help";
         this.arguments = "[cmd name]";
         this.help = "Shows you a list of the available commands.";
         this.cooldown = 3;
+
+        this.category = new Category("Bot");
     }
 
     @Override
-    protected void execute(CommandEvent commandEvent)
+    protected void execute(CommandEvent event)
     {
-        EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
+        MessageChannel channel = event.getChannel();
 
-        if(!commandEvent.getArgs().isEmpty())
+        if(!event.getArgs().isEmpty())
         {
+            EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
+
             // goes through all command to find a match
-            for(Command command : commandEvent.getClient().getCommands())
+            for(Command command : event.getClient().getCommands())
             {
                 String[] aliases = command.getAliases();
 
-                if(command.getName().equalsIgnoreCase(commandEvent.getArgs()) ||
-                        (aliases != null && Arrays.stream(aliases).anyMatch(a -> a.equalsIgnoreCase(commandEvent.getArgs()))))
+                if(command.getName().equalsIgnoreCase(event.getArgs()) ||
+                        (aliases != null && Arrays.stream(aliases).anyMatch(a -> a.equalsIgnoreCase(event.getArgs()))))
                 {
                     embed.setTitle(String.format("Command Info for `%s%s`", Jukebox.getPrefix(), command.getName()));
                     embed.addField("Arguments", command.getArguments() == null ? "*None*" : command.getArguments(), true);
@@ -72,7 +80,6 @@ public class Help extends Command
                             embed.setDescription(
                                     """
                                     Plays a track given through a URL or search query. If no track is given, the Jukebox will continue playback if paused/stopped.
-
                                     The bot currently **supports** playing from these streaming services:
                                     - YouTube (videos/playlists)
                                     - Soundcloud (tracks only)
@@ -95,7 +102,6 @@ public class Help extends Command
                             embed.setDescription(String.format(
                                     """
                                     Changes the repeat state of the Jukebox.
-
                                     There are three states that the player can be set to:
                                     `%1$srepeat track` - This will continuously loop the current track.
                                     `%1$srepeat queue` - This will continuously loop all the tracks in the queue. After a track is played, it will be readded at the end of the queue.
@@ -115,42 +121,83 @@ public class Help extends Command
                             break;
                     }
 
-                    commandEvent.reply(embed.build());
+                    event.reply(embed.build());
                     return;
                 }
             }
 
             // if unable to find a match, show error message
-            commandEvent.reply(":x: | Sorry, there's no command that matches that name!");
+            event.reply(":x: | Sorry, there's no command that matches that name!");
         }
 
         else
         {
-            embed.setTitle("Jukebox Commands");
-            embed.setColor(0x32CD32);
-            embed.setDescription("Here are a list of commands you can use!");
-            embed.setFooter("Version " + Jukebox.getVersion());
-            embed.setThumbnail(commandEvent.getJDA().getSelfUser().getAvatarUrl());
+            EmbedBuilder embed = new EmbedBuilder()
+                    .setColor(0x409df5);
+            embed.setTitle("Player Controls");
+            getCommands(embed, "player");
 
-            for(Command command : commandEvent.getClient().getCommands())
+            channel.sendMessageEmbeds(embed.build()).setActionRow(
+                    Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).asDisabled().withLabel("Player"),
+                    Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).withLabel("Bot"),
+                    Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).withLabel("Tools")
+            ).queue();
+        }
+    }
+
+    public static void getEmbed(ButtonClickEvent event, String category)
+    {
+        EmbedBuilder embed = new EmbedBuilder()
+                .setColor(0x409df5)
+                .setTitle("Help Menu");
+        switch (category)
+        {
+            case "player":
+                embed.setTitle("Player Controls");
+                getCommands(embed, "player");
+
+                event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                        Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).asDisabled().withLabel("Player"),
+                        Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).withLabel("Bot"),
+                        Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).withLabel("Tools")
+                ).queue();
+                break;
+            case "bot":
+                embed.setTitle("Bot Commands");
+                getCommands(embed, "bot");
+
+                event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                        Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).withLabel("Player"),
+                        Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).asDisabled().withLabel("Bot"),
+                        Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).withLabel("Tools")
+                ).queue();
+                break;
+            case "tool":
+                embed.setTitle("Other Tools");
+                getCommands(embed, "tool");
+                event.deferEdit().setEmbeds(embed.build()).setActionRow(
+                        Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).withLabel("Player"),
+                        Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).withLabel("Bot"),
+                        Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).asDisabled().withLabel("Tools")
+                ).queue();
+                break;
+        }
+    }
+
+    private static void getCommands(EmbedBuilder embed, String category)
+    {
+        for(Command command: Jukebox.getHelpCache().get(category))
+        {
+            String commandName = String.format("%s%s", Jukebox.getPrefix(), command.getName());
+            if(command.getAliases().length > 0)
             {
-                if(!command.isHidden() && !command.isOwnerCommand())
+                String[] aliases = command.getAliases();
+                for (String alias : aliases)
                 {
-                    String commandName = String.format("%s%s", Jukebox.getPrefix(), command.getName());
-                    if(command.getAliases().length > 0)
-                    {
-                        String[] aliases = command.getAliases();
-                        for (String alias : aliases)
-                        {
-                            commandName = commandName.concat("/" + alias);
-                        }
-                    }
-
-                    embed.addField(commandName, command.getHelp(), true);
+                    commandName = commandName.concat("/" + alias);
                 }
             }
-
-            commandEvent.reply(embed.build());
+            embed.addField(commandName, command.getHelp(), true);
         }
     }
 }

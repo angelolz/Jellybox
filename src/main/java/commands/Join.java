@@ -13,6 +13,8 @@ public class Join extends Command
         this.name = "join";
         this.help = "Joins the same voice channel as you.";
         this.cooldown = 3;
+
+        this.category = new Category("Bot");
     }
 
     @Override

@@ -13,6 +13,8 @@ public class Shuffle extends Command
         this.name = "Shuffle";
         this.help = "Shuffles the tracks that are in the queue (if any).";
         this.cooldown = 3;
+
+        this.category = new Category("Player");
     }
 
     @Override

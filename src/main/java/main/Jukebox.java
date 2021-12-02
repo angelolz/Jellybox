@@ -2,6 +2,7 @@ package main;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.wrapper.spotify.SpotifyApi;
 import commands.*;
@@ -20,6 +21,7 @@ import utils.LyricsFetcher;
 import javax.security.auth.login.LoginException;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.Properties;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +43,9 @@ public class Jukebox
 
     //Cache
     private static AsyncLoadingCache<String, List<String>> cache; // Cache a list of descriptions
+
+    // Help
+    private static Hashtable<String, List<Command>> helpCache;
 
     public static void main(String[] args) throws IOException, IllegalArgumentException
     {
@@ -103,6 +108,9 @@ public class Jukebox
             new Invite()
         );
 
+        // help cache
+        helpCache = new Hashtable<>();
+
         try
         {
             //start tracking uptime
@@ -129,11 +137,8 @@ public class Jukebox
             JDABuilder.createDefault(token)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.listening("loading!! | !help"))
-                .addEventListeners(client.build(), new ButtonListener())
+                .addEventListeners(client.build(), new ButtonListener(), new ScheduledTasks(client.build()))
                 .build();
-
-            //run scheduled tasks
-            ScheduledTasks.init();
         }
 
         catch(LoginException e)
@@ -170,4 +175,6 @@ public class Jukebox
     public static TwitchApi getTwitchApi() { return twitchApi; }
 
     public static AsyncLoadingCache<String, List<String>> getCache() { return cache; }
+    public static Hashtable<String, List<Command>> getHelpCache() { return helpCache; }
+
 }

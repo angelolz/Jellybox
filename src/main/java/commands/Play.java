@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import org.checkerframework.checker.units.qual.C;
 import utils.URLUtils;
 
 import java.util.LinkedList;
@@ -19,6 +20,8 @@ public class Play extends Command
         this.arguments = "[url or query]";
         this.help = "Plays a track from a URL or search query.";
         this.cooldown = 3;
+
+        this.category = new Category("Player");
     }
 
     @Override

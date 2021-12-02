@@ -3,6 +3,7 @@ package commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.checkerframework.checker.units.qual.C;
 
 public class Invite extends Command
 {
@@ -11,6 +12,8 @@ public class Invite extends Command
         this.name = "invite";
         this.ownerCommand = true;
         this.hidden = true;
+
+        this.category = new Category("Bot");
     }
 
     @Override

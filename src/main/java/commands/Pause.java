@@ -13,6 +13,8 @@ public class Pause extends Command
         this.name = "pause";
         this.help = "Pauses the current track.";
         this.cooldown = 3;
+
+        this.category = new Category("Player");
     }
 
     @Override

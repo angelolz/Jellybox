@@ -11,6 +11,8 @@ public class Ping extends Command
         this.name = "ping";
         this.help = "Returns the latency of the bot.";
         this.cooldown = 3;
+
+        this.category = new Category("Bot");
     }
 
     @Override

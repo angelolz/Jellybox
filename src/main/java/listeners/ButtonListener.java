@@ -1,9 +1,13 @@
 package listeners;
 
+import commands.Help;
 import commands.Lyrics;
 import commands.Queue;
+import main.Jukebox;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 public class ButtonListener extends ListenerAdapter
 {
@@ -25,9 +29,15 @@ public class ButtonListener extends ListenerAdapter
                     case "lyrics":
                         runLyrics(args, event);
                         break;
+                    case "help":
+                        runHelp(args,event);
                 }
             }
         }
+    }
+
+    private void runHelp(String[] args, ButtonClickEvent event){
+        Help.getEmbed(event, args[3]);
     }
 
     private void runLyrics(String[] args, ButtonClickEvent event)

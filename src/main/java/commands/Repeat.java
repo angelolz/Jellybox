@@ -15,6 +15,8 @@ public class Repeat extends Command
         this.aliases = new String[] {"loop"};
         this.help = "Repeat the currently playing track or current queue.";
         this.cooldown = 3;
+
+        this.category = new Category("Player");
     }
 
     @Override

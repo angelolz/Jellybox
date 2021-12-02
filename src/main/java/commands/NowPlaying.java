@@ -20,6 +20,8 @@ public class NowPlaying extends Command
         this.aliases = new String[] {"np"};
         this.help = "Displays info about the current playing track.";
         this.cooldown = 3;
+
+        this.category = new Category("Tools");
     }
 
     @Override
