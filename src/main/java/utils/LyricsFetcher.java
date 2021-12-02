@@ -14,7 +14,7 @@ public class LyricsFetcher
         boolean isSectionOnly = true; // Keeps track if a section name is the only content of a chunk
         for(String line: lyrics)
         {
-            if((lyricsChunk.length() + line.length()) > 3900 || line.isEmpty()) //Trigger when the line length is too long or there is a break in the lyrics
+            if((lyricsChunk.length() + line.length()) > 1000 || line.isEmpty()) //Trigger when the line length is too long or there is a break in the lyrics
             {
                 if(lyricsChunk.length() > 0 && !isSectionOnly) // A chunk must not only contain a section name
                 {
