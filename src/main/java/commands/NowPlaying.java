@@ -43,6 +43,7 @@ public class NowPlaying extends Command
             embed.setTitle("Now Playing");
             embed.addField("Song", "*None*", true);
             embed.addField("Size of Queue: ", String.valueOf(queue.size()), true);
+            //repeat state is not shown if no song is playing
         }
         
         else
