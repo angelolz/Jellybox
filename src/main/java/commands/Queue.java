@@ -156,9 +156,9 @@ public class Queue extends Command
                     {
 
                         if(trackNumber == 1 && playingTrack != null){//now playing track
-                            embed.appendDescription(String.format("**Now Playing)** %s `[%s]` (%s)\n\n", playingTrack.getInfo().title,
-                                ConvertLong.convertLongToTrackTime(playingTrack.getDuration()), playingTrack.getUserData(User.class).getAsMention()));
-                                i--;
+                            embed.appendDescription(String.format("**Now Playing)** %s `[%s]` (%s)\n\n", playingTrack.getInfo().title, //labeled as now playing
+                            ConvertLong.convertLongToTrackTime(playingTrack.getDuration()), playingTrack.getUserData(User.class).getAsMention()));
+                            i--;
                         }
                         else{
                             embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n", trackNumber, track.getInfo().title,
@@ -169,7 +169,7 @@ public class Queue extends Command
                     else
                     {
                         if(trackNumber == 1 && playingTrack != null){//now playing track
-                            embed.appendDescription(String.format("**Now Playing)** %s (%s)\n\n", playingTrack.getInfo().title,
+                            embed.appendDescription(String.format("**Now Playing)** %s (%s)\n\n", playingTrack.getInfo().title, //labeled as now playing
                                 track.getUserData(User.class).getAsMention()));
                                 i--;
                         }
