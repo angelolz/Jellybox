@@ -1,5 +1,7 @@
 package commands;
 
+import java.util.LinkedList;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -30,6 +32,7 @@ public class NowPlaying extends Command
         GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild());
         AudioPlayer player = manager.getScheduler().getPlayer();
         AudioTrack track = player.getPlayingTrack();
+        LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();
 
         if(track == null)
             commandEvent.reply(":x: | There is no track playing!");
@@ -52,6 +55,7 @@ public class NowPlaying extends Command
             }
             embed.addField("Requested by", track.getUserData(User.class).getAsMention(), true);
             embed.setThumbnail(ThumbnailGrabber.getThumbnail(track));
+            embed.addField("Size of Queue", String.valueOf(queue.size()), true);
 
             AudioTrack nextTrack = manager.getScheduler().getQueue().peek();
 
