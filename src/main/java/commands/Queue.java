@@ -2,7 +2,10 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+
 import main.Jukebox;
 import music.GuildMusicManager;
 import music.PlayerManager;
@@ -141,6 +144,9 @@ public class Queue extends Command
                 int maxPages = queue.size() % MAX_ITEMS == 0 ? queue.size() / MAX_ITEMS : (queue.size() / MAX_ITEMS) + 1;
                 embed.setFooter(String.format("Page 1 of %s | Total Tracks in Queue: %s", maxPages, queue.size()));
 
+                AudioPlayer player = manager.getScheduler().getPlayer();
+                AudioTrack playingTrack = player.getPlayingTrack();
+
                 int trackNumber = 1;
                 for(int i = 0; i < Math.min(MAX_ITEMS, queue.size()); i++)
                 {
@@ -148,14 +154,30 @@ public class Queue extends Command
 
                     if(!track.getInfo().isStream)
                     {
-                        embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n", trackNumber, track.getInfo().title,
+
+                        if(trackNumber == 1 && playingTrack != null){//now playing track
+                            embed.appendDescription(String.format("**Now Playing)** %s `[%s]` (%s)\n\n", playingTrack.getInfo().title,
+                                ConvertLong.convertLongToTrackTime(playingTrack.getDuration()), playingTrack.getUserData(User.class).getAsMention()));
+                                i--;
+                        }
+                        else{
+                            embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n", trackNumber, track.getInfo().title,
                                 ConvertLong.convertLongToTrackTime(track.getDuration()), track.getUserData(User.class).getAsMention()));
+                        }   
                     }
 
                     else
                     {
-                        embed.appendDescription(String.format("**%d)** %s (%s)\n\n", trackNumber, track.getInfo().title,
+                        if(trackNumber == 1 && playingTrack != null){//now playing track
+                            embed.appendDescription(String.format("**Now Playing)** %s (%s)\n\n", playingTrack.getInfo().title,
                                 track.getUserData(User.class).getAsMention()));
+                                i--;
+                        }
+                        else{
+                            embed.appendDescription(String.format("**%d)** %s (%s)\n\n", trackNumber, track.getInfo().title,
+                                track.getUserData(User.class).getAsMention()));
+                        }
+                        
                     }
                     
                     trackNumber++;
