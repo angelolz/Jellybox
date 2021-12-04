@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import music.GuildMusicManager;
 import music.PlayerManager;
+import music.TrackScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import utils.ConvertLong;
@@ -30,6 +31,7 @@ public class NowPlaying extends Command
     protected void execute(CommandEvent commandEvent)
     {
         GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild());
+        TrackScheduler scheduler = manager.getScheduler();
         AudioPlayer player = manager.getScheduler().getPlayer();
         AudioTrack track = player.getPlayingTrack();
         LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();
@@ -56,6 +58,7 @@ public class NowPlaying extends Command
             embed.addField("Requested by", track.getUserData(User.class).getAsMention(), true);
             embed.setThumbnail(ThumbnailGrabber.getThumbnail(track));
             embed.addField("Size of Queue", String.valueOf(queue.size()), true);
+            embed.addField("Repeat State", scheduler.getLoopState().toString(), true);
 
             AudioTrack nextTrack = manager.getScheduler().getQueue().peek();
 
