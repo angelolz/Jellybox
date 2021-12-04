@@ -37,8 +37,14 @@ public class NowPlaying extends Command
         LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();
 
         if(track == null)
-            commandEvent.reply(":x: | There is no track playing!");
+        {
+            EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
 
+            embed.setTitle("Now Playing");
+            embed.addField("Song", "*None*", true);
+            embed.addField("Size of Queue: ", String.valueOf(queue.size()), true);
+        }
+        
         else
         {
             AudioTrackInfo trackInfo = track.getInfo();
