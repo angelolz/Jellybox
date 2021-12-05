@@ -3,11 +3,8 @@ package listeners;
 import commands.Help;
 import commands.Lyrics;
 import commands.Queue;
-import main.Jukebox;
-import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 
 public class ButtonListener extends ListenerAdapter
 {
@@ -19,18 +16,11 @@ public class ButtonListener extends ListenerAdapter
         {
             if(args[1].equalsIgnoreCase("pagination"))
             {
-                switch (args[2].toLowerCase())
+                switch(args[2].toLowerCase())
                 {
-                    //ex: 189690228292845568:pagination:queue:left:2:897901180330590218
-                    case "queue":
-                        runQueue(args, event);
-                        break;
-                    //ex: 189690228292845568:pagination:lyrics:right:1:lose yourself
-                    case "lyrics":
-                        runLyrics(args, event);
-                        break;
-                    case "help":
-                        runHelp(args,event);
+                    case "queue" -> runQueue(args, event);
+                    case "lyrics" -> runLyrics(args, event);
+                    case "help" -> runHelp(args, event);
                 }
             }
         }
@@ -42,29 +32,20 @@ public class ButtonListener extends ListenerAdapter
 
     private void runLyrics(String[] args, ButtonClickEvent event)
     {
-        switch (args[3].toLowerCase())
+        switch(args[3].toLowerCase())
         {
-            case "left":
-                Lyrics.getEmbed(event, Integer.parseInt(args[4])-1, args[5]);
-                break;
-            case "right":
-                Lyrics.getEmbed(event, Integer.parseInt(args[4])+1, args[5]);
-                break;
+            case "left" -> Lyrics.getEmbed(event, Integer.parseInt(args[4]) - 1, args[5]);
+            case "right" -> Lyrics.getEmbed(event, Integer.parseInt(args[4]) + 1, args[5]);
         }
     }
 
     private void runQueue(String[] args, ButtonClickEvent event)
     {
-        switch (args[3].toLowerCase())
+        switch(args[3].toLowerCase())
         {
-            case "left":
-                Queue.getEmbed(event, Integer.parseInt(args[4])-1, args[5]);
-                break;
-            case "right":
-                Queue.getEmbed(event, Integer.parseInt(args[4])+1, args[5]);
-                break;
-            case "refresh":
-                Queue.getEmbed(event, Integer.parseInt(args[4]), args[5]);
+            case "left" -> Queue.getEmbed(event, Integer.parseInt(args[4]) - 1, args[5]);
+            case "right" -> Queue.getEmbed(event, Integer.parseInt(args[4]) + 1, args[5]);
+            case "refresh" -> Queue.getEmbed(event, Integer.parseInt(args[4]), args[5]);
         }
     }
 }

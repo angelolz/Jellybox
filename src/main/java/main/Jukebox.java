@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import structure.TwitchApi;
+import utils.ConvertLong;
 import utils.LyricsFetcher;
 
 import javax.security.auth.login.LoginException;
@@ -163,9 +164,9 @@ public class Jukebox
         return logger;
     }
 
-    public static long getUptime()
+    public static String getUptime()
     {
-        return uptime;
+        return ConvertLong.convertLongToDaysLength(System.currentTimeMillis() - uptime);
     }
 
     public static SpotifyApi getSpotifyApi() { return spotifyApi; }

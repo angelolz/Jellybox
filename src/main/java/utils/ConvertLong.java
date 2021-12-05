@@ -25,25 +25,10 @@ public class ConvertLong
         days = (int) ((ms / (1000*60*60*24)));
 
         if(days > 0)
-        {
-            result.append(String.format("%d days, %d hours, %d minutes, and %d seconds",
-                days, hours, minutes, seconds));
-        }
-
-        else if(hours > 0)
-        {
-            result.append(String.format("%d hours, %d minutes, and %d seconds",
-                hours, minutes, seconds));
-        }
-
-        else if(minutes > 0)
-        {
-            result.append(String.format("%d minutes, and %d seconds",
-                minutes, seconds));
-        }
+            result.append(String.format("%d days, %02d:%02d:%02d", days, hours, minutes, seconds));
 
         else
-            result.append(String.format("%d seconds", seconds));
+            result.append(String.format("%02d:%02d:%02d", hours, minutes, seconds));
 
         return result.toString();
     }

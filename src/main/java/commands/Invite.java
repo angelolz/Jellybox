@@ -3,7 +3,6 @@ package commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
-import org.checkerframework.checker.units.qual.C;
 
 public class Invite extends Command
 {

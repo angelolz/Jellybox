@@ -6,9 +6,9 @@ import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.credentials.ClientCredentials;
 import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import main.Jukebox;
-import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ScheduledTasks extends ListenerAdapter
 {
-    private CommandClient client;
+    private final CommandClient client;
 
     public ScheduledTasks(CommandClient client)
     {
@@ -27,7 +27,7 @@ public class ScheduledTasks extends ListenerAdapter
     }
 
     @Override
-    public void onReady(ReadyEvent event)
+    public void onReady(@NotNull ReadyEvent event)
     {
         //get refresh tokens for spotify and twitch api
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(ScheduledTasks::refreshToken, 0, 1, TimeUnit.HOURS);
@@ -71,17 +71,11 @@ public class ScheduledTasks extends ListenerAdapter
             {
                 if(!command.isHidden() && !command.isOwnerCommand())
                 {
-                    switch (command.getCategory().getName().toLowerCase(Locale.ROOT))
+                    switch(command.getCategory().getName().toLowerCase(Locale.ROOT))
                     {
-                        case "bot":
-                            botCommands.add(command);
-                            break;
-                        case "player":
-                            playerCommands.add(command);
-                            break;
-                        case "tools":
-                            toolCommands.add(command);
-                            break;
+                        case "bot" -> botCommands.add(command);
+                        case "player" -> playerCommands.add(command);
+                        case "tools" -> toolCommands.add(command);
                     }
                 }
             }

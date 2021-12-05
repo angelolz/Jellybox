@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import music.GuildMusicManager;
@@ -32,27 +31,19 @@ public class NowPlaying extends Command
     {
         GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild());
         TrackScheduler scheduler = manager.getScheduler();
-        AudioPlayer player = manager.getScheduler().getPlayer();
-        AudioTrack track = player.getPlayingTrack();
-        LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();
+        AudioTrack track = manager.getScheduler().getPlayer().getPlayingTrack();
 
         if(track == null)
-        {
-            EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
+            commandEvent.reply(":x: | There is no track playing!");
 
-            embed.setTitle("Now Playing");
-            embed.addField("Song", "*None*", true);
-            embed.addField("Size of Queue: ", String.valueOf(queue.size()), true);
-            //repeat state is not shown if no song is playing
-        }
-        
         else
         {
+            LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();
+
             AudioTrackInfo trackInfo = track.getInfo();
             EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
 
             embed.setTitle("Now Playing", trackInfo.uri);
-            embed.addField("Artist", trackInfo.author, true);
             embed.addField("Title", trackInfo.title, true);
             if(track.getInfo().isStream)
                 embed.addField("Time Elapsed", String.valueOf(ConvertLong.convertLongToTrackTime(track.getPosition())), true);

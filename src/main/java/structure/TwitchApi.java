@@ -46,7 +46,6 @@ public class TwitchApi
             Gson gson = new Gson();
             TwitchAuthResponse t = gson.fromJson(response.body(), TwitchAuthResponse.class);
             this.accessToken = t.access_token;
-            System.out.println(t.access_token);
         }
 
         catch(Exception e)
@@ -65,7 +64,6 @@ public class TwitchApi
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println(response.body());
         Gson gson = new Gson();
         TwitchUserResponse t = gson.fromJson(response.body(), TwitchUserResponse.class);
         return t.getProfileUrl();

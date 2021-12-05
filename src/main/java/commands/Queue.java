@@ -2,9 +2,7 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import main.Jukebox;
 import music.GuildMusicManager;
@@ -15,7 +13,6 @@ import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
-import org.checkerframework.checker.units.qual.C;
 import utils.ConvertLong;
 
 import java.awt.*;
@@ -126,7 +123,7 @@ public class Queue extends Command
 
                     catch(IndexOutOfBoundsException e)
                     {
-                        event.reply(":x: | That track number!");
+                        event.reply(":x: | That track number does not exist!");
                     }
 
                     catch(NumberFormatException e)
@@ -144,9 +141,16 @@ public class Queue extends Command
                 int maxPages = queue.size() % MAX_ITEMS == 0 ? queue.size() / MAX_ITEMS : (queue.size() / MAX_ITEMS) + 1;
                 embed.setFooter(String.format("Page 1 of %s | Total Tracks in Queue: %s", maxPages, queue.size()));
 
-                AudioPlayer player = manager.getScheduler().getPlayer();
-                AudioTrack playingTrack = player.getPlayingTrack();
+                AudioTrack playingTrack = manager.getScheduler().getPlayer().getPlayingTrack();
+                if(playingTrack != null)
+                {
+                    embed.addField("Now Playing",
+                        String.format("%s `[%s]` (%s)", playingTrack.getInfo().title, ConvertLong.convertLongToTrackTime(playingTrack.getDuration()),
+                            playingTrack.getUserData(User.class).getAsMention()),
+                        false);
+                }
 
+                StringBuilder queueString = new StringBuilder();
                 int trackNumber = 1;
                 for(int i = 0; i < Math.min(MAX_ITEMS, queue.size()); i++)
                 {
@@ -154,42 +158,19 @@ public class Queue extends Command
 
                     if(!track.getInfo().isStream)
                     {
-
-                        if(trackNumber == 1 && playingTrack != null){//now playing track
-                            embed.appendDescription(String.format("**Now Playing)** %s `[%s]` (%s)\n\n", playingTrack.getInfo().title, //labeled as now playing
-                                ConvertLong.convertLongToTrackTime(playingTrack.getDuration()), playingTrack.getUserData(User.class).getAsMention()));
-                            i--;
-                        }
-                        else if(trackNumber == 1 && playingTrack == null){
-                            embed.appendDescription(String.format("**Now Playing)** None\n\n"));
-                            i--;
-                        }
-                        else{
-                            embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n", trackNumber, track.getInfo().title,
-                                ConvertLong.convertLongToTrackTime(track.getDuration()), track.getUserData(User.class).getAsMention()));
-                        }   
+                        queueString.append(String.format("**%d)** %s `[%s]` (%s)\n\n", trackNumber, track.getInfo().title,
+                            ConvertLong.convertLongToTrackTime(track.getDuration()), track.getUserData(User.class).getAsMention()));
                     }
 
                     else
                     {
-                        if(trackNumber == 1 && playingTrack != null){//now playing track
-                            embed.appendDescription(String.format("**Now Playing)** %s (%s)\n\n", playingTrack.getInfo().title, //labeled as now playing
-                                track.getUserData(User.class).getAsMention()));
-                            i--;
-                        }
-                        else if(trackNumber == 1 && playingTrack == null){
-                            embed.appendDescription(String.format("**Now Playing)** None\n\n"));
-                            i--;
-                        }
-                        else{
-                            embed.appendDescription(String.format("**%d)** %s (%s)\n\n", trackNumber, track.getInfo().title,
-                                track.getUserData(User.class).getAsMention()));
-                        }
-                        
+                        queueString.append(String.format("**%d)** %s (%s)\n\n", trackNumber, track.getInfo().title,
+                            track.getUserData(User.class).getAsMention()));
                     }
-                    
+
                     trackNumber++;
                 }
+                embed.addField("Queue List", queueString.toString(), false);
 
                 if(queue.size() < MAX_ITEMS)
                 {
@@ -217,8 +198,9 @@ public class Queue extends Command
 
     public static void getEmbed(ButtonClickEvent event, int pageNum, String guildId)
     {
-        LinkedList<AudioTrack> queue = PlayerManager.getInstance()
-                .getMusicManager(event.getJDA().getGuildById(guildId)).getScheduler().getQueue();
+        GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getJDA().getGuildById(guildId));
+        LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();
+
         int maxPages = queue.size() % MAX_ITEMS == 0 ? queue.size() / MAX_ITEMS : (queue.size() / MAX_ITEMS) + 1;
         int currentPage = pageNum;
 
@@ -242,19 +224,29 @@ public class Queue extends Command
         else
         {
             embed.setTitle("Current Tracks in Queue");
-            int trackNumber = ((currentPage - 1) * MAX_ITEMS) + 1;
-
             embed.setFooter(String.format("Page %s of %s | Total Tracks in Queue: %s", currentPage, maxPages, queue.size()));
 
+            AudioTrack playingTrack = manager.getScheduler().getPlayer().getPlayingTrack();
+            if(playingTrack != null)
+            {
+                embed.addField("Now Playing",
+                    String.format("%s `[%s]` (%s)", playingTrack.getInfo().title, ConvertLong.convertLongToTrackTime(playingTrack.getDuration()),
+                        playingTrack.getUserData(User.class).getAsMention()),
+                    false);
+            }
+
+            StringBuilder queueString = new StringBuilder();
+            int trackNumber = ((currentPage - 1) * MAX_ITEMS) + 1;
             for(int i = (currentPage - 1) * MAX_ITEMS; i < Math.min((currentPage * MAX_ITEMS), queue.size()); i++)
             {
                 AudioTrack track = queue.get(i);
-                embed.appendDescription(String.format("**%d)** %s `[%s]` (%s)\n\n",
+                queueString.append(String.format("**%d)** %s `[%s]` (%s)\n\n",
                         trackNumber, track.getInfo().title,
                         ConvertLong.convertLongToTrackTime(track.getDuration()),
                         track.getUserData(User.class).getAsMention()));
                 trackNumber++;
             }
+            embed.addField("Queue List", queueString.toString(), false);
 
             //button checks
             if(currentPage == maxPages && maxPages == 1)

@@ -147,9 +147,7 @@ public class Help extends Command
 
     public static void getEmbed(ButtonClickEvent event, String category)
     {
-        EmbedBuilder embed = new EmbedBuilder()
-                .setColor(0x409df5)
-                .setTitle("Help Menu");
+        EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
         switch (category)
         {
             case "player":
@@ -193,11 +191,10 @@ public class Help extends Command
             {
                 String[] aliases = command.getAliases();
                 for (String alias : aliases)
-                {
                     commandName = commandName.concat("/" + alias);
-                }
             }
             embed.addField(commandName, command.getHelp(), true);
         }
+        embed.setFooter(String.format("Version %s | Uptime: %s", Jukebox.getVersion(), Jukebox.getUptime()));
     }
 }

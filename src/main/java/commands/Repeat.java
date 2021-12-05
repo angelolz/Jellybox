@@ -2,6 +2,7 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import main.Jukebox;
 import music.LoopState;
 import music.PlayerManager;
 import music.TrackScheduler;
@@ -54,10 +55,10 @@ public class Repeat extends Command
             }
 
             embed.appendDescription("\n\nIf you'd like to change the repeat state, please choose one of the following options:");
-            embed.addField("!repeat track", "Repeats the current track.", false);
-            embed.addField("!repeat queue", "Repeats the currently state of the queue. " +
+            embed.addField(String.format("%srepeat/loop track", Jukebox.getPrefix()), "Repeats the current track.", false);
+            embed.addField(String.format("%srepeat/loop queue", Jukebox.getPrefix()), "Repeats the currently state of the queue. " +
                     "After a track has been played, it will be re-added to the end of the queue.", false);
-            embed.addField("!repeat off", "Disables the repeat function.", false);
+            embed.addField(String.format("%srepeat/loop off", Jukebox.getPrefix()), "Disables the repeat function.", false);
         }
 
         commandEvent.reply(embed.build());

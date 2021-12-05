@@ -55,19 +55,14 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
 
         try
         {
-            switch(m.group(1).toLowerCase())
+            return switch(m.group(1).toLowerCase())
             {
-                case "track":
-                    return getSpotifyTrack(m.group(2));
-                case "album":
-                    return getSpotifyAlbum(m.group(2));
-                case "playlist":
-                    return getSpotifyPlaylist(m.group(2));
-                case "artist":
-                    return getSpotifyArtist(m.group(2));
-                default:
-                    return null;
-            }
+                case "track" -> getSpotifyTrack(m.group(2));
+                case "album" -> getSpotifyAlbum(m.group(2));
+                case "playlist" -> getSpotifyPlaylist(m.group(2));
+                case "artist" -> getSpotifyArtist(m.group(2));
+                default -> null;
+            };
         }
 
         catch(Exception e)
@@ -159,12 +154,12 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
     private AudioTrack buildTrack(Track track)
     {
         AudioTrackInfo info = new AudioTrackInfo(
-                track.getName(),
-                track.getArtists()[0].getName(),
-                track.getDurationMs(),
-                track.getId(),
-                false,
-                track.getExternalUrls().get("spotify")
+            track.getName(),
+            track.getArtists()[0].getName(),
+            track.getDurationMs(),
+            track.getId(),
+            false,
+            track.getExternalUrls().get("spotify")
         );
 
         return new SpotifyAudioTrack(info, this);
@@ -173,12 +168,12 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
     private AudioTrack buildSimplifiedTrack(TrackSimplified track)
     {
         AudioTrackInfo info = new AudioTrackInfo(
-                track.getName(),
-                track.getArtists()[0].getName(),
-                track.getDurationMs(),
-                track.getId(),
-                false,
-                track.getExternalUrls().get("spotify")
+            track.getName(),
+            track.getArtists()[0].getName(),
+            track.getDurationMs(),
+            track.getId(),
+            false,
+            track.getExternalUrls().get("spotify")
         );
 
         return new SpotifyAudioTrack(info, this);
