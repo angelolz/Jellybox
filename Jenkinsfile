@@ -60,7 +60,7 @@ pipeline
                             configName: "DServer",
                             verbose: true,
                             transfers: [
-                                sshTransfer(execCommand: 'rm -rf /home/dickserv/Desktop/jukebox; rm -rf /home/dickserv/Desktop/jukebox/Dockerfile; rm -rf /home/dickserv/Desktop/jukebox/config.properties'),
+                                sshTransfer(execCommand: 'rm -rf /home/dickserv/Desktop/jukebox/target; rm -rf /home/dickserv/Desktop/jukebox/Dockerfile; rm -rf /home/dickserv/Desktop/jukebox/config.properties'),
                                 sshTransfer(execCommand: 'if docker ps -a | grep jukebox; then docker rm $(docker stop $(docker ps -a -q --filter name="jukebox" --format="{{.ID}}")); fi'),
                                 sshTransfer(execCommand: 'if docker image list | grep jukebox; then docker image rm jukebox:latest; fi'),
                                 sshTransfer(sourceFiles: 'target/Jukebox-1.0.jar'),
