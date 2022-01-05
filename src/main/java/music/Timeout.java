@@ -2,6 +2,7 @@ package music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -18,8 +19,8 @@ public class Timeout extends AudioEventAdapter
 
     public Timeout(AudioManager audioManager, TrackScheduler scheduler)
     {
-        DELAY = 600000; // Sets the delay to 10 minutes
-
+//        DELAY = 600000; // Sets the delay to 10 minutes
+        DELAY = 5000;
         this.audioManager = audioManager;
         this.scheduler = scheduler;
     }
@@ -49,6 +50,11 @@ public class Timeout extends AudioEventAdapter
     public void onPlayerResume(AudioPlayer player)
     {
         cancelTimer();
+    }
+
+    @Override
+    public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
+        startTimer();
     }
 
     public void startTimer()

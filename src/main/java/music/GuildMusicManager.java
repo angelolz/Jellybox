@@ -44,4 +44,10 @@ public class GuildMusicManager
             scheduler.setNotifChannel(notifChannel);
         }
     }
+
+    public void resetNotifChannel()
+    {
+        this.notifChannel = null;
+        scheduler.setNotifChannel(null);
+    }
 }
