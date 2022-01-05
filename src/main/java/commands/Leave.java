@@ -2,9 +2,9 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import music.GuildMusicManager;
 import music.LoopState;
 import music.PlayerManager;
-import music.TrackScheduler;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
 public class Leave extends Command
@@ -30,11 +30,12 @@ public class Leave extends Command
         {
             selfVoiceState.getGuild().getAudioManager().closeAudioConnection();
 
-            TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
-            scheduler.getPlayer().stopTrack();
-            scheduler.getQueue().clear();
-            scheduler.getPlayer().setPaused(false);
-            scheduler.setLoopState(LoopState.DISABLED);
+            GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild());
+            manager.getScheduler().getPlayer().stopTrack();
+            manager.getScheduler().getQueue().clear();
+            manager.getScheduler().getPlayer().setPaused(false);
+            manager.getScheduler().setLoopState(LoopState.DISABLED);
+            manager.resetNotifChannel();
 
             commandEvent.reply(":wave: Goodbye!");
         }

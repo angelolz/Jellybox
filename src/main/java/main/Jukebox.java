@@ -31,7 +31,7 @@ public class Jukebox
 {
     //bot setup
     private static final String prefix = "+";
-    private static final String version = "1.0";
+    private static final String version = "1.0.1";
     private static long uptime;
 
     //logger
