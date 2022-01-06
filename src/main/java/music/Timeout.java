@@ -19,8 +19,7 @@ public class Timeout extends AudioEventAdapter
 
     public Timeout(AudioManager audioManager, TrackScheduler scheduler)
     {
-//        DELAY = 600000; // Sets the delay to 10 minutes
-        DELAY = 5000;
+        DELAY = 600000; // Sets the delay to 10 minutes
         this.audioManager = audioManager;
         this.scheduler = scheduler;
     }
