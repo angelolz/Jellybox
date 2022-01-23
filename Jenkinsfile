@@ -66,7 +66,7 @@ pipeline
                                 sshTransfer(sourceFiles: 'target/Jukebox-1.0.1.jar'),
                                 sshTransfer(sourceFiles: 'config.properties'),
                                 sshTransfer(sourceFiles: 'Dockerfile'),
-                                sshTransfer(execCommand: 'docker build -t jukebox ./Desktop/jukebox'),
+                                sshTransfer(execCommand: 'docker build -t jukebox .'),
                                 sshTransfer(execCommand: 'docker run -d --network host --restart always --name jukebox jukebox:latest')
                             ]
                         )
