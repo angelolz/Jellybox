@@ -57,7 +57,7 @@ pipeline
                     continueOnError: false, failOnError: true,
                     publishers: [
                         sshPublisherDesc(
-                            configName: "DServer",
+                            configName: "HomeServer",
                             verbose: true,
                             transfers: [
                                 sshTransfer(execCommand: 'cd Desktop/Jukebox; if (Test-Path -Path target) {rm -R ./target -ErrorAction SilentlyContinue}'),
@@ -70,6 +70,20 @@ pipeline
                                 sshTransfer(sourceFiles: 'Dockerfile'),
                                 sshTransfer(execCommand: 'cd Desktop/Jukebox; docker build -t jukebox .'),
                                 sshTransfer(execCommand: 'cd Desktop/Jukebox; docker run -d --network host --restart always --name jukebox jukebox:latest')
+                            ]
+                        ),
+                        sshPublisherDesc(
+                            configName: "Oracle",
+                            verbose: true,
+                            transfers: [
+                                sshTransfer(execCommand: 'rm -rf /home/angelolz/jukebox/target; rm -rf /home/angelolz/jukebox/Dockerfile; rm -rf /home/angelolz/jukebox/config.properties'),
+                                sshTransfer(execCommand: 'if docker ps -a | grep jukebox; then docker rm $(docker stop $(docker ps -a -q --filter name="jukebox" --format="{{.ID}}")); fi'),
+                                sshTransfer(execCommand: 'if docker image list | grep jukebox; then docker image rm jukebox:latest; fi'),
+                                sshTransfer(sourceFiles: 'target/Jukebox-1.0.1.jar'),
+                                sshTransfer(sourceFiles: 'config.properties'),
+                                sshTransfer(sourceFiles: 'Dockerfile'),
+                                sshTransfer(execCommand: 'docker build -t jukebox ./Desktop/jukebox'),
+                                sshTransfer(execCommand: 'docker run -d --network host --restart always --name jukebox jukebox:latest')
                             ]
                         )
                     ]
