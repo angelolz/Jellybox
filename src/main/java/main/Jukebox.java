@@ -20,7 +20,6 @@ import structure.TwitchApi;
 import utils.ConvertLong;
 import utils.LyricsFetcher;
 
-import javax.security.auth.login.LoginException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Hashtable;
@@ -31,8 +30,8 @@ import java.util.concurrent.TimeUnit;
 public class Jukebox
 {
     //bot setup
-    private static final String prefix = "+";
-    private static final String version = "1.1.0";
+    private static final String PREFIX = "+";
+    private static final String VERSION = "1.1.0";
     private static long uptime;
 
     //logger
@@ -83,7 +82,7 @@ public class Jukebox
 
         //bot config
         client.useHelpBuilder(false);
-        client.setPrefix(prefix);
+        client.setPrefix(PREFIX);
         client.setOwnerId(ownerId);
         client.setCoOwnerIds(coOwnerIds[0], coOwnerIds[1]);
         client.setActivity(Activity.listening("music! | +help"));
@@ -153,12 +152,12 @@ public class Jukebox
 
     public static String getVersion()
     {
-        return version;
+        return VERSION;
     }
 
     public static String getPrefix()
     {
-        return prefix;
+        return PREFIX;
     }
 
     public static Logger getLogger()

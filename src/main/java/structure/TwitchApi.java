@@ -14,8 +14,8 @@ import java.util.Map;
 
 public class TwitchApi
 {
-    final public String clientId;
-    final public String clientSecret;
+    public final String clientId;
+    public final String clientSecret;
     public String accessToken;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_2)

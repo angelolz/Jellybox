@@ -94,16 +94,12 @@ public class Lyrics extends Command
                 {
                     switch(e.getCause().getClass().getSimpleName())
                     {
-                        case "IndexOutOfBoundsException":
-                            event.reply(":x: | Couldn't find the lyrics for the requested track!");
-                            break;
-                        case "RuntimeException":
-                            event.reply(":x: | " + e.getMessage());
-                            break;
-                        default:
+                        case "IndexOutOfBoundsException" -> event.reply(":x: | Couldn't find the lyrics for the requested track!");
+                        case "RuntimeException" -> event.reply(":x: | " + e.getMessage());
+                        default -> {
                             event.reply(":x: | An error has occurred! Please try again later.");
                             Jukebox.getLogger().error("{} Error: {}", e.getCause().getClass().getSimpleName(), e.getMessage());
-                            break;
+                        }
                     }
                 }
             });
@@ -122,7 +118,7 @@ public class Lyrics extends Command
 
     private String currentTrackQuery(AudioTrack track) throws IOException
     {
-        String parsedQuery = URLEncoder.encode(track.getInfo().title.toLowerCase().replaceAll("[(\\[].*?[)\\]]",""), StandardCharsets.UTF_8).replaceAll("%23", "#");
+        String parsedQuery = URLEncoder.encode(track.getInfo().title.toLowerCase().replaceAll("[(\\[][^)\\\\]]*+[)\\]]",""), StandardCharsets.UTF_8).replaceAll("%23", "#");
         String fullURL = "https://metadata-filter.vercel.app/api/youtube?track=" + parsedQuery;
 
         URL jsonURL = new URL(fullURL);

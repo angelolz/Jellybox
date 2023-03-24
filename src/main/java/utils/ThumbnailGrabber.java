@@ -35,6 +35,8 @@ public class ThumbnailGrabber
                     return null;
                 case "twitch":
                     return Jukebox.getTwitchApi().getURL(track.getInfo().author);
+                default:
+                    Jukebox.getLogger().warn("Unknown source: {}", track.getSourceManager().getSourceName());
             }
 
             return null;

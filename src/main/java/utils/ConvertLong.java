@@ -16,13 +16,16 @@ public class ConvertLong
 
     public static String convertLongToDaysLength(long ms)
     {
-        int days, hours, minutes, seconds;
+        int days;
+        int hours;
+        int minutes;
+        int seconds;
         StringBuilder result = new StringBuilder();
 
         seconds = (int) ((ms / 1000) % 60);
         minutes = (int) ((ms / (1000*60)) % 60);
         hours = (int) ((ms / (1000*60*60)) % 24);
-        days = (int) ((ms / (1000*60*60*24)));
+        days = (int) (ms / (1000*60*60*24));
 
         if(days > 0)
             result.append(String.format("%d days, %02d:%02d:%02d", days, hours, minutes, seconds));

@@ -158,13 +158,13 @@ public class Queue extends Command
 
                     if(!track.getInfo().isStream)
                     {
-                        queueString.append(String.format("**%d)** %s `[%s]` (%s)\n\n", trackNumber, track.getInfo().title,
+                        queueString.append(String.format("**%d)** %s `[%s]` (%s)%n%n", trackNumber, track.getInfo().title,
                             ConvertLong.convertLongToTrackTime(track.getDuration()), track.getUserData(User.class).getAsMention()));
                     }
 
                     else
                     {
-                        queueString.append(String.format("**%d)** %s (%s)\n\n", trackNumber, track.getInfo().title,
+                        queueString.append(String.format("**%d)** %s (%s)%n%n", trackNumber, track.getInfo().title,
                             track.getUserData(User.class).getAsMention()));
                     }
 
@@ -240,7 +240,7 @@ public class Queue extends Command
             for(int i = (currentPage - 1) * MAX_ITEMS; i < Math.min((currentPage * MAX_ITEMS), queue.size()); i++)
             {
                 AudioTrack track = queue.get(i);
-                queueString.append(String.format("**%d)** %s `[%s]` (%s)\n\n",
+                queueString.append(String.format("**%d)** %s `[%s]` (%s)%n%n",
                         trackNumber, track.getInfo().title,
                         ConvertLong.convertLongToTrackTime(track.getDuration()),
                         track.getUserData(User.class).getAsMention()));

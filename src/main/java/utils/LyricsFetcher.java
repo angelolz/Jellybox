@@ -3,10 +3,11 @@ package utils;
 import main.Jukebox;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LyricsFetcher
 {
-    public static ArrayList<String> get(String key)
+    public static List<String> get(String key)
     {
         String[] lyrics = Jukebox.getGeniusApi().search(key).get(0).getText().split("\n");
         ArrayList<String> formattedLyrics = new ArrayList<>();

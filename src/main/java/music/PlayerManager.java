@@ -28,24 +28,24 @@ public class PlayerManager
 {
     private static PlayerManager instance;
     private final Map<Long, GuildMusicManager> musicManagers;
-    private final AudioPlayerManager playerManager;
+    private final AudioPlayerManager audioPlayerManager;
 
     private PlayerManager()
     {
         this.musicManagers = new HashMap<>();
-        this.playerManager = new DefaultAudioPlayerManager();
+        this.audioPlayerManager = new DefaultAudioPlayerManager();
 
-        playerManager.registerSourceManager(new YoutubeAudioSourceManager());
-        playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        playerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager()));
-        playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager());
+        audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
+        audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager()));
+        audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
     }
 
     public GuildMusicManager getMusicManager(Guild guild)
     {
         return musicManagers.computeIfAbsent(guild.getIdLong(),
-                (guildId) -> {
-                    final GuildMusicManager guildMusicManager = new GuildMusicManager(playerManager, guild.getAudioManager());
+                guildId -> {
+                    final GuildMusicManager guildMusicManager = new GuildMusicManager(audioPlayerManager, guild.getAudioManager());
 
                     guild.getAudioManager().setSendingHandler(guildMusicManager.getHandler());
 
@@ -57,7 +57,7 @@ public class PlayerManager
     {
         final GuildMusicManager guildMusicManager = getMusicManager(channel.getGuild());
 
-        playerManager.loadItemOrdered(guildMusicManager, trackUrl,
+        audioPlayerManager.loadItemOrdered(guildMusicManager, trackUrl,
                 new AudioLoadResultHandler()
                 {
                     final EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
@@ -154,8 +154,10 @@ public class PlayerManager
 
                             if(tracksAdded <= 250 && audioPlaylist.getTracks().size() > 250)
                             {
-                                embed.appendDescription("\n\nThe playlist you've added is too large, so I've added only the first **250** tracks " +
-                                        "to the queue.");
+                                embed.appendDescription("""
+
+
+                                    The playlist you've added is too large, so I've added only the first **250** tracks to the queue.""");
                             }
 
                             channel.sendMessageEmbeds(embed.build()).queue();

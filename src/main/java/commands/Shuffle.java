@@ -36,7 +36,7 @@ public class Shuffle extends Command
         {
             TrackScheduler scheduler  = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
 
-            if(scheduler.getQueue().size() == 0)
+            if(scheduler.getQueue().isEmpty())
                 commandEvent.reply(":x: | There are no tracks in the queue to shuffle!");
 
             else

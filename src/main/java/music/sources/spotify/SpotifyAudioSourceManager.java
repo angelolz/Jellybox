@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 public class SpotifyAudioSourceManager implements AudioSourceManager
 {
-    private static final String PATTERN = "^(?:http://|https://)?[a-z]+\\.spotify\\.com/([a-zA-z]+)/([a-zA-z0-9]+).*$";
+    private static final String PATTERN = "^(?:http://|https://)?[a-z]+\\.spotify\\.com/([A-z]+)/([A-z0-9]+).*$";
 
     private static final Pattern SPOTIFY_REGEX = Pattern.compile(PATTERN);
 
@@ -111,7 +111,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
     {
         try
         {
-            int totalItems, itemsProcessed;
+            int totalItems;
+            int itemsProcessed;
             GetPlaylistsItemsRequest getPlaylistsItemsRequest = Jukebox.getSpotifyApi().getPlaylistsItems(id).build();
             Paging<PlaylistTrack> playlistTrackPaging = getPlaylistsItemsRequest.execute();
             List<AudioTrack> playlist = new ArrayList<>();
@@ -130,7 +131,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
                 for(PlaylistTrack playlistTrack: playlistTracks)
                 {
                     itemsProcessed++;
-                    if(playlistTrack.getIsLocal()) continue;
+                    if(Boolean.TRUE.equals(playlistTrack.getIsLocal())) continue;
                     IPlaylistItem item = playlistTrack.getTrack();
                     if (!(item instanceof Track track)) continue;
 
