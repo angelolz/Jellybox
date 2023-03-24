@@ -22,13 +22,13 @@ public class Skip extends Command
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
 
-        if(!selfVoiceState.inVoiceChannel())
+        if(!selfVoiceState.inAudioChannel())
             commandEvent.reply(":x: | I'm not in a voice channel!");
 
-        else if(!userVoiceState.inVoiceChannel())
+        else if(!userVoiceState.inAudioChannel())
             commandEvent.reply(":x: | You need to be in a voice channel to use this command!");
 
-        else if(selfVoiceState.inVoiceChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
+        else if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
             commandEvent.reply(":x: | You need to be in the same voice channel as me for this command to work!");
 
         else

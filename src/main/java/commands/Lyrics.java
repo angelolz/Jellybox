@@ -7,10 +7,10 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.Jukebox;
 import music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import structure.VideoMetadata;
 
 import java.io.IOException;
@@ -138,7 +138,7 @@ public class Lyrics extends Command
         return query.getData();
     }
 
-    public static void getEmbed(ButtonClickEvent event, int index, String search)
+    public static void getEmbed(ButtonInteractionEvent event, int index, String search)
     {
         Jukebox.getCache().get(search).whenComplete((formattedLyrics, e) -> {
             if (e == null)

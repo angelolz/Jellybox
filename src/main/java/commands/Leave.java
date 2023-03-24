@@ -23,7 +23,7 @@ public class Leave extends Command
     {
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
 
-        if(!selfVoiceState.inVoiceChannel())
+        if(!selfVoiceState.inAudioChannel())
             commandEvent.reply(":x: | I'm not in a voice channel!");
 
         else

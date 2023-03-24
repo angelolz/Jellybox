@@ -3,13 +3,13 @@ package listeners;
 import commands.Help;
 import commands.Lyrics;
 import commands.Queue;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ButtonListener extends ListenerAdapter
 {
     @Override
-    public void onButtonClick(ButtonClickEvent event)
+    public void onButtonInteraction(ButtonInteractionEvent event)
     {
         String[] args = event.getComponentId().split(":");
         if(event.getUser().getId().equals(args[0]))
@@ -26,11 +26,11 @@ public class ButtonListener extends ListenerAdapter
         }
     }
 
-    private void runHelp(String[] args, ButtonClickEvent event){
+    private void runHelp(String[] args, ButtonInteractionEvent event){
         Help.getEmbed(event, args[3]);
     }
 
-    private void runLyrics(String[] args, ButtonClickEvent event)
+    private void runLyrics(String[] args, ButtonInteractionEvent event)
     {
         switch(args[3].toLowerCase())
         {
@@ -39,7 +39,7 @@ public class ButtonListener extends ListenerAdapter
         }
     }
 
-    private void runQueue(String[] args, ButtonClickEvent event)
+    private void runQueue(String[] args, ButtonInteractionEvent event)
     {
         switch(args[3].toLowerCase())
         {

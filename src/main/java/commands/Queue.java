@@ -9,11 +9,11 @@ import music.GuildMusicManager;
 import music.PlayerManager;
 import music.TrackScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import utils.ConvertLong;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -196,7 +196,7 @@ public class Queue extends Command
         }
     }
 
-    public static void getEmbed(ButtonClickEvent event, int pageNum, String guildId)
+    public static void getEmbed(ButtonInteractionEvent event, int pageNum, String guildId)
     {
         GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getJDA().getGuildById(guildId));
         LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();

@@ -4,10 +4,10 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import main.Jukebox;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.*;
 
@@ -145,7 +145,7 @@ public class Help extends Command
         }
     }
 
-    public static void getEmbed(ButtonClickEvent event, String category)
+    public static void getEmbed(ButtonInteractionEvent event, String category)
     {
         EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
         switch (category)

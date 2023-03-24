@@ -29,7 +29,7 @@ public class Play extends Command
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
 
-        if(!userVoiceState.inVoiceChannel())
+        if(!userVoiceState.inAudioChannel())
             commandEvent.reply(":x: | You need to be in a voice channel to use this command!");
 
         else
@@ -38,14 +38,14 @@ public class Play extends Command
             LinkedList<AudioTrack> queue = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getQueue();
 
             //if bot is in a different channel
-            if(selfVoiceState.inVoiceChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
+            if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
             {
                 commandEvent.reply(":x: | I'm already in another voice channel!");
                 return;
             }
 
             //if bot is not in voice channel
-            else if(!selfVoiceState.inVoiceChannel())
+            else if(!selfVoiceState.inAudioChannel())
             {
                 commandEvent.getGuild().getAudioManager().setSelfDeafened(true); //this is for privacy reasons and saves on bandwidth
                 commandEvent.getGuild().getAudioManager().openAudioConnection(userVoiceState.getChannel());

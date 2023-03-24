@@ -13,6 +13,7 @@ import listeners.ButtonListener;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import structure.TwitchApi;
@@ -31,7 +32,7 @@ public class Jukebox
 {
     //bot setup
     private static final String prefix = "+";
-    private static final String version = "1.0.1";
+    private static final String version = "1.1.0";
     private static long uptime;
 
     //logger
@@ -137,12 +138,13 @@ public class Jukebox
             //start building bot
             JDABuilder.createDefault(token)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .setActivity(Activity.listening("loading!! | !help"))
                 .addEventListeners(client.build(), new ButtonListener(), new ScheduledTasks(client.build()))
                 .build();
         }
 
-        catch(LoginException e)
+        catch(Exception e)
         {
             System.out.println("Unable to login with bot token.");
             e.printStackTrace();
