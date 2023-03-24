@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import structure.YTSearch;
 import utils.URLUtils;
+import utils.YoutubeHostManager;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -36,20 +37,37 @@ public class SpotifyAudioTrack extends YoutubeAudioTrack
             try
             {
                 AudioTrackInfo info = this.trackInfo;
+                YoutubeHostManager ytHostManager = new YoutubeHostManager();
                 Gson gson = new Gson();
-                String json = URLUtils.readURL(String.format("https://invidious.snopyta.org/api/v1/search?pretty=1&q=%s%%20%s",
-                        URLEncoder.encode(info.author, StandardCharsets.UTF_8),
-                        URLEncoder.encode(info.title, StandardCharsets.UTF_8))
+                String json = null;
+                while(json == null && !ytHostManager.noHostAvailable()) {
+                    try {
+                        json = URLUtils.readURL(String.format("%sapi/v1/search?pretty=1&q=%s%%20%s",
+                                ytHostManager.getNext(),
+                                URLEncoder.encode(info.author, StandardCharsets.UTF_8),
+                                URLEncoder.encode(info.title, StandardCharsets.UTF_8))
                             .replaceAll("\\+", "%20"));
-                JSONArray jsonArray = new JSONArray(json);
-                JSONObject jsonObj = jsonArray.getJSONObject(0);
-                YTSearch y = gson.fromJson(jsonObj.toString(), YTSearch.class);
+                    }
 
-                youtubeId = y.videoId;
-                this.setIdentifier(y.videoId);
+                    catch(IOException e) {
+                        Jukebox.getLogger().debug("Failed to get json: {}", e.getMessage());
+                    }
+                }
+
+                if(json != null) {
+                    JSONArray jsonArray = new JSONArray(json);
+                    JSONObject jsonObj = jsonArray.getJSONObject(0);
+                    YTSearch y = gson.fromJson(jsonObj.toString(), YTSearch.class);
+
+                    youtubeId = y.videoId;
+                    this.setIdentifier(y.videoId);
+                }
+
+                else
+                    throw new Exception(String.format("Couldn't find host for: %s - %s", info.author, info.title));
             }
 
-            catch(IOException e)
+            catch(Exception e)
             {
                 Jukebox.getLogger().error("Error when getting spotify identifier: {}", e.getMessage());
             }
