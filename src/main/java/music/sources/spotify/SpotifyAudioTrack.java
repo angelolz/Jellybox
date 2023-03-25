@@ -88,8 +88,13 @@ public class SpotifyAudioTrack extends YoutubeAudioTrack
         try
         {
             final Field identifier = infoCls.getDeclaredField("identifier");
+            final Field uri = infoCls.getDeclaredField("uri");
+
+
             identifier.setAccessible(true);
             identifier.set(this.trackInfo, videoId);
+            uri.setAccessible(true);
+            uri.set(this.trackInfo, "https://youtu.be/" + videoId);
         }
 
         catch (NoSuchFieldException | IllegalAccessException e)
