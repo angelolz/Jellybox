@@ -124,7 +124,7 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler
                 embed.appendDescription("""
 
 
-                                The playlist you've added is too large, so I've added only the first **250** tracks to the queue.""");
+                                The playlist you've added is too large, so I've added only the first **500** tracks to the queue.""");
             }
 
             channel.sendMessageEmbeds(embed.build()).queue();
