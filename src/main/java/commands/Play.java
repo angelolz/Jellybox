@@ -15,7 +15,7 @@ public class Play extends Command
     public Play()
     {
         this.name = "play";
-        this.aliases = new String[] {"p"};
+        this.aliases = new String[]{ "p" };
         this.arguments = "[url or query]";
         this.help = "Plays a track from a URL or search query.";
         this.cooldown = 3;
@@ -55,48 +55,53 @@ public class Play extends Command
                 PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getTimer().startTimer();
             }
 
-            if(commandEvent.getArgs().isEmpty())
+            if(!commandEvent.getMessage().getAttachments().isEmpty())
+                PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), commandEvent.getMessage().getAttachments());
+            else
             {
-                if(player.isPaused())
+                if(commandEvent.getArgs().isEmpty())
                 {
-                    player.setPaused(false);
-                    commandEvent.reply(":arrow_forward: | Resumed playback!");
-                }
-
-                else
-                {
-                    if(player.getPlayingTrack() != null)
+                    if(player.isPaused())
                     {
-                        commandEvent.reply(":x: | There's already a track playing! If you want to add a track to the queue, " +
-                                "please give me a search query or URL!");
+                        player.setPaused(false);
+                        commandEvent.reply(":arrow_forward: | Resumed playback!");
                     }
-
-                    else if(queue.isEmpty())
-                        commandEvent.reply(":x: | There's nothing to play because the queue is empty!");
 
                     else
                     {
-                        player.playTrack(queue.poll());
-                        commandEvent.reply(":arrow_forward: | Resumed playback!");
+                        if(player.getPlayingTrack() != null)
+                        {
+                            commandEvent.reply(":x: | There's already a track playing! If you want to add a track to the queue, " +
+                                "please give me a search query or URL!");
+                        }
+
+                        else if(queue.isEmpty())
+                            commandEvent.reply(":x: | There's nothing to play because the queue is empty!");
+
+                        else
+                        {
+                            player.playTrack(queue.poll());
+                            commandEvent.reply(":arrow_forward: | Resumed playback!");
+                        }
                     }
                 }
-            }
 
-            else
-            {
-                String query;
-                if (commandEvent.getArgs().charAt(0) == '<' && commandEvent.getArgs().endsWith(">"))
-                    query = commandEvent.getArgs().substring(1, commandEvent.getArgs().length() - 1);
                 else
-                    query = commandEvent.getArgs();
+                {
+                    String query;
+                    if(commandEvent.getArgs().charAt(0) == '<' && commandEvent.getArgs().endsWith(">"))
+                        query = commandEvent.getArgs().substring(1, commandEvent.getArgs().length() - 1);
+                    else
+                        query = commandEvent.getArgs();
 
-                if(URLUtils.isURI(query))
-                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), query);
-                else
-                    PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), "ytmsearch: " + query);
+                    if(URLUtils.isURI(query))
+                        PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), query);
+                    else
+                        PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), "ytmsearch: " + query);
 
-                if(player.isPaused())
-                    commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, then type `!p` or `!play`!");
+                    if(player.isPaused())
+                        commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, then type `!p` or `!play`!");
+                }
             }
         }
     }

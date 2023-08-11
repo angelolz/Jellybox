@@ -31,7 +31,7 @@ public class Jukebox
 {
     //bot setup
     private static final String PREFIX = "+";
-    private static final String VERSION = "1.1.2";
+    private static final String VERSION = "1.2";
     private static long uptime;
 
     //logger
@@ -106,7 +106,8 @@ public class Jukebox
 
         //admin/hidden commands
         client.addCommands(
-            new Invite()
+            new Invite(),
+            new Admin()
         );
 
         // help cache
