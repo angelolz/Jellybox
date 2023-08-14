@@ -37,6 +37,10 @@ public class PlayerManager
         audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
     }
 
+    public Map<Long, GuildMusicManager> getMusicManagers() {
+        return musicManagers;
+    }
+
     public GuildMusicManager getMusicManager(Guild guild)
     {
         return musicManagers.computeIfAbsent(guild.getIdLong(),

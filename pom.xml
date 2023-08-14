@@ -6,7 +6,7 @@
 
     <groupId>cs471.team23.Jukebox</groupId>
     <artifactId>jukebox</artifactId>
-    <version>1.2</version>
+    <version>1.2.1</version>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
@@ -76,9 +76,9 @@
 
         <!-- music player library -->
         <dependency>
-            <groupId>com.github.walkyst</groupId>
-            <artifactId>lavaplayer-fork</artifactId>
-            <version>1.4.1</version>
+            <groupId>dev.arbjerg</groupId>
+            <artifactId>lavaplayer</artifactId>
+            <version>2.0.1</version>
         </dependency>
 
         <!-- spotify api -->

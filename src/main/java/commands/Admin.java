@@ -2,10 +2,15 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import music.GuildMusicManager;
+import music.PlayerManager;
+import music.TrackScheduler;
 import net.dv8tion.jda.api.entities.Guild;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class Admin extends Command
@@ -34,7 +39,7 @@ public class Admin extends Command
             }
 
             case "leave" -> {
-                Stream<Guild> guildStream = commandEvent.getJDA().getGuilds().stream().filter(guild -> guild.getId().equals(args[1]));
+                Stream<Guild> guildStream = commandEvent.getJDA().getGuilds().stream().filter(guild -> guild.getId().equals(args[1].trim()));
                 List<Guild> guildLeftList = new ArrayList<>();
 
                 guildStream.forEach(guild -> guild.leave().queue(s -> guildLeftList.add(guild)));
@@ -52,7 +57,28 @@ public class Admin extends Command
                 commandEvent.reply(sb.toString());
             }
 
+            case "active" -> {
+                commandEvent.reply(getPlayersStatus());
+            }
+
             default -> commandEvent.reply("what do u want loser");
         }
+    }
+
+    @NotNull
+    private static String getPlayersStatus()
+    {
+        Map<Long, GuildMusicManager> musicManagers = PlayerManager.getInstance().getMusicManagers();
+        StringBuilder sb = new StringBuilder();
+        for(Map.Entry<Long, GuildMusicManager> musicManager : musicManagers.entrySet()) {
+            TrackScheduler trackScheduler = musicManager.getValue().getScheduler();
+
+            sb.append(String.format("**%s**: %s | %s | %s songs in queue\n",
+                musicManager.getKey(),
+                trackScheduler.getPlayer().getPlayingTrack() == null ? "⏹️ No track playing" : "▶️ Playing",
+                trackScheduler.getPlayer().isPaused() ? "⏸️ Paused" : "▶️ Not paused",
+                trackScheduler.getQueue().size()));
+        }
+        return sb.toString();
     }
 }
