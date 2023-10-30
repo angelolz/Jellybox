@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import utils.ConvertLong;
+import utils.Statics;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -24,9 +25,9 @@ public class TrackScheduler extends AudioEventAdapter
 
     public TrackScheduler(AudioPlayer player)
     {
-         this.player = player;
-         this.queue = new LinkedList<>();
-         this.loopState = LoopState.DISABLED;
+        this.player = player;
+        this.queue = new LinkedList<>();
+        this.loopState = LoopState.DISABLED;
     }
 
     public boolean queue(AudioTrack track, User requester)
@@ -61,11 +62,10 @@ public class TrackScheduler extends AudioEventAdapter
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException e)
     {
         EmbedBuilder embed = new EmbedBuilder().setColor(Color.red);
-        embed.setTitle("Error!");
-        embed.setDescription(":x: Couldn't play track!");
-        embed.addField("Track", track.getInfo().title, false);
-
-        embed.addField("Requested By", track.getUserData(User.class).getAsMention(), false);
+        embed.setTitle("Error!")
+             .setDescription(":x: Couldn't play track!")
+             .addField("Track", track.getInfo().title, false)
+             .addField("Requested By", track.getUserData(User.class).getAsMention(), false);
 
         notifChannel.sendMessageEmbeds(embed.build()).queue();
         Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
@@ -100,10 +100,10 @@ public class TrackScheduler extends AudioEventAdapter
 
             player.startTrack(nextTrack, false);
 
-            EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
-            embed.setTitle("Now Playing");
-            embed.setDescription(String.format("%s `(%s)` [%s]",
-                nextTrackInfo.title, ConvertLong.convertLongToTrackTime(nextTrackInfo.length), nextTrack.getUserData(User.class).getAsMention()));
+            EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
+            embed.setTitle("Now Playing")
+                 .setDescription(String.format("%s `(%s)` [%s]",
+                     nextTrackInfo.title, ConvertLong.convertLongToTrackTime(nextTrackInfo.length), nextTrack.getUserData(User.class).getAsMention()));
             notifChannel.sendMessageEmbeds(embed.build()).queue();
         }
     }

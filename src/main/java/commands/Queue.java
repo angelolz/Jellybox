@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import utils.ConvertLong;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import utils.Statics;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -25,7 +26,7 @@ public class Queue extends Command
     public Queue()
     {
         this.name = "queue";
-        this.aliases = new String[] {"q"};
+        this.aliases = new String[]{ "q" };
         this.help = "Returns all the tracks that are in the queue.";
         this.cooldown = 3;
 
@@ -73,10 +74,10 @@ public class Queue extends Command
 
             else if(args[0].equalsIgnoreCase("move"))
             {
-                if (args.length < 3)
+                if(args.length < 3)
                 {
                     event.reply(String.format(":x: | You need to specify what position you want to move the track as well! " +
-                            "For example: `%squeue move 5 3` will move the track in the 5th position to the 3rd position.", Jukebox.getPrefix()));
+                        "For example: `%squeue move 5 3` will move the track in the 5th position to the 3rd position.", Jukebox.getPrefix()));
                 }
 
                 else
@@ -90,12 +91,12 @@ public class Queue extends Command
                         event.reply(String.format(":white_check_mark: | Moved **%s** to position **%s**", track.getInfo().title, args[2]));
                     }
 
-                    catch (IndexOutOfBoundsException e)
+                    catch(IndexOutOfBoundsException e)
                     {
                         event.reply(":x: | That track number or new position does not exist!");
                     }
 
-                    catch (NumberFormatException e)
+                    catch(NumberFormatException e)
                     {
                         event.reply(":x: | You've entered an invalid number!");
                     }
@@ -107,7 +108,7 @@ public class Queue extends Command
                 if(args.length < 2)
                 {
                     event.reply(String.format(":x: | You need to provide the track number that you want played next! " +
-                            "For example: `%squeue next 4` will move the track in the 4th position to the top of the queue.", Jukebox.getPrefix()));
+                        "For example: `%squeue next 4` will move the track in the 4th position to the top of the queue.", Jukebox.getPrefix()));
                 }
 
                 else
@@ -135,12 +136,12 @@ public class Queue extends Command
 
             else
             {
-                EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
-                embed.setTitle("Current Tracks in Queue");
-
+                EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
                 int maxPages = queue.size() % MAX_ITEMS == 0 ? queue.size() / MAX_ITEMS : (queue.size() / MAX_ITEMS) + 1;
-                embed.setFooter(String.format("Page 1 of %s | Total Tracks in Queue: %s", maxPages, queue.size()));
+                embed.setTitle("Current Tracks in Queue")
+                     .setFooter(String.format("Page 1 of %s | Total Tracks in Queue: %s", maxPages, queue.size()));
 
+                //todo fix this dupe
                 AudioTrack playingTrack = manager.getScheduler().getPlayer().getPlayingTrack();
                 if(playingTrack != null)
                 {
@@ -158,13 +159,13 @@ public class Queue extends Command
 
                     if(!track.getInfo().isStream)
                     {
-                        queueString.append(String.format("**%d)** %s `[%s]` (%s)%n%n", trackNumber, track.getInfo().title,
+                        queueString.append(String.format("**%d)** %s - %s `[%s]` (%s)%n", trackNumber, track.getInfo().author, track.getInfo().title,
                             ConvertLong.convertLongToTrackTime(track.getDuration()), track.getUserData(User.class).getAsMention()));
                     }
 
                     else
                     {
-                        queueString.append(String.format("**%d)** %s (%s)%n%n", trackNumber, track.getInfo().title,
+                        queueString.append(String.format("**%d)** %s - %s (%s)%n", trackNumber, track.getInfo().author, track.getInfo().title,
                             track.getUserData(User.class).getAsMention()));
                     }
 
@@ -175,21 +176,21 @@ public class Queue extends Command
                 if(queue.size() < MAX_ITEMS)
                 {
                     event.getChannel().sendMessageEmbeds(embed.build()).setActionRow(
-                            Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
-                            Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                                    event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
-                            Button.secondary("disabled-right", Emoji.fromUnicode("U+27A1")).asDisabled()
+                        Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
+                        Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                            event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
+                        Button.secondary("disabled-right", Emoji.fromUnicode("U+27A1")).asDisabled()
                     ).queue();
                 }
 
                 else
                 {
                     event.getChannel().sendMessageEmbeds(embed.build()).setActionRow(
-                            Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
-                            Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                                    event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
-                            Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
-                                    event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+27A1"))
+                        Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
+                        Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                            event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
+                        Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
+                            event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+27A1"))
                     ).queue();
                 }
             }
@@ -210,26 +211,27 @@ public class Queue extends Command
         else if(currentPage > maxPages)
             currentPage = maxPages;
 
-        EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
+        EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
         if(queue.isEmpty())
         {
-            embed.setColor(Color.RED);
-            embed.setDescription(":x: | The queue is empty!");
+            embed.setColor(Color.RED)
+                 .setDescription(":x: | The queue is empty!");
+
             event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                            event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504"))
+                Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                    event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504"))
             ).queue();
         }
 
         else
         {
-            embed.setTitle("Current Tracks in Queue");
-            embed.setFooter(String.format("Page %s of %s | Total Tracks in Queue: %s", currentPage, maxPages, queue.size()));
+            embed.setTitle("Current Tracks in Queue")
+                 .setFooter(String.format("Page %s of %s | Total Tracks in Queue: %s", currentPage, maxPages, queue.size()));
 
             AudioTrack playingTrack = manager.getScheduler().getPlayer().getPlayingTrack();
             if(playingTrack != null)
             {
-                embed.addField("Now Playing",
+                embed.addField("▶️ Now Playing",
                     String.format("%s `[%s]` (%s)", playingTrack.getInfo().title, ConvertLong.convertLongToTrackTime(playingTrack.getDuration()),
                         playingTrack.getUserData(User.class).getAsMention()),
                     false);
@@ -240,56 +242,56 @@ public class Queue extends Command
             for(int i = (currentPage - 1) * MAX_ITEMS; i < Math.min((currentPage * MAX_ITEMS), queue.size()); i++)
             {
                 AudioTrack track = queue.get(i);
-                queueString.append(String.format("**%d)** %s `[%s]` (%s)%n%n",
-                        trackNumber, track.getInfo().title,
-                        ConvertLong.convertLongToTrackTime(track.getDuration()),
-                        track.getUserData(User.class).getAsMention()));
+                queueString.append(String.format("**%d)** %s - %s `[%s]` (%s)%n",
+                    trackNumber, track.getInfo().author, track.getInfo().title,
+                    ConvertLong.convertLongToTrackTime(track.getDuration()),
+                    track.getUserData(User.class).getAsMention()));
                 trackNumber++;
             }
-            embed.addField("Queue List", queueString.toString(), false);
+            embed.addField("📃 Queue List", queueString.toString(), false);
 
             //button checks
             if(currentPage == maxPages && maxPages == 1)
             {
                 event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                        Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
-                        Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                                event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
-                        Button.secondary("disabled-right", Emoji.fromUnicode("U+27A1")).asDisabled()
+                    Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
+                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                        event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
+                    Button.secondary("disabled-right", Emoji.fromUnicode("U+27A1")).asDisabled()
                 ).queue();
             }
 
             else if(currentPage == 1 && maxPages > 1)
             {
                 event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                        Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
-                        Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                                event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
-                        Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
-                                event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+27A1"))
+                    Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
+                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
+                    Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
+                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+27A1"))
                 ).queue();
             }
 
             else if(currentPage == maxPages)
             {
                 event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                        Button.secondary(String.format("%s:pagination:queue:left:%s:%s",
-                                event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+2B05")),
-                        Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                                event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
-                        Button.secondary("disabled-right", Emoji.fromUnicode("U+27A1")).asDisabled()
+                    Button.secondary(String.format("%s:pagination:queue:left:%s:%s",
+                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+2B05")),
+                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
+                    Button.secondary("disabled-right", Emoji.fromUnicode("U+27A1")).asDisabled()
                 ).queue();
             }
 
             else
             {
                 event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                        Button.secondary(String.format("%s:pagination:queue:left:%s:%s",
-                                event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+2B05")),
-                        Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                                event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
-                        Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
-                                event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+27A1"))
+                    Button.secondary(String.format("%s:pagination:queue:left:%s:%s",
+                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+2B05")),
+                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
+                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
+                    Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
+                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+27A1"))
                 ).queue();
             }
         }

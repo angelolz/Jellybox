@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import structure.VideoMetadata;
+import utils.Statics;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -71,7 +72,7 @@ public class Lyrics extends Command
                 {
                     // Creates the first page
                     EmbedBuilder embed = new EmbedBuilder()
-                            .setColor(0x409df5)
+                            .setColor(Statics.EMBED_COLOR)
                             .setTitle("Lyrics Lookup")
                             .setDescription("Requested by: " + event.getAuthor().getAsTag());
 
@@ -140,7 +141,7 @@ public class Lyrics extends Command
             if (e == null)
             {
                 EmbedBuilder embed = new EmbedBuilder()
-                        .setColor(0x409df5)
+                        .setColor(Statics.EMBED_COLOR)
                         .setTitle("Lyrics Lookup")
                         .setFooter("Requested by: " + event.getUser().getAsTag());
                 embed.setDescription(formattedLyrics.get(index));

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import utils.Statics;
 
 import java.util.*;
 
@@ -31,7 +32,7 @@ public class Help extends Command
 
         if(!event.getArgs().isEmpty())
         {
-            EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
+            EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
 
             // goes through all command to find a match
             for(Command command : event.getClient().getCommands())
@@ -39,11 +40,11 @@ public class Help extends Command
                 String[] aliases = command.getAliases();
 
                 if(command.getName().equalsIgnoreCase(event.getArgs()) ||
-                        (aliases != null && Arrays.stream(aliases).anyMatch(a -> a.equalsIgnoreCase(event.getArgs()))))
+                    (aliases != null && Arrays.stream(aliases).anyMatch(a -> a.equalsIgnoreCase(event.getArgs()))))
                 {
-                    embed.setTitle(String.format("Command Info for `%s%s`", Jukebox.getPrefix(), command.getName()));
-                    embed.addField("Arguments", command.getArguments() == null ? "*None*" : command.getArguments(), true);
-                    embed.addField("Cooldown Time", String.valueOf(command.getCooldown()), true);
+                    embed.setTitle(String.format("Command Info for `%s%s`", Jukebox.getPrefix(), command.getName()))
+                         .addField("Arguments", command.getArguments() == null ? "*None*" : command.getArguments(), true)
+                         .addField("Cooldown Time", String.valueOf(command.getCooldown()), true);
 
                     //convert aliases to list object so it can print it out nicely
                     List<String> list = Arrays.asList(command.getAliases());
@@ -54,11 +55,11 @@ public class Help extends Command
                     {
                         case "help":
                             embed.setDescription("Shows an embed listing all of the available commands as well as detailed help for each of them. " +
-                                    "If you provide a command name or its alias as an argument, it would show the usage of the command in more detail.");
+                                "If you provide a command name or its alias as an argument, it would show the usage of the command in more detail.");
                             break;
                         case "join":
                             embed.setDescription("Joins the same voice channel that you are in. " +
-                                    "Requires the `Connect` permission in the voice channel's permission settings.");
+                                "Requires the `Connect` permission in the voice channel's permission settings.");
                             break;
                         case "leave":
                             embed.setDescription("Leaves any voice channel that the Jukebox is in.");
@@ -71,14 +72,14 @@ public class Help extends Command
                             break;
                         case "pause":
                             embed.setDescription(String.format("Pauses the current track (if any). " +
-                                    "Use the `%splay` command to unpause the track.", Jukebox.getPrefix()));
+                                "Use the `%splay` command to unpause the track.", Jukebox.getPrefix()));
                             break;
                         case "ping":
                             embed.setDescription("Returns the latency of the Jukebox.");
                             break;
                         case "play":
                             embed.setDescription(
-                                    """
+                                """
                                     Plays a track given through a URL or search query. If no track is given, the Jukebox will continue playback if paused/stopped.
                                     The bot currently **supports** playing from these streaming services:
                                     - YouTube (videos/playlists)
@@ -87,27 +88,27 @@ public class Help extends Command
                                     """);
                             break;
                         case "queue":
-                            embed.setDescription("Displays all the tracks that are currently in the queue.");
-                            embed.addField("Subcommands",
-                                    String.format(
-                                            """
-                                            `%1$squeue remove <track position>` - Removes a track from the queue.
-                                            `%1$squeue move <old position> <new position>` - Moves a track to a new position in queue.
-                                            `%1$squeue next <track position>` - Moves a track to the first position in queue.
-                                            """
-                                            , Jukebox.getPrefix()),
-                                    true);
+                            embed.setDescription("Displays all the tracks that are currently in the queue.")
+                                 .addField("Subcommands",
+                                     String.format(
+                                         """
+                                             `%1$squeue remove <track position>` - Removes a track from the queue.
+                                             `%1$squeue move <old position> <new position>` - Moves a track to a new position in queue.
+                                             `%1$squeue next <track position>` - Moves a track to the first position in queue.
+                                             """
+                                         , Jukebox.getPrefix()),
+                                     true);
                             break;
                         case "repeat":
                             embed.setDescription(String.format(
-                                    """
+                                """
                                     Changes the repeat state of the Jukebox.
                                     There are three states that the player can be set to:
                                     `%1$srepeat track` - This will continuously loop the current track.
                                     `%1$srepeat queue` - This will continuously loop all the tracks in the queue. After a track is played, it will be readded at the end of the queue.
                                     `%1$srepeat off` - Turns off the repeat functions of the Jukebox.
                                     """,
-                                    Jukebox.getPrefix()));
+                                Jukebox.getPrefix()));
                             break;
                         case "skip":
                             embed.setDescription("Skips the current track (if any) and plays the next track in the queue.");
@@ -117,7 +118,7 @@ public class Help extends Command
                             break;
                         case "stop":
                             embed.setDescription(String.format("Stops the current track (if any). " +
-                                    "If the `%splay` command is used, the track will play again from the beginning.", Jukebox.getPrefix()));
+                                "If the `%splay` command is used, the track will play again from the beginning.", Jukebox.getPrefix()));
                             break;
                     }
 
@@ -133,31 +134,32 @@ public class Help extends Command
         else
         {
             EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(0x409df5);
-            embed.setTitle("Player Controls");
+                .setColor(Statics.EMBED_COLOR)
+                .setTitle("Player Controls");
+
             getCommands(embed, "player");
 
             channel.sendMessageEmbeds(embed.build()).setActionRow(
-                    Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).asDisabled().withLabel("Player"),
-                    Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).withLabel("Bot"),
-                    Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).withLabel("Tools")
+                Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).asDisabled().withLabel("Player"),
+                Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).withLabel("Bot"),
+                Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).withLabel("Tools")
             ).queue();
         }
     }
 
     public static void getEmbed(ButtonInteractionEvent event, String category)
     {
-        EmbedBuilder embed = new EmbedBuilder().setColor(0x409df5);
-        switch (category)
+        EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
+        switch(category)
         {
             case "player":
                 embed.setTitle("Player Controls");
                 getCommands(embed, "player");
 
                 event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                        Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).asDisabled().withLabel("Player"),
-                        Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).withLabel("Bot"),
-                        Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).withLabel("Tools")
+                    Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).asDisabled().withLabel("Player"),
+                    Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).withLabel("Bot"),
+                    Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).withLabel("Tools")
                 ).queue();
                 break;
             case "bot":
@@ -165,18 +167,18 @@ public class Help extends Command
                 getCommands(embed, "bot");
 
                 event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                        Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).withLabel("Player"),
-                        Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).asDisabled().withLabel("Bot"),
-                        Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).withLabel("Tools")
+                    Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).withLabel("Player"),
+                    Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).asDisabled().withLabel("Bot"),
+                    Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).withLabel("Tools")
                 ).queue();
                 break;
             case "tool":
                 embed.setTitle("Other Tools");
                 getCommands(embed, "tool");
                 event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                        Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).withLabel("Player"),
-                        Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).withLabel("Bot"),
-                        Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).asDisabled().withLabel("Tools")
+                    Button.secondary(String.format("%s:pagination:help:player", event.getMember().getId()), Emoji.fromUnicode("U+1F3B5")).withLabel("Player"),
+                    Button.secondary(String.format("%s:pagination:help:bot", event.getMember().getId()), Emoji.fromUnicode("U+1F916")).withLabel("Bot"),
+                    Button.secondary(String.format("%s:pagination:help:tool", event.getMember().getId()), Emoji.fromUnicode("U+1F4C4")).asDisabled().withLabel("Tools")
                 ).queue();
                 break;
         }
@@ -184,13 +186,13 @@ public class Help extends Command
 
     private static void getCommands(EmbedBuilder embed, String category)
     {
-        for(Command command: Jukebox.getHelpCache().get(category))
+        for(Command command : Jukebox.getHelpCache().get(category))
         {
             String commandName = String.format("%s%s", Jukebox.getPrefix(), command.getName());
             if(command.getAliases().length > 0)
             {
                 String[] aliases = command.getAliases();
-                for (String alias : aliases)
+                for(String alias : aliases)
                     commandName = commandName.concat("/" + alias);
             }
             embed.addField(commandName, command.getHelp(), true);

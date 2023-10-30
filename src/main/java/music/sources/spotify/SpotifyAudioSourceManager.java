@@ -113,8 +113,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
         {
             int totalItems;
             int itemsProcessed;
-            GetPlaylistsItemsRequest getPlaylistsItemsRequest = Jukebox.getSpotifyApi().getPlaylistsItems(id).build();
-            Paging<PlaylistTrack> playlistTrackPaging = getPlaylistsItemsRequest.execute();
+            Playlist spotifyPlaylist = Jukebox.getSpotifyApi().getPlaylist(id).build().execute();
+            Paging<PlaylistTrack> playlistTrackPaging = spotifyPlaylist.getTracks();
             List<AudioTrack> playlist = new ArrayList<>();
 
             totalItems = playlistTrackPaging.getTotal();
@@ -122,7 +122,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
 
             while(itemsProcessed < totalItems)
             {
-                GetPlaylistsItemsRequest getMoreItemsRequest = Jukebox.getSpotifyApi().getPlaylistsItems(id).offset(itemsProcessed).build();
+                GetPlaylistsItemsRequest getMoreItemsRequest = Jukebox.getSpotifyApi().getPlaylistsItems(id).offset(itemsProcessed).limit(50).build();
                 Paging<PlaylistTrack> morePlayListTracks = getMoreItemsRequest.execute();
                 List<PlaylistTrack> playlistTracks = List.of(morePlayListTracks.getItems());
 
@@ -142,8 +142,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
             if (playlist.isEmpty())
                 throw new FriendlyException("This playlist does not contain playable tracks (podcasts cannot be played)!", FriendlyException.Severity.COMMON, null);
 
-            //TODO might need name
-            return new BasicAudioPlaylist("", playlist, null, false);
+            return new BasicAudioPlaylist(spotifyPlaylist.getName(), playlist, null, false);
         }
 
         catch (Exception e)

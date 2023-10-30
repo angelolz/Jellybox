@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import utils.Statics;
 import utils.URLUtils;
 
 import java.util.LinkedList;
@@ -88,6 +89,12 @@ public class Play extends Command
 
                 else
                 {
+                    if(PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getQueue().size() >= Statics.MAX_QUEUE_ITEMS)
+                    {
+                        commandEvent.replyFormatted("❌ | Your request was not loaded due to the queue reaching the maximum size of **%d** tracks.", Statics.MAX_QUEUE_ITEMS);
+                        return;
+                    }
+
                     String query;
                     if(commandEvent.getArgs().charAt(0) == '<' && commandEvent.getArgs().endsWith(">"))
                         query = commandEvent.getArgs().substring(1, commandEvent.getArgs().length() - 1);
