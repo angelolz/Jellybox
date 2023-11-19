@@ -3,6 +3,7 @@ package structure;
 import com.google.gson.Gson;
 import main.Jukebox;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -45,7 +46,7 @@ public class TwitchApi
 
             Gson gson = new Gson();
             TwitchAuthResponse t = gson.fromJson(response.body(), TwitchAuthResponse.class);
-            this.accessToken = t.access_token;
+            this.accessToken = t.accessToken;
         }
 
         catch(Exception e)
@@ -54,7 +55,7 @@ public class TwitchApi
         }
     }
 
-    public String getURL(String username) throws Exception
+    public String getURL(String username) throws IOException, InterruptedException
     {
         HttpRequest request = HttpRequest.newBuilder().GET()
                 .uri(URI.create("https://api.twitch.tv/helix/users?login=" + username))
@@ -74,7 +75,7 @@ public class TwitchApi
         var builder = new StringBuilder();
         for (Map.Entry<String, String> entry : data.entrySet())
         {
-            if (builder.length() > 0)
+            if (!builder.isEmpty())
                 builder.append("&");
 
             builder.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));

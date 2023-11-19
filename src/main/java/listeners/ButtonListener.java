@@ -1,8 +1,8 @@
 package listeners;
 
 import commands.Help;
-import commands.Lyrics;
 import commands.Queue;
+import main.Jukebox;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -18,34 +18,12 @@ public class ButtonListener extends ListenerAdapter
             {
                 switch(args[2].toLowerCase())
                 {
-                    case "queue" -> runQueue(args, event);
-                    case "lyrics" -> runLyrics(args, event);
-                    case "help" -> runHelp(args, event);
+                    case "queue" -> Queue.paginate(event, args);
+                    case "help" -> Help.getEmbed(event, args[3]);
+                    default ->
+                        Jukebox.getLogger().error("Unknown action: {} | ID: {}", args[2], event.getComponentId());
                 }
             }
-        }
-    }
-
-    private void runHelp(String[] args, ButtonInteractionEvent event){
-        Help.getEmbed(event, args[3]);
-    }
-
-    private void runLyrics(String[] args, ButtonInteractionEvent event)
-    {
-        switch(args[3].toLowerCase())
-        {
-            case "left" -> Lyrics.getEmbed(event, Integer.parseInt(args[4]) - 1, args[5]);
-            case "right" -> Lyrics.getEmbed(event, Integer.parseInt(args[4]) + 1, args[5]);
-        }
-    }
-
-    private void runQueue(String[] args, ButtonInteractionEvent event)
-    {
-        switch(args[3].toLowerCase())
-        {
-            case "left" -> Queue.getEmbed(event, Integer.parseInt(args[4]) - 1, args[5]);
-            case "right" -> Queue.getEmbed(event, Integer.parseInt(args[4]) + 1, args[5]);
-            case "refresh" -> Queue.getEmbed(event, Integer.parseInt(args[4]), args[5]);
         }
     }
 }

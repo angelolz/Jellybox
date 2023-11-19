@@ -1,6 +1,9 @@
 package structure;
 
+import com.google.gson.annotations.SerializedName;
+
 public class TwitchAuthResponse
 {
-    public String access_token;
+    @SerializedName("access_token")
+    public String accessToken;
 }

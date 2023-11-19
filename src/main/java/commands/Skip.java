@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import music.PlayerManager;
 import music.TrackScheduler;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import utils.UtilClass;
 
 public class Skip extends Command
 {
@@ -16,36 +17,27 @@ public class Skip extends Command
 
         this.category = new Category("Player");
     }
+
     @Override
     protected void execute(CommandEvent commandEvent)
     {
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
 
-        if(!selfVoiceState.inAudioChannel())
-            commandEvent.reply(":x: | I'm not in a voice channel!");
+        if(UtilClass.checkInvalidVoiceState(commandEvent, selfVoiceState, userVoiceState)) return;
 
-        else if(!userVoiceState.inAudioChannel())
-            commandEvent.reply(":x: | You need to be in a voice channel to use this command!");
-
-        else if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            commandEvent.reply(":x: | You need to be in the same voice channel as me for this command to work!");
-
-        else
+        TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
+        if(scheduler.getPlayer().getPlayingTrack() == null)
         {
-            TrackScheduler scheduler  = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
-            if(scheduler.getPlayer().getPlayingTrack() == null)
-                commandEvent.reply(":x: | There's no track playing!");
-
-            else
-            {
-                if(scheduler.getQueue().peek() != null)
-                    scheduler.nextTrack();
-                else
-                    scheduler.getPlayer().stopTrack();
-
-                commandEvent.reply(":next_track: | The track has been skipped.");
-            }
+            commandEvent.reply(":x: | There's no track playing!");
+            return;
         }
+
+        if(scheduler.getQueue().peek() != null)
+            scheduler.nextTrack();
+        else
+            scheduler.getPlayer().stopTrack();
+
+        commandEvent.reply(":next_track: | The track has been skipped.");
     }
 }

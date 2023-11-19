@@ -5,24 +5,21 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import main.Jukebox;
-import music.GuildMusicManager;
 import music.PlayerManager;
-import music.TrackScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import utils.ConvertLong;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import utils.Statics;
+import utils.UtilClass;
 
-import java.awt.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Queue extends Command
 {
-    private static final int MAX_ITEMS = 10;
-
     public Queue()
     {
         this.name = "queue";
@@ -36,264 +33,171 @@ public class Queue extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getGuild());
-        TrackScheduler scheduler = manager.getScheduler();
-        LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();
+        LinkedList<AudioTrack> queue = PlayerManager.getInstance().getMusicManager(event.getGuild()).getScheduler().getQueue();
+        AudioTrack playingTrack = PlayerManager.getInstance().getMusicManager(event.getGuild()).getScheduler().getPlayer().getPlayingTrack();
         String[] args = event.getArgs().split("\\s+");
 
-        if(manager.getScheduler().getQueue().isEmpty())
-            event.reply(":x: | The queue is empty!");
-
-        else
+        if(queue.isEmpty())
         {
-            if(args[0].equalsIgnoreCase("remove"))
+            event.reply(":x: | The queue is empty!");
+            return;
+        }
+
+        switch(args[0].toLowerCase())
+        {
+            case "remove" -> removeTrack(event, args, queue);
+            case "move" -> moveTrack(event, queue, args);
+            default ->
             {
-                if(args.length < 2)
-                    event.reply(":x: | You need to provide the queue position of the track you want removed!");
-
-                else
-                {
-                    try
-                    {
-                        String trackName = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1).getInfo().title;
-                        scheduler.getQueue().remove(Integer.parseInt(args[1]) - 1);
-                        event.reply(":wastebasket: | Track removed from queue: " + trackName);
-                    }
-
-                    catch(IndexOutOfBoundsException e)
-                    {
-                        event.reply(":x: | That track number does not exist!");
-                    }
-
-                    catch(NumberFormatException e)
-                    {
-                        event.reply(":x: | You've entered an invalid number!");
-                    }
-                }
-            }
-
-            else if(args[0].equalsIgnoreCase("move"))
-            {
-                if(args.length < 3)
-                {
-                    event.reply(String.format(":x: | You need to specify what position you want to move the track as well! " +
-                        "For example: `%squeue move 5 3` will move the track in the 5th position to the 3rd position.", Jukebox.getPrefix()));
-                }
-
-                else
-                {
-                    try
-                    {
-                        AudioTrack track = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1); //Save the track to be moved.
-                        scheduler.getQueue().remove(Integer.parseInt(args[1]) - 1); //Remove track from original position.
-                        scheduler.getQueue().add(Integer.parseInt(args[2]) - 1, track); //Move track to new position.
-
-                        event.reply(String.format(":white_check_mark: | Moved **%s** to position **%s**", track.getInfo().title, args[2]));
-                    }
-
-                    catch(IndexOutOfBoundsException e)
-                    {
-                        event.reply(":x: | That track number or new position does not exist!");
-                    }
-
-                    catch(NumberFormatException e)
-                    {
-                        event.reply(":x: | You've entered an invalid number!");
-                    }
-                }
-            }
-
-            else if(args[0].equalsIgnoreCase("next"))
-            {
-                if(args.length < 2)
-                {
-                    event.reply(String.format(":x: | You need to provide the track number that you want played next! " +
-                        "For example: `%squeue next 4` will move the track in the 4th position to the top of the queue.", Jukebox.getPrefix()));
-                }
-
-                else
-                {
-                    try
-                    {
-                        AudioTrack track = scheduler.getQueue().get(Integer.parseInt(args[1]) - 1); //Save the track to be moved.
-                        scheduler.getQueue().remove(Integer.parseInt(args[1]) - 1); //Remove track from original position.
-                        scheduler.getQueue().addFirst(track); //Move track to front of queue
-
-                        event.reply(String.format(":white_check_mark: | Moved **%s** to the top of the queue!", track.getInfo().title));
-                    }
-
-                    catch(IndexOutOfBoundsException e)
-                    {
-                        event.reply(":x: | That track number does not exist!");
-                    }
-
-                    catch(NumberFormatException e)
-                    {
-                        event.reply(":x: | You've entered an invalid number!");
-                    }
-                }
-            }
-
-            else
-            {
-                EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
-                int maxPages = queue.size() % MAX_ITEMS == 0 ? queue.size() / MAX_ITEMS : (queue.size() / MAX_ITEMS) + 1;
-                embed.setTitle("Current Tracks in Queue")
-                     .setFooter(String.format("Page 1 of %s | Total Tracks in Queue: %s", maxPages, queue.size()));
-
-                //todo fix this dupe
-                AudioTrack playingTrack = manager.getScheduler().getPlayer().getPlayingTrack();
-                if(playingTrack != null)
-                {
-                    embed.addField("Now Playing",
-                        String.format("%s `[%s]` (%s)", playingTrack.getInfo().title, ConvertLong.convertLongToTrackTime(playingTrack.getDuration()),
-                            playingTrack.getUserData(User.class).getAsMention()),
-                        false);
-                }
-
-                StringBuilder queueString = new StringBuilder();
-                int trackNumber = 1;
-                for(int i = 0; i < Math.min(MAX_ITEMS, queue.size()); i++)
-                {
-                    AudioTrack track = queue.get(i);
-
-                    if(!track.getInfo().isStream)
-                    {
-                        queueString.append(String.format("**%d)** %s - %s `[%s]` (%s)%n", trackNumber, track.getInfo().author, track.getInfo().title,
-                            ConvertLong.convertLongToTrackTime(track.getDuration()), track.getUserData(User.class).getAsMention()));
-                    }
-
-                    else
-                    {
-                        queueString.append(String.format("**%d)** %s - %s (%s)%n", trackNumber, track.getInfo().author, track.getInfo().title,
-                            track.getUserData(User.class).getAsMention()));
-                    }
-
-                    trackNumber++;
-                }
-                embed.addField("Queue List", queueString.toString(), false);
-
-                if(queue.size() < MAX_ITEMS)
-                {
-                    event.getChannel().sendMessageEmbeds(embed.build()).setActionRow(
-                        Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
-                        Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                            event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
-                        Button.secondary("disabled-right", Emoji.fromUnicode("U+27A1")).asDisabled()
-                    ).queue();
-                }
-
-                else
-                {
-                    event.getChannel().sendMessageEmbeds(embed.build()).setActionRow(
-                        Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
-                        Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                            event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
-                        Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
-                            event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+27A1"))
-                    ).queue();
-                }
+                EmbedBuilder embed = printEmbed(queue, playingTrack);
+                int maxPages = getMaxPages(queue);
+                event.getChannel().sendMessageEmbeds(embed.build()).setActionRow(getPaginationButtons(event.getAuthor().getId(), event.getGuild().getId(), 1, maxPages));
             }
         }
     }
 
-    public static void getEmbed(ButtonInteractionEvent event, int pageNum, String guildId)
+    private static void removeTrack(CommandEvent event, String[] args, LinkedList<AudioTrack> queue)
     {
-        GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getJDA().getGuildById(guildId));
-        LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();
+        if(args.length < 2)
+        {
+            event.reply(":x: | You need to provide the queue position of the track you want removed!");
+            return;
+        }
 
-        int maxPages = queue.size() % MAX_ITEMS == 0 ? queue.size() / MAX_ITEMS : (queue.size() / MAX_ITEMS) + 1;
-        int currentPage = pageNum;
+        Integer trackNum = checkNum(event, queue, args[1]);
+        if(trackNum == null) return;
 
-        if(currentPage < 1)
-            currentPage = 1;
+        AudioTrack track = queue.remove(trackNum.intValue());
+        event.replyFormatted(":wastebasket: | Track removed from queue: **%s**", track.getInfo().title);
+    }
 
-        else if(currentPage > maxPages)
-            currentPage = maxPages;
+    private static void moveTrack(CommandEvent event, LinkedList<AudioTrack> queue, String[] args)
+    {
+        if(args.length < 3)
+        {
+            event.replyFormatted(":x: | You need to specify what position you want to move the track as well! " +
+                "For example: `%squeue move 5 3` will move the track in the 5th position to the 3rd position.", Jukebox.getPrefix());
+            return;
+        }
 
+        Integer oldPos = checkNum(event, queue, args[1]);
+        if(oldPos == null) return;
+
+        Integer newPos = checkNum(event, queue, args[2]);
+        if(newPos == null) return;
+
+        AudioTrack track = queue.remove(oldPos.intValue()); //Remove track from original position.
+        queue.add(newPos, track); //Move track to new position.
+
+        event.replyFormatted(":white_check_mark: | Moved **%s** to position **%s**", track.getInfo().title, args[2]);
+    }
+
+    private static Integer checkNum(CommandEvent event, LinkedList<AudioTrack> queue, String num)
+    {
+        if(isNumber(num))
+        {
+            event.reply(":x: | You've entered an invalid number!");
+            return null;
+        }
+
+        int trackNum = Integer.parseInt(num) - 1;
+        if(!isWithinRange(queue, trackNum))
+        {
+            event.reply(":x: | That track number does not exist!");
+            return null;
+        }
+
+        return trackNum;
+    }
+
+    private static boolean isNumber(String num)
+    {
+        try
+        {
+            Integer.parseInt(num);
+            return true;
+        }
+
+        catch(NumberFormatException e)
+        {
+            return false;
+        }
+    }
+
+    private static boolean isWithinRange(LinkedList<AudioTrack> queue, int num)
+    {
+        return num > 0 && num < queue.size();
+    }
+
+    private static int getMaxPages(LinkedList<AudioTrack> queue)
+    {
+        return queue.size() % Statics.MAX_ITEMS_PER_PAGE == 0 ? queue.size() / Statics.MAX_ITEMS_PER_PAGE : (queue.size() / Statics.MAX_ITEMS_PER_PAGE) + 1;
+    }
+
+    private static EmbedBuilder printEmbed(LinkedList<AudioTrack> queue, AudioTrack playingTrack)
+    {
         EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
-        if(queue.isEmpty())
-        {
-            embed.setColor(Color.RED)
-                 .setDescription(":x: | The queue is empty!");
+        int maxPages = getMaxPages(queue);
+        embed.setTitle("Current Tracks in Queue")
+             .setFooter(String.format("Page 1 of %s | Total Tracks in Queue: %s", maxPages, queue.size()));
 
-            event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                    event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504"))
-            ).queue();
+        if(playingTrack != null)
+        {
+            embed.addField("Now Playing",
+                String.format("%s `[%s]` (%s)", playingTrack.getInfo().title, UtilClass.convertLongToTrackTime(playingTrack.getDuration()),
+                    playingTrack.getUserData(User.class).getAsMention()),
+                false);
         }
 
-        else
+        StringBuilder queueString = new StringBuilder();
+        int trackNumber = 1;
+        for(int i = 0; i < Math.min(Statics.MAX_ITEMS_PER_PAGE, queue.size()); i++)
         {
-            embed.setTitle("Current Tracks in Queue")
-                 .setFooter(String.format("Page %s of %s | Total Tracks in Queue: %s", currentPage, maxPages, queue.size()));
+            AudioTrack track = queue.get(i);
+            String trackFormat = "**%d)** %s - %s %s (%s)%n";
+            String duration = UtilClass.convertLongToTrackTime(track.getDuration());
+            String authorAndTitle = String.format("%s - %s", track.getInfo().author, track.getInfo().title);
 
-            AudioTrack playingTrack = manager.getScheduler().getPlayer().getPlayingTrack();
-            if(playingTrack != null)
-            {
-                embed.addField("▶️ Now Playing",
-                    String.format("%s `[%s]` (%s)", playingTrack.getInfo().title, ConvertLong.convertLongToTrackTime(playingTrack.getDuration()),
-                        playingTrack.getUserData(User.class).getAsMention()),
-                    false);
-            }
-
-            StringBuilder queueString = new StringBuilder();
-            int trackNumber = ((currentPage - 1) * MAX_ITEMS) + 1;
-            for(int i = (currentPage - 1) * MAX_ITEMS; i < Math.min((currentPage * MAX_ITEMS), queue.size()); i++)
-            {
-                AudioTrack track = queue.get(i);
-                queueString.append(String.format("**%d)** %s - %s `[%s]` (%s)%n",
-                    trackNumber, track.getInfo().author, track.getInfo().title,
-                    ConvertLong.convertLongToTrackTime(track.getDuration()),
-                    track.getUserData(User.class).getAsMention()));
-                trackNumber++;
-            }
-            embed.addField("📃 Queue List", queueString.toString(), false);
-
-            //button checks
-            if(currentPage == maxPages && maxPages == 1)
-            {
-                event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                    Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
-                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                        event.getMember().getId(), 1, event.getGuild().getId()), Emoji.fromUnicode("U+1F504")),
-                    Button.secondary("disabled-right", Emoji.fromUnicode("U+27A1")).asDisabled()
-                ).queue();
-            }
-
-            else if(currentPage == 1 && maxPages > 1)
-            {
-                event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                    Button.secondary("disabled-left", Emoji.fromUnicode("U+2B05")).asDisabled(),
-                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
-                    Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
-                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+27A1"))
-                ).queue();
-            }
-
-            else if(currentPage == maxPages)
-            {
-                event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                    Button.secondary(String.format("%s:pagination:queue:left:%s:%s",
-                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+2B05")),
-                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
-                    Button.secondary("disabled-right", Emoji.fromUnicode("U+27A1")).asDisabled()
-                ).queue();
-            }
-
+            if(!track.getInfo().isStream)
+                queueString.append(String.format(trackFormat, trackNumber, authorAndTitle, "`[" + duration + "]`", track.getUserData(User.class).getAsMention()));
             else
-            {
-                event.deferEdit().setEmbeds(embed.build()).setActionRow(
-                    Button.secondary(String.format("%s:pagination:queue:left:%s:%s",
-                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+2B05")),
-                    Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s",
-                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+1F504")),
-                    Button.secondary(String.format("%s:pagination:queue:right:%s:%s",
-                        event.getMember().getId(), currentPage, guildId), Emoji.fromUnicode("U+27A1"))
-                ).queue();
-            }
+                queueString.append(String.format(trackFormat, trackNumber, authorAndTitle, "", track.getUserData(User.class).getAsMention()));
+
+            trackNumber++;
         }
+        embed.addField("Queue List", queueString.toString(), false);
+
+        return embed;
+    }
+
+    private static List<Button> getPaginationButtons(String userId, String guildId, int currentPage, int maxPages)
+    {
+        List<Button> buttons = new ArrayList<>();
+
+        buttons.add(Button.secondary(String.format("%s:pagination:queue:left:%s:%s", userId, currentPage, guildId), Emoji.fromUnicode("U+2B05")).withDisabled(currentPage <= 1));
+        buttons.add(Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s", userId, currentPage, guildId), Emoji.fromUnicode("U+1F504")));
+        buttons.add(Button.secondary(String.format("%s:pagination:queue:right:%s:%s", userId, currentPage, guildId), Emoji.fromUnicode("U+2B05")).withDisabled(currentPage >= maxPages));
+
+        return buttons;
+    }
+
+    public static void paginate(ButtonInteractionEvent event, String[] args)
+    {
+        event.deferEdit().queue();
+
+        int pageNum;
+        switch(args[3].toLowerCase())
+        {
+            case "left" -> pageNum = Integer.parseInt(args[4]) - 1;
+            case "right" -> pageNum = Integer.parseInt(args[4]) + 1;
+            default -> pageNum = Integer.parseInt(args[4]);
+        }
+
+        LinkedList<AudioTrack> queue = PlayerManager.getInstance().getMusicManager(event.getGuild()).getScheduler().getQueue();
+        AudioTrack playingTrack = PlayerManager.getInstance().getMusicManager(event.getGuild()).getScheduler().getPlayer().getPlayingTrack();
+        int maxPages = getMaxPages(queue);
+
+        EmbedBuilder embed = printEmbed(queue, playingTrack);
+        event.getHook().editOriginalEmbeds(embed.build()).setActionRow(getPaginationButtons(event.getUser().getId(), args[5], pageNum, maxPages)).queue();
     }
 }

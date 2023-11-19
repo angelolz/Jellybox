@@ -6,16 +6,18 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import lombok.Getter;
 import main.Jukebox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import utils.ConvertLong;
 import utils.Statics;
+import utils.UtilClass;
 
 import java.awt.*;
 import java.util.LinkedList;
 
+@Getter
 public class TrackScheduler extends AudioEventAdapter
 {
     private final AudioPlayer player;
@@ -71,24 +73,15 @@ public class TrackScheduler extends AudioEventAdapter
         Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
     }
 
-    public AudioPlayer getPlayer()
-    {
-        return player;
-    }
-
-    public LinkedList<AudioTrack> getQueue()
-    {
-        return queue;
-    }
 
     public void setNotifChannel(TextChannel channel)
     {
         this.notifChannel = channel;
     }
 
-    public TextChannel getNotifChannel()
+    public void setLoopState(LoopState loopState)
     {
-        return notifChannel;
+        this.loopState = loopState;
     }
 
     public void nextTrack()
@@ -103,18 +96,9 @@ public class TrackScheduler extends AudioEventAdapter
             EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
             embed.setTitle("Now Playing")
                  .setDescription(String.format("%s `(%s)` [%s]",
-                     nextTrackInfo.title, ConvertLong.convertLongToTrackTime(nextTrackInfo.length), nextTrack.getUserData(User.class).getAsMention()));
+                     nextTrackInfo.title, UtilClass.convertLongToTrackTime(nextTrackInfo.length), nextTrack.getUserData(User.class).getAsMention()));
             notifChannel.sendMessageEmbeds(embed.build()).queue();
         }
     }
 
-    public void setLoopState(LoopState loopState)
-    {
-        this.loopState = loopState;
-    }
-
-    public LoopState getLoopState()
-    {
-        return loopState;
-    }
 }

@@ -10,9 +10,8 @@ import main.Jukebox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import utils.ConvertLong;
 import utils.Statics;
-import utils.ThumbnailGrabber;
+import utils.UtilClass;
 
 import java.util.LinkedList;
 
@@ -49,12 +48,12 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler
             LinkedList<AudioTrack> queue = scheduler.getQueue();
 
             embed.setTitle("Added to Queue!")
-                 .setThumbnail(ThumbnailGrabber.getThumbnail(audioTrack))
+                 .setThumbnail(UtilClass.getThumbnail(audioTrack))
                  .addField("Artist", trackInfo.author, true)
                  .addField("Title", trackInfo.title, true);
 
             if(!trackInfo.isStream)
-                embed.addField("Length", ConvertLong.convertLongToTrackTime(trackInfo.length), true);
+                embed.addField("Length", UtilClass.convertLongToTrackTime(trackInfo.length), true);
 
             embed.addField("Requested by:", requester.getAsMention(), true)
                  .addField("Position in queue", String.valueOf(queue.size()), true);
@@ -64,22 +63,22 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler
 
             if(hasStream(player, queue))
             {
-                embed.addField("Time before track plays*", ConvertLong.convertLongToTrackTime(totalQueueLength), true)
+                embed.addField("Time before track plays*", UtilClass.convertLongToTrackTime(totalQueueLength), true)
                      .setFooter("* This does not include the livestreams that are currently playing and/or added in the queue.");
             }
 
             else
-                embed.addField("Time before track plays*", ConvertLong.convertLongToTrackTime(totalQueueLength), true);
+                embed.addField("Time before track plays*", UtilClass.convertLongToTrackTime(totalQueueLength), true);
         }
 
         else
         {
             embed.setTitle("Now Playing")
-                 .setThumbnail(ThumbnailGrabber.getThumbnail(audioTrack));
+                 .setThumbnail(UtilClass.getThumbnail(audioTrack));
             if(trackInfo.isStream)
                 embed.setDescription(String.format("%s (%s)", trackInfo.title, requester.getAsMention()));
             else
-                embed.setDescription(String.format("%s `[%s]` (%s)", trackInfo.title, ConvertLong.convertLongToTrackTime(trackInfo.length), requester.getAsMention()));
+                embed.setDescription(String.format("%s `[%s]` (%s)", trackInfo.title, UtilClass.convertLongToTrackTime(trackInfo.length), requester.getAsMention()));
         }
 
         channel.sendMessageEmbeds(embed.build()).queue();
@@ -121,7 +120,7 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler
 
         embed.setColor(Statics.EMBED_COLOR)
              .setDescription(String.format("🎶 Added **%d** tracks to the queue from the playlist **%s**!", tracksAdded, audioPlaylist.getName()))
-             .addField("Total time added:", ConvertLong.convertLongToTrackTime(playlistDuration), true)
+             .addField("Total time added:", UtilClass.convertLongToTrackTime(playlistDuration), true)
              .addField("Requested by:", requester.getAsMention(), true);
 
         if(limitReached)

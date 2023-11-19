@@ -98,12 +98,11 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
         GetArtistsTopTracksRequest getArtistsTopTracksRequest = Jukebox.getSpotifyApi().getArtistsTopTracks(id, CountryCode.US).build();
         Track[] tracks = getArtistsTopTracksRequest.execute();
 
-        for(Track track: tracks)
+        for(Track track : tracks)
         {
             playlist.add(buildTrack(track));
         }
 
-        //TODO might need name
         return new BasicAudioPlaylist("", playlist, null, false);
     }
 
@@ -126,26 +125,29 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
                 Paging<PlaylistTrack> morePlayListTracks = getMoreItemsRequest.execute();
                 List<PlaylistTrack> playlistTracks = List.of(morePlayListTracks.getItems());
 
-                if (playlistTracks.isEmpty()) return null;
+                if(playlistTracks.isEmpty()) return null;
 
-                for(PlaylistTrack playlistTrack: playlistTracks)
+                for(PlaylistTrack playlistTrack : playlistTracks)
                 {
                     itemsProcessed++;
-                    if(Boolean.TRUE.equals(playlistTrack.getIsLocal())) continue;
-                    IPlaylistItem item = playlistTrack.getTrack();
-                    if (!(item instanceof Track track)) continue;
 
-                    playlist.add(buildTrack(track));
+                    if(Boolean.TRUE.equals(playlistTrack.getIsLocal()))
+                        continue;
+
+                    IPlaylistItem item = playlistTrack.getTrack();
+
+                    if(item instanceof Track track)
+                        playlist.add(buildTrack(track));
                 }
             }
 
-            if (playlist.isEmpty())
+            if(playlist.isEmpty())
                 throw new FriendlyException("This playlist does not contain playable tracks (podcasts cannot be played)!", FriendlyException.Severity.COMMON, null);
 
             return new BasicAudioPlaylist(spotifyPlaylist.getName(), playlist, null, false);
         }
 
-        catch (Exception e)
+        catch(Exception e)
         {
             throw ExceptionTools.wrapUnfriendlyExceptions(e.getMessage(), FriendlyException.Severity.FAULT, e);
         }
@@ -180,19 +182,20 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
     }
 
     @Override
-    public boolean isTrackEncodable(AudioTrack audioTrack) {
+    public boolean isTrackEncodable(AudioTrack audioTrack)
+    {
         return true;
     }
 
     @Override
-    public void encodeTrack(AudioTrack audioTrack, DataOutput dataOutput) {}
+    public void encodeTrack(AudioTrack audioTrack, DataOutput dataOutput) { /* ignored */ }
 
     @Override
     public AudioTrack decodeTrack(AudioTrackInfo audioTrackInfo, DataInput dataInput)
     {
-        return new SpotifyAudioTrack(audioTrackInfo,this);
+        return new SpotifyAudioTrack(audioTrackInfo, this);
     }
 
     @Override
-    public void shutdown() {}
+    public void shutdown() { /* ignored */ }
 }

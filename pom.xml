@@ -38,12 +38,6 @@
     </repositories>
 
     <dependencies>
-        <!-- Genius Lyrics API -->
-        <dependency>
-            <groupId>com.github.LowLevelSubmarine</groupId>
-            <artifactId>GeniusLyricsAPI</artifactId>
-            <version>master</version>
-        </dependency>
         <!-- main JDA lib -->
         <dependency>
             <groupId>net.dv8tion</groupId>
@@ -88,19 +82,19 @@
             <version>6.5.4</version>
         </dependency>
 
-        <!-- Caching API -->
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>3.1.5</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/xyz.gianlu.librespot/librespot-java -->
         <dependency>
             <groupId>xyz.gianlu.librespot</groupId>
             <artifactId>librespot-java</artifactId>
             <version>1.6.3</version>
             <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

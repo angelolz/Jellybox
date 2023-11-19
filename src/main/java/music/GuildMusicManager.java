@@ -2,9 +2,11 @@ package music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+@Getter
 public class GuildMusicManager
 {
     private final TrackScheduler scheduler;
@@ -22,17 +24,7 @@ public class GuildMusicManager
         player.addListener(timeout); // Adds listener to timer
     }
 
-    public AudioPlayerSendHandler getHandler()
-    {
-        return handler;
-    }
-
-    public TrackScheduler getScheduler()
-    {
-        return scheduler;
-    }
-
-    public Timeout getTimer(){
+    public Timeout getTimer() {
         return timeout;
     }
 

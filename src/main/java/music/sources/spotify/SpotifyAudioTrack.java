@@ -7,13 +7,10 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.Jukebox;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import structure.YTSearch;
-import utils.URLUtils;
+import utils.UtilClass;
 import utils.YoutubeHostManager;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -40,31 +37,25 @@ public class SpotifyAudioTrack extends YoutubeAudioTrack
                 YoutubeHostManager ytHostManager = new YoutubeHostManager();
                 Gson gson = new Gson();
                 String json = null;
-                while(json == null && !ytHostManager.noHostAvailable()) {
-                    try {
-                        json = URLUtils.readURL(String.format("%sapi/v1/search?pretty=1&q=%s%%20%s",
-                                ytHostManager.getNext(),
-                                URLEncoder.encode(info.author, StandardCharsets.UTF_8),
-                                URLEncoder.encode(info.title, StandardCharsets.UTF_8))
-                            .replaceAll("\\+", "%20"));
-                    }
-
-                    catch(IOException e) {
-                        Jukebox.getLogger().debug("Failed to get json: {}", e.getMessage());
-                    }
+                while(json == null && !ytHostManager.noHostAvailable())
+                {
+                    json = UtilClass.readURL(String.format("%sapi/v1/search?pretty=1&q=%s%%20%s",
+                                                       ytHostManager.getNext(),
+                                                       URLEncoder.encode(info.author, StandardCharsets.UTF_8),
+                                                       URLEncoder.encode(info.title, StandardCharsets.UTF_8))
+                                                   .replaceAll("\\+", "%20"));
                 }
 
-                if(json != null) {
-                    JSONArray jsonArray = new JSONArray(json);
-                    JSONObject jsonObj = jsonArray.getJSONObject(0);
-                    YTSearch y = gson.fromJson(jsonObj.toString(), YTSearch.class);
+                if(json != null)
+                {
+                    YTSearch[] y = gson.fromJson(json, YTSearch[].class);
 
-                    youtubeId = y.videoId;
-                    this.setIdentifier(y.videoId);
+                    youtubeId = y[0].getVideoId();
+                    this.setIdentifier(youtubeId);
                 }
 
                 else
-                    throw new Exception(String.format("Couldn't find host for: %s - %s", info.author, info.title));
+                    throw new FriendlyException(String.format("Couldn't find host for: %s - %s", info.author, info.title), FriendlyException.Severity.FAULT, null);
             }
 
             catch(Exception e)
@@ -90,14 +81,13 @@ public class SpotifyAudioTrack extends YoutubeAudioTrack
             final Field identifier = infoCls.getDeclaredField("identifier");
             final Field uri = infoCls.getDeclaredField("uri");
 
-
             identifier.setAccessible(true);
             identifier.set(this.trackInfo, videoId);
             uri.setAccessible(true);
             uri.set(this.trackInfo, "https://youtu.be/" + videoId);
         }
 
-        catch (NoSuchFieldException | IllegalAccessException e)
+        catch(NoSuchFieldException | IllegalAccessException e)
         {
             throw new FriendlyException("Failed to look up YouTube track!", FriendlyException.Severity.SUSPICIOUS, e);
         }

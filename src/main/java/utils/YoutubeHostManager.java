@@ -2,7 +2,7 @@ package utils;
 
 public class YoutubeHostManager
 {
-    private final static String[] hosts = new String[] {
+    private static final String[] hosts = new String[] {
         "https://vid.puffyan.us/",
         "https://inv.riverside.rocks/",
         "https://invidious.slipfox.xyz/",

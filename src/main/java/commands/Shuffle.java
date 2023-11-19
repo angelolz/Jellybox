@@ -1,10 +1,13 @@
 package commands;
+
 import java.util.Collections;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import music.PlayerManager;
 import music.TrackScheduler;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import utils.UtilClass;
 
 public class Shuffle extends Command
 {
@@ -23,27 +26,17 @@ public class Shuffle extends Command
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
 
-        if(!selfVoiceState.inAudioChannel())
-            commandEvent.reply(":x: | I'm not in a voice channel!");
+        if(UtilClass.checkInvalidVoiceState(commandEvent, selfVoiceState, userVoiceState)) return;
 
-        else if(!userVoiceState.inAudioChannel())
-            commandEvent.reply(":x: | You need to be in a voice channel to use this command!");
+        TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
 
-        else if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            commandEvent.reply(":x: | You need to be in the same voice channel as me for this command to work!");
+        if(scheduler.getQueue().isEmpty())
+            commandEvent.reply(":x: | There are no tracks in the queue to shuffle!");
 
         else
         {
-            TrackScheduler scheduler  = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
-
-            if(scheduler.getQueue().isEmpty())
-                commandEvent.reply(":x: | There are no tracks in the queue to shuffle!");
-
-            else
-            {
-                Collections.shuffle(scheduler.getQueue());
-                commandEvent.reply(":white_check_mark: | The queue has been shuffled.");
-            }
+            Collections.shuffle(scheduler.getQueue());
+            commandEvent.reply(":white_check_mark: | The queue has been shuffled.");
         }
     }
 }

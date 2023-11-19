@@ -1,12 +1,9 @@
 package main;
 
-import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.wrapper.spotify.SpotifyApi;
 import commands.*;
-import core.GLA;
 import listeners.ScheduledTasks;
 import listeners.ButtonListener;
 
@@ -17,15 +14,11 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import structure.TwitchApi;
-import utils.ConvertLong;
-import utils.LyricsFetcher;
+import utils.UtilClass;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.Properties;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class Jukebox
 {
@@ -33,20 +26,15 @@ public class Jukebox
     private static final String PREFIX = "+";
     private static final String VERSION = "1.2.2";
     private static long uptime;
+    private static CommandClient client;
 
     //logger
     private static Logger logger;
 
     //apis
     private static SpotifyApi spotifyApi;
-    private static GLA geniusApi;
     private static TwitchApi twitchApi;
 
-    //Cache
-    private static AsyncLoadingCache<String, List<String>> cache; // Cache a list of descriptions
-
-    // Help
-    private static Hashtable<String, List<Command>> helpCache;
 
     public static void main(String[] args) throws IOException, IllegalArgumentException
     {
@@ -65,30 +53,21 @@ public class Jukebox
         String spClientId = prop.getProperty("spotify_client_id");
         String spClientSecret = prop.getProperty("spotify_client_secret");
 
-        String geniusId = prop.getProperty("gla_id");
-        String geniusToken = prop.getProperty("gla_access_token");
-
         String twitchClientId = prop.getProperty("twitch_client_id");
         String twitchClientSecret = prop.getProperty("twitch_client_secret");
 
         //create builder for adding commands and listeners
-        CommandClientBuilder client = new CommandClientBuilder();
-
-        // Initialize cache
-        cache = Caffeine.newBuilder()
-            .maximumSize(20)
-            .expireAfterWrite(3, TimeUnit.MINUTES)
-            .buildAsync(LyricsFetcher::get);
+        CommandClientBuilder clientBuilder = new CommandClientBuilder();
 
         //bot config
-        client.useHelpBuilder(false);
-        client.setPrefix(PREFIX);
-        client.setOwnerId(ownerId);
-        client.setCoOwnerIds(coOwnerIds[0], coOwnerIds[1]);
-        client.setActivity(Activity.listening("music! | +help"));
+        clientBuilder.useHelpBuilder(false);
+        clientBuilder.setPrefix(PREFIX);
+        clientBuilder.setOwnerId(ownerId);
+        clientBuilder.setCoOwnerIds(coOwnerIds[0], coOwnerIds[1]);
+        clientBuilder.setActivity(Activity.listening("music! | +help"));
 
         //add commands
-        client.addCommands(
+        clientBuilder.addCommands(
             new Help(),
             new Ping(),
             new Join(),
@@ -98,29 +77,23 @@ public class Jukebox
             new Skip(),
             new Repeat(),
             new Shuffle(),
-            new Lyrics(),
             new NowPlaying(),
             new Leave(),
             new Queue()
         );
 
         //admin/hidden commands
-        client.addCommands(
+        clientBuilder.addCommands(
             new Invite(),
             new Admin()
         );
 
-        // help cache
-        helpCache = new Hashtable<>();
+        client = clientBuilder.build();
 
         try
         {
             //start tracking uptime
             uptime = System.currentTimeMillis();
-
-            //build genius api
-            geniusApi = new GLA(geniusId, geniusToken);
-            logger.info("Finished loading Genius API.");
 
             //build spotify api
             spotifyApi = new SpotifyApi.Builder()
@@ -140,7 +113,7 @@ public class Jukebox
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .setActivity(Activity.listening("loading!! | !help"))
-                .addEventListeners(client.build(), new ButtonListener(), new ScheduledTasks(client.build()))
+                .addEventListeners(client, new ButtonListener(), new ScheduledTasks())
                 .build();
         }
 
@@ -166,18 +139,17 @@ public class Jukebox
         return logger;
     }
 
+    public static CommandClient getClient() {
+        return client;
+    }
+
     public static String getUptime()
     {
-        return ConvertLong.convertLongToDaysLength(System.currentTimeMillis() - uptime);
+        return UtilClass.convertLongToDaysLength(System.currentTimeMillis() - uptime);
     }
 
     public static SpotifyApi getSpotifyApi() { return spotifyApi; }
 
-    public static GLA getGeniusApi() { return geniusApi; }
-
     public static TwitchApi getTwitchApi() { return twitchApi; }
-
-    public static AsyncLoadingCache<String, List<String>> getCache() { return cache; }
-    public static Hashtable<String, List<Command>> getHelpCache() { return helpCache; }
 
 }

@@ -4,10 +4,10 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import lombok.Getter;
 import music.sources.spotify.SpotifyAudioSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -21,6 +21,7 @@ import java.util.Map;
 public class PlayerManager
 {
     private static PlayerManager instance;
+    @Getter
     private final Map<Long, GuildMusicManager> musicManagers;
     private final AudioPlayerManager audioPlayerManager;
 
@@ -35,10 +36,6 @@ public class PlayerManager
         audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
         audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
-    }
-
-    public Map<Long, GuildMusicManager> getMusicManagers() {
-        return musicManagers;
     }
 
     public GuildMusicManager getMusicManager(Guild guild)

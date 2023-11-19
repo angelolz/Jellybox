@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import utils.UtilClass;
 
 public class Stop extends Command
 {
@@ -23,28 +24,18 @@ public class Stop extends Command
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
 
-        if(!selfVoiceState.inAudioChannel())
-            commandEvent.reply(":x: | I'm not in a voice channel!");
+        if(UtilClass.checkInvalidVoiceState(commandEvent, selfVoiceState, userVoiceState)) return;
 
-        else if(!userVoiceState.inAudioChannel())
-            commandEvent.reply(":x: | You need to be in a voice channel to use this command!");
+        AudioPlayer player = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer();
 
-        else if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            commandEvent.reply(":x: | You need to be in the same voice channel as me for this command to work!");
+        if(player.getPlayingTrack() != null)
+        {
+            player.getPlayingTrack().setPosition(0);
+            player.setPaused(true);
+            commandEvent.reply(":stop_button: | The currently playing track has been stopped.");
+        }
 
         else
-        {
-            AudioPlayer player = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getPlayer();
-            
-            if(player.getPlayingTrack() != null)
-            {
-                player.getPlayingTrack().setPosition(0);
-                player.setPaused(true);
-                commandEvent.reply(":stop_button: | The currently playing track has been stopped.");
-            }
-
-            else
-                commandEvent.reply(":x: | There is no track playing!");
-        }
+            commandEvent.reply(":x: | There is no track playing!");
     }
 }

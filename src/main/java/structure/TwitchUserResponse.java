@@ -1,16 +1,19 @@
 package structure;
 
+import com.google.gson.annotations.SerializedName;
+
 public class TwitchUserResponse
 {
     public static class UserData
     {
-        public String profile_image_url;
+        @SerializedName("profile_image_url")
+        private String profileImageUrl;
     }
 
-    public UserData[] data;
+    private UserData[] data;
 
     public String getProfileUrl()
     {
-        return data[0].profile_image_url;
+        return data[0].profileImageUrl;
     }
 }

@@ -1,6 +1,9 @@
 package structure;
 
+import lombok.Getter;
+
+@Getter
 public class YTSearch
 {
-    public String videoId;
+    private String videoId;
 }

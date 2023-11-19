@@ -59,7 +59,7 @@ public class Admin extends Command
             }
 
             case "active" -> commandEvent.reply(getPlayersStatus(commandEvent.getJDA()));
-            default -> commandEvent.reply("what do u want loser");
+            default -> commandEvent.reply("what do u want loser `(servers, leave <guildId>, active)`");
         }
     }
 
