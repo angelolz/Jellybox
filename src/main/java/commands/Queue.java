@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import utils.Statics;
 import utils.UtilClass;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,9 +50,9 @@ public class Queue extends Command
             case "move" -> moveTrack(event, queue, args);
             default ->
             {
-                EmbedBuilder embed = printEmbed(queue, playingTrack);
+                EmbedBuilder embed = printEmbed(queue, playingTrack, 1);
                 int maxPages = getMaxPages(queue);
-                event.getChannel().sendMessageEmbeds(embed.build()).setActionRow(getPaginationButtons(event.getAuthor().getId(), event.getGuild().getId(), 1, maxPages));
+                event.getChannel().sendMessageEmbeds(embed.build()).setActionRow(getPaginationButtons(event.getAuthor().getId(), event.getGuild().getId(), 1, maxPages)).queue();
             }
         }
     }
@@ -134,12 +135,13 @@ public class Queue extends Command
         return queue.size() % Statics.MAX_ITEMS_PER_PAGE == 0 ? queue.size() / Statics.MAX_ITEMS_PER_PAGE : (queue.size() / Statics.MAX_ITEMS_PER_PAGE) + 1;
     }
 
-    private static EmbedBuilder printEmbed(LinkedList<AudioTrack> queue, AudioTrack playingTrack)
+    private static EmbedBuilder printEmbed(LinkedList<AudioTrack> queue, AudioTrack playingTrack, int pageNum)
     {
         EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
         int maxPages = getMaxPages(queue);
+
         embed.setTitle("Current Tracks in Queue")
-             .setFooter(String.format("Page 1 of %s | Total Tracks in Queue: %s", maxPages, queue.size()));
+             .setFooter(String.format("Page %s of %s | Total Tracks in Queue: %s", pageNum, maxPages, queue.size()));
 
         if(playingTrack != null)
         {
@@ -149,19 +151,27 @@ public class Queue extends Command
                 false);
         }
 
+        if(queue.isEmpty())
+        {
+            embed.setColor(Color.RED)
+                 .addField("Queue List", ":x: | The queue is empty!", false)
+                 .setFooter("");
+
+            return embed;
+        }
+
         StringBuilder queueString = new StringBuilder();
-        int trackNumber = 1;
-        for(int i = 0; i < Math.min(Statics.MAX_ITEMS_PER_PAGE, queue.size()); i++)
+        int trackNumber = ((pageNum - 1) * Statics.MAX_ITEMS_PER_PAGE) + 1;
+        for(int i = (pageNum - 1) * Statics.MAX_ITEMS_PER_PAGE; i < Math.min((pageNum * Statics.MAX_ITEMS_PER_PAGE), queue.size()); i++)
         {
             AudioTrack track = queue.get(i);
             String trackFormat = "**%d)** %s - %s %s (%s)%n";
             String duration = UtilClass.convertLongToTrackTime(track.getDuration());
-            String authorAndTitle = String.format("%s - %s", track.getInfo().author, track.getInfo().title);
 
             if(!track.getInfo().isStream)
-                queueString.append(String.format(trackFormat, trackNumber, authorAndTitle, "`[" + duration + "]`", track.getUserData(User.class).getAsMention()));
+                queueString.append(String.format(trackFormat, trackNumber, track.getInfo().author, track.getInfo().title, "`[" + duration + "]`", track.getUserData(User.class).getAsMention()));
             else
-                queueString.append(String.format(trackFormat, trackNumber, authorAndTitle, "", track.getUserData(User.class).getAsMention()));
+                queueString.append(String.format(trackFormat, trackNumber, track.getInfo().author, track.getInfo().title, "", track.getUserData(User.class).getAsMention()));
 
             trackNumber++;
         }
@@ -174,9 +184,9 @@ public class Queue extends Command
     {
         List<Button> buttons = new ArrayList<>();
 
-        buttons.add(Button.secondary(String.format("%s:pagination:queue:left:%s:%s", userId, currentPage, guildId), Emoji.fromUnicode("U+2B05")).withDisabled(currentPage <= 1));
-        buttons.add(Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s", userId, currentPage, guildId), Emoji.fromUnicode("U+1F504")));
-        buttons.add(Button.secondary(String.format("%s:pagination:queue:right:%s:%s", userId, currentPage, guildId), Emoji.fromUnicode("U+2B05")).withDisabled(currentPage >= maxPages));
+        buttons.add(Button.secondary(String.format("%s:pagination:queue:left:%s:%s", userId, currentPage, guildId), Emoji.fromUnicode("⬅️")).withDisabled(maxPages == 0 || currentPage <= 1));
+        buttons.add(Button.secondary(String.format("%s:pagination:queue:refresh:%s:%s", userId, currentPage, guildId), Emoji.fromUnicode("🔃")));
+        buttons.add(Button.secondary(String.format("%s:pagination:queue:right:%s:%s", userId, currentPage, guildId), Emoji.fromFormatted("➡️")).withDisabled(currentPage >= maxPages));
 
         return buttons;
     }
@@ -197,7 +207,13 @@ public class Queue extends Command
         AudioTrack playingTrack = PlayerManager.getInstance().getMusicManager(event.getGuild()).getScheduler().getPlayer().getPlayingTrack();
         int maxPages = getMaxPages(queue);
 
-        EmbedBuilder embed = printEmbed(queue, playingTrack);
+        if(pageNum < 1)
+            pageNum = 1;
+
+        if(pageNum > maxPages)
+            pageNum = maxPages;
+
+        EmbedBuilder embed = printEmbed(queue, playingTrack, pageNum);
         event.getHook().editOriginalEmbeds(embed.build()).setActionRow(getPaginationButtons(event.getUser().getId(), args[5], pageNum, maxPages)).queue();
     }
 }

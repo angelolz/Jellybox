@@ -48,7 +48,6 @@ public class Jukebox
 
         String token = prop.getProperty("bot_token");
         String ownerId = prop.getProperty("angel_id");
-        String[] coOwnerIds = new String[] {prop.getProperty("andrew_id"), prop.getProperty("daniel_id")};
 
         String spClientId = prop.getProperty("spotify_client_id");
         String spClientSecret = prop.getProperty("spotify_client_secret");
@@ -63,7 +62,6 @@ public class Jukebox
         clientBuilder.useHelpBuilder(false);
         clientBuilder.setPrefix(PREFIX);
         clientBuilder.setOwnerId(ownerId);
-        clientBuilder.setCoOwnerIds(coOwnerIds[0], coOwnerIds[1]);
         clientBuilder.setActivity(Activity.listening("music! | +help"));
 
         //add commands
