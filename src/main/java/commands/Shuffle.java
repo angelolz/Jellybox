@@ -31,12 +31,12 @@ public class Shuffle extends Command
         TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
 
         if(scheduler.getQueue().isEmpty())
-            commandEvent.reply(":x: | There are no tracks in the queue to shuffle!");
+            commandEvent.replyError("There are no tracks in the queue to shuffle!");
 
         else
         {
             Collections.shuffle(scheduler.getQueue());
-            commandEvent.reply(":white_check_mark: | The queue has been shuffled.");
+            commandEvent.reply("✅ | The queue has been shuffled.");
         }
     }
 }

@@ -2,7 +2,6 @@ package main;
 
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import com.wrapper.spotify.SpotifyApi;
 import commands.*;
 import listeners.ScheduledTasks;
 import listeners.ButtonListener;
@@ -13,6 +12,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.michaelthelin.spotify.SpotifyApi;
 import structure.TwitchApi;
 import utils.UtilClass;
 
@@ -24,7 +24,7 @@ public class Jukebox
 {
     //bot setup
     private static final String PREFIX = "+";
-    private static final String VERSION = "1.2.3";
+    private static final String VERSION = "1.3.0";
     private static long uptime;
     private static CommandClient client;
 
@@ -59,10 +59,11 @@ public class Jukebox
         CommandClientBuilder clientBuilder = new CommandClientBuilder();
 
         //bot config
-        clientBuilder.useHelpBuilder(false);
-        clientBuilder.setPrefix(PREFIX);
-        clientBuilder.setOwnerId(ownerId);
-        clientBuilder.setActivity(Activity.listening("music! | +help"));
+        clientBuilder.useHelpBuilder(false)
+                     .setPrefix(PREFIX)
+                     .setOwnerId(ownerId)
+                     .setActivity(Activity.listening("music! | +help"))
+                     .setEmojis("✅ | ", "⚠️ | ", "❌ | ");
 
         //add commands
         clientBuilder.addCommands(
@@ -77,7 +78,8 @@ public class Jukebox
             new Shuffle(),
             new NowPlaying(),
             new Leave(),
-            new Queue()
+            new Queue(),
+            new Analyze()
         );
 
         //admin/hidden commands
@@ -94,6 +96,7 @@ public class Jukebox
             uptime = System.currentTimeMillis();
 
             //build spotify api
+
             spotifyApi = new SpotifyApi.Builder()
                 .setClientId(spClientId)
                 .setClientSecret(spClientSecret)
@@ -108,11 +111,11 @@ public class Jukebox
 
             //start building bot
             JDABuilder.createDefault(token)
-                .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                .setActivity(Activity.listening("loading!! | !help"))
-                .addEventListeners(client, new ButtonListener(), new ScheduledTasks())
-                .build();
+                      .setStatus(OnlineStatus.DO_NOT_DISTURB)
+                      .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                      .setActivity(Activity.listening("loading!! | !help"))
+                      .addEventListeners(client, new ButtonListener(), new ScheduledTasks())
+                      .build();
         }
 
         catch(Exception e)
@@ -137,7 +140,8 @@ public class Jukebox
         return logger;
     }
 
-    public static CommandClient getClient() {
+    public static CommandClient getClient()
+    {
         return client;
     }
 

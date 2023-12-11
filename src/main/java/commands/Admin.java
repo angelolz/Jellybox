@@ -20,6 +20,8 @@ public class Admin extends Command
     {
         this.name = "admin";
         this.ownerCommand = true;
+
+        this.category = new Category("Admin");
     }
 
     @Override
@@ -47,7 +49,7 @@ public class Admin extends Command
 
                 if(guildLeftList.isEmpty())
                 {
-                    commandEvent.reply(":x: | no servers found with that id.");
+                    commandEvent.replyError("no servers found with that id.");
                     return;
                 }
 

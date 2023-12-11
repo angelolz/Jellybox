@@ -65,7 +65,7 @@ public class TrackScheduler extends AudioEventAdapter
     {
         EmbedBuilder embed = new EmbedBuilder().setColor(Color.red);
         embed.setTitle("Error!")
-             .setDescription(":x: Couldn't play track!")
+             .setDescription("❌ Couldn't play track!")
              .addField("Track", track.getInfo().title, false)
              .addField("Requested By", track.getUserData(User.class).getAsMention(), false);
 

@@ -32,7 +32,7 @@ public class     Pause extends Command
         {
             if(player.isPaused())
             {
-                commandEvent.reply(":x: | I'm already paused! Type `!p` or `!play` to continue playback!");
+                commandEvent.replyError("I'm already paused! Type `!p` or `!play` to continue playback!");
                 return;
             }
 
@@ -41,6 +41,6 @@ public class     Pause extends Command
         }
 
         else
-            commandEvent.reply(":x: | There's nothing playing!");
+            commandEvent.replyError("There's nothing playing!");
     }
 }

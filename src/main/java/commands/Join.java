@@ -25,19 +25,19 @@ public class Join extends Command
 
         if(selfVoiceState.inAudioChannel())
         {
-            commandEvent.reply(":x: | I'm already in a voice channel!");
+            commandEvent.replyError("I'm already in a voice channel!");
             return;
         }
 
         if(!userVoiceState.inAudioChannel())
         {
-            commandEvent.reply(":x: | You must be in a voice channel in order to use this command!");
+            commandEvent.replyError("You must be in a voice channel in order to use this command!");
             return;
         }
 
         if(!commandEvent.getSelfMember().hasPermission(userVoiceState.getChannel(), Permission.VOICE_CONNECT))
         {
-            commandEvent.reply(":x: | I don't have permission to connect to the voice channel!");
+            commandEvent.replyError("I don't have permission to connect to the voice channel!");
             return;
         }
 

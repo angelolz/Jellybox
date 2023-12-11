@@ -32,7 +32,7 @@ public class Play extends Command
 
         if(!userVoiceState.inAudioChannel())
         {
-            commandEvent.reply(":x: | You need to be in a voice channel to use this command!");
+            commandEvent.replyError("You need to be in a voice channel to use this command!");
             return;
         }
 
@@ -52,7 +52,7 @@ public class Play extends Command
     {
         if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
         {
-            commandEvent.reply(":x: | I'm already in another voice channel!");
+            commandEvent.replyError("I'm already in another voice channel!");
             return false;
         }
 
@@ -74,14 +74,14 @@ public class Play extends Command
         {
             if(player.getPlayingTrack() != null)
             {
-                commandEvent.reply(":x: | There's already a track playing! If you want to add a track to the queue, " +
+                commandEvent.replyError("There's already a track playing! If you want to add a track to the queue, " +
                     "please give me a search query or URL!");
                 return;
             }
 
             if(queue.isEmpty())
             {
-                commandEvent.reply(":x: | There's nothing to play because the queue is empty! Add a track by giving a search query or URL.");
+                commandEvent.replyError("There's nothing to play because the queue is empty! Add a track by giving a search query or URL.");
                 return;
             }
 

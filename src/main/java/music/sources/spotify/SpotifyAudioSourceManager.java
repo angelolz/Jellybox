@@ -7,12 +7,12 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.tools.ExceptionTools;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.*;
-import com.wrapper.spotify.exceptions.SpotifyWebApiException;
-import com.wrapper.spotify.model_objects.IPlaylistItem;
-import com.wrapper.spotify.model_objects.specification.*;
-import com.wrapper.spotify.requests.data.artists.GetArtistsTopTracksRequest;
-import com.wrapper.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
-import com.wrapper.spotify.requests.data.tracks.GetTrackRequest;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.IPlaylistItem;
+import se.michaelthelin.spotify.model_objects.specification.*;
+import se.michaelthelin.spotify.requests.data.artists.GetArtistsTopTracksRequest;
+import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
+import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 import main.Jukebox;
 import org.apache.hc.core5.http.ParseException;
 
@@ -34,6 +34,11 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
 
     final YoutubeAudioSourceManager youtubeAudioSourceManager;
 
+    public SpotifyAudioSourceManager() //used for retrieving regex only
+    {
+        this.youtubeAudioSourceManager = null;
+    }
+
     public SpotifyAudioSourceManager(YoutubeAudioSourceManager youtubeAudioSourceManager)
     {
         this.youtubeAudioSourceManager = youtubeAudioSourceManager;
@@ -48,10 +53,10 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
     @Override
     public AudioItem loadItem(AudioPlayerManager audioPlayerManager, AudioReference audioReference)
     {
-        Matcher m = SPOTIFY_REGEX.matcher(audioReference.identifier);
+        if(youtubeAudioSourceManager == null) return null;
 
-        if(!m.matches())
-            return null;
+        Matcher m = SPOTIFY_REGEX.matcher(audioReference.identifier);
+        if(!m.matches()) return null;
 
         try
         {
@@ -85,9 +90,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
         Album album = albumFuture.get();
 
         for(TrackSimplified track : album.getTracks().getItems())
-        {
             playlist.add(buildSimplifiedTrack(track));
-        }
 
         return new BasicAudioPlaylist(album.getName(), playlist, null, false);
     }
@@ -99,9 +102,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
         Track[] tracks = getArtistsTopTracksRequest.execute();
 
         for(Track track : tracks)
-        {
             playlist.add(buildTrack(track));
-        }
 
         return new BasicAudioPlaylist("", playlist, null, false);
     }
@@ -198,4 +199,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager
 
     @Override
     public void shutdown() { /* ignored */ }
+
+    public Pattern getSpotifyPattern() {
+        return SPOTIFY_REGEX;
+    }
 }

@@ -58,7 +58,7 @@ public class Help extends Command
             }
 
             // if unable to find a match, show error message
-            event.reply(":x: | Sorry, there's no command that matches that name!");
+            event.replyError("Sorry, there's no command that matches that name!");
         }
 
         else
@@ -67,7 +67,7 @@ public class Help extends Command
                 .setColor(Statics.EMBED_COLOR)
                 .setTitle("Player Controls");
 
-            getCommands(embed, "player");
+            getCommands(embed, "Player");
 
             channel.sendMessageEmbeds(embed.build()).setActionRow(getCategoryButtons(event.getAuthor().getId(), "player")).queue();
         }
@@ -81,17 +81,17 @@ public class Help extends Command
             case "player" ->
             {
                 embed.setTitle("Player Controls");
-                getCommands(embed, "player");
+                getCommands(embed, "Player");
             }
             case "bot" ->
             {
                 embed.setTitle("Bot Commands");
-                getCommands(embed, "bot");
+                getCommands(embed, "Bot");
             }
             case "tool" ->
             {
                 embed.setTitle("Other Tools");
-                getCommands(embed, "tool");
+                getCommands(embed, "Tools");
             }
             default -> Jukebox.getLogger().error("Unknown embed category name: {}", category);
         }
@@ -110,6 +110,8 @@ public class Help extends Command
         List<Command> commandsInCategory = Jukebox.getClient().getCommands().stream().filter(c -> c.getCategory().getName().equals(category)).toList();
         for(Command command : commandsInCategory)
         {
+            if(command.isOwnerCommand() || command.isHidden()) continue;
+
             String commandName = String.format("%s%s", Jukebox.getPrefix(), command.getName());
             if(command.getAliases().length > 0)
             {

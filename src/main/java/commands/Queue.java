@@ -40,7 +40,7 @@ public class Queue extends Command
 
         if(queue.isEmpty())
         {
-            event.reply(":x: | The queue is empty!");
+            event.replyError("The queue is empty!");
             return;
         }
 
@@ -61,7 +61,7 @@ public class Queue extends Command
     {
         if(args.length < 2)
         {
-            event.reply(":x: | You need to provide the queue position of the track you want removed!");
+            event.replyError("You need to provide the queue position of the track you want removed!");
             return;
         }
 
@@ -76,7 +76,7 @@ public class Queue extends Command
     {
         if(args.length < 3)
         {
-            event.replyFormatted(":x: | You need to specify what position you want to move the track as well! " +
+            event.replyFormatted("❌ | You need to specify what position you want to move the track as well! " +
                 "For example: `%squeue move 5 3` will move the track in the 5th position to the 3rd position.", Jukebox.getPrefix());
             return;
         }
@@ -90,21 +90,21 @@ public class Queue extends Command
         AudioTrack track = queue.remove(oldPos.intValue()); //Remove track from original position.
         queue.add(newPos, track); //Move track to new position.
 
-        event.replyFormatted(":white_check_mark: | Moved **%s** to position **%s**", track.getInfo().title, args[2]);
+        event.replyFormatted("✅ | Moved **%s** to position **%s**", track.getInfo().title, args[2]);
     }
 
     private static Integer checkNum(CommandEvent event, LinkedList<AudioTrack> queue, String num)
     {
         if(isNumber(num))
         {
-            event.reply(":x: | You've entered an invalid number!");
+            event.replyError("You've entered an invalid number!");
             return null;
         }
 
         int trackNum = Integer.parseInt(num) - 1;
         if(!isWithinRange(queue, trackNum))
         {
-            event.reply(":x: | That track number does not exist!");
+            event.replyError("That track number does not exist!");
             return null;
         }
 
@@ -154,7 +154,7 @@ public class Queue extends Command
         if(queue.isEmpty())
         {
             embed.setColor(Color.RED)
-                 .addField("Queue List", ":x: | The queue is empty!", false)
+                 .addField("Queue List", "❌ | The queue is empty!", false)
                  .setFooter("");
 
             return embed;

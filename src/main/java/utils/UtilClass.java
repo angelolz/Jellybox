@@ -2,8 +2,8 @@ package utils;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.wrapper.spotify.model_objects.specification.Image;
-import com.wrapper.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.model_objects.specification.Image;
+import se.michaelthelin.spotify.model_objects.specification.Track;
 import main.Jukebox;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
@@ -129,19 +129,19 @@ public class UtilClass
     {
         if(!selfVoiceState.inAudioChannel())
         {
-            commandEvent.reply(":x: | I'm not in a voice channel!");
+            commandEvent.replyError("I'm not in a voice channel!");
             return true;
         }
 
         if(!userVoiceState.inAudioChannel())
         {
-            commandEvent.reply(":x: | You need to be in a voice channel to use this command!");
+            commandEvent.replyError("You need to be in a voice channel to use this command!");
             return true;
         }
 
         if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
         {
-            commandEvent.reply(":x: | You need to be in the same voice channel as me for this command to work!");
+            commandEvent.replyError("You need to be in the same voice channel as me for this command to work!");
             return true;
         }
 

@@ -29,7 +29,7 @@ public class Skip extends Command
         TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
         if(scheduler.getPlayer().getPlayingTrack() == null)
         {
-            commandEvent.reply(":x: | There's no track playing!");
+            commandEvent.replyError("There's no track playing!");
             return;
         }
 

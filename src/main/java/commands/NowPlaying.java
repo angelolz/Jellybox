@@ -35,7 +35,7 @@ public class NowPlaying extends Command
 
         if(track == null)
         {
-            commandEvent.reply(":x: | There is no track playing!");
+            commandEvent.replyError("There is no track playing!");
             return;
         }
 

@@ -132,13 +132,13 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler
     @Override
     public void noMatches()
     {
-        channel.sendMessage(":x: | Sorry, we couldn't find a matching result for your request!").queue();
+        channel.sendMessage("❌ | Sorry, we couldn't find a matching result for your request!").queue();
     }
 
     @Override
     public void loadFailed(FriendlyException e)
     {
-        channel.sendMessage(":x: | There was an error trying to play your track.").queue();
+        channel.sendMessage("❌ | There was an error trying to play your track.").queue();
         Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
     }
 

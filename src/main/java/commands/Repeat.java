@@ -33,18 +33,18 @@ public class Repeat extends Command
             case "track" ->
             {
                 scheduler.setLoopState(LoopState.TRACK);
-                embed.setDescription(":white_check_mark: | I will now repeat the **current track**.");
+                embed.setDescription("✅ | I will now repeat the **current track**.");
             }
             case "queue" ->
             {
                 scheduler.setLoopState(LoopState.QUEUE);
-                embed.setDescription(":white_check_mark: I will now repeat the **current queue**.");
+                embed.setDescription("✅ I will now repeat the **current queue**.");
             }
 
             case "off" ->
             {
                 scheduler.setLoopState(LoopState.DISABLED);
-                embed.setDescription(":white_check_mark: The repeat function is now **disabled**.");
+                embed.setDescription("✅ The repeat function is now **disabled**.");
             }
 
             default ->

@@ -36,6 +36,6 @@ public class Stop extends Command
         }
 
         else
-            commandEvent.reply(":x: | There is no track playing!");
+            commandEvent.replyError("There is no track playing!");
     }
 }

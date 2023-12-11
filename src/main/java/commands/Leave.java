@@ -25,7 +25,7 @@ public class Leave extends Command
 
         if(!selfVoiceState.inAudioChannel())
         {
-            commandEvent.reply(":x: | I'm not in a voice channel!");
+            commandEvent.replyError("I'm not in a voice channel!");
             return;
         }
 
