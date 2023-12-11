@@ -82,7 +82,7 @@ public class Analyze extends Command
 
                  .addField("Artist(s) Genres:", getGenres(artists), false)
 
-                 .addField("Popularity", String.valueOf(track.getPopularity()) + "%", true)
+                 .addField("Popularity", track.getPopularity() + "%", true)
                  .addField("Happiness", toPercentage(audioFeatures.getValence()), true)
                  .addField("Danceability", toPercentage(audioFeatures.getDanceability()), true)
 
