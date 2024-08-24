@@ -6,7 +6,7 @@
 
     <groupId>cs471.team23.Jukebox</groupId>
     <artifactId>jukebox</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3</version>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
