@@ -2,10 +2,10 @@ package music.sources.spotify;
 
 import com.google.gson.Gson;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.lavalink.youtube.track.YoutubeAudioTrack;
 import main.Jukebox;
 import structure.YTSearch;
 import utils.UtilClass;

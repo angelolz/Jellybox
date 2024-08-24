@@ -30,9 +30,9 @@ public class PlayerManager
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
-        audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new dev.lavalink.youtube.YoutubeAudioSourceManager());
         audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager()));
+        audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new dev.lavalink.youtube.YoutubeAudioSourceManager()));
         audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
         audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());

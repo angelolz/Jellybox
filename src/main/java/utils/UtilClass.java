@@ -98,7 +98,7 @@ public class UtilClass
                 case "spotify" ->
                 {
                     final String PATTERN = "^(?:http://|https://)?[a-z]+.spotify.com/[a-z]+/([a-z0-9]+).*$";
-                    final Pattern SPOTIFY_REGEX = Pattern.compile(PATTERN);
+                    final Pattern SPOTIFY_REGEX = Pattern.compile(PATTERN, Pattern.CASE_INSENSITIVE);
                     Matcher m = SPOTIFY_REGEX.matcher(track.getInfo().uri);
                     if(m.matches())
                     {
@@ -121,6 +121,7 @@ public class UtilClass
         catch(Exception e)
         {
             Jukebox.getLogger().error("Error getting thumbnail: {}", e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
