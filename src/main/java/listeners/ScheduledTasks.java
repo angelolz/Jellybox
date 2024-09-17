@@ -18,6 +18,10 @@ public class ScheduledTasks extends ListenerAdapter
     {
         //get refresh tokens for spotify and twitch api
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(ScheduledTasks::refreshToken, 0, 1, TimeUnit.HOURS);
+
+        event.getJDA().openPrivateChannelById(Jukebox.getOwnerId()).queue(
+            dm -> dm.sendMessageFormat("Don't forget to get po_token and visitor data using %sadmin token <poToken> <vistorData>", Jukebox.getPrefix()).queue()
+        );
     }
 
     private static void refreshToken()

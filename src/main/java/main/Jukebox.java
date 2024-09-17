@@ -24,9 +24,10 @@ public class Jukebox
 {
     //bot setup
     private static final String PREFIX = "+";
-    private static final String VERSION = "1.3.3";
+    private static final String VERSION = "1.3.4";
     private static long uptime;
     private static CommandClient client;
+    private static String ownerId;
 
     //logger
     private static Logger logger;
@@ -47,7 +48,7 @@ public class Jukebox
         prop.load(propFile);
 
         String token = prop.getProperty("bot_token");
-        String ownerId = prop.getProperty("angel_id");
+        ownerId = prop.getProperty("angel_id");
 
         String spClientId = prop.getProperty("spotify_client_id");
         String spClientSecret = prop.getProperty("spotify_client_secret");
@@ -143,6 +144,11 @@ public class Jukebox
     public static CommandClient getClient()
     {
         return client;
+    }
+
+    public static String getOwnerId()
+    {
+        return ownerId;
     }
 
     public static String getUptime()

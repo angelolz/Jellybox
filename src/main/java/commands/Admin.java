@@ -2,11 +2,13 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import dev.lavalink.youtube.clients.Web;
 import music.GuildMusicManager;
 import music.PlayerManager;
 import music.TrackScheduler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -61,6 +63,8 @@ public class Admin extends Command
             }
 
             case "active" -> commandEvent.reply(getPlayersStatus(commandEvent.getJDA()));
+
+            case "token" -> setTokens(args, commandEvent);
             default -> commandEvent.reply("what do u want loser `(servers, leave <guildId>, active)`");
         }
     }
@@ -85,5 +89,17 @@ public class Admin extends Command
                 trackScheduler.getQueue().size()));
         }
         return sb.toString();
+    }
+
+    private static void setTokens(String[] args, CommandEvent event)
+    {
+        if(args.length < 2)
+        {
+            event.reply("usage: token <po_token> <visitor_data>");
+            return;
+        }
+
+        Web.setPoTokenAndVisitorData(args[1], args[2]);
+        event.getMessage().addReaction(Emoji.fromUnicode("U+2705")).queue();
     }
 }
