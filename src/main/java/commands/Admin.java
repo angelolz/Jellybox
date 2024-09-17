@@ -22,7 +22,7 @@ public class Admin extends Command
     {
         this.name = "admin";
         this.ownerCommand = true;
-
+        this.guildOnly = false;
         this.category = new Category("Admin");
     }
 
