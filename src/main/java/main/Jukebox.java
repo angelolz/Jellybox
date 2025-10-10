@@ -3,67 +3,42 @@ package main;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import commands.*;
-import listeners.ScheduledTasks;
 import listeners.ButtonListener;
 
+import lombok.Getter;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.michaelthelin.spotify.SpotifyApi;
-import structure.TwitchApi;
 import utils.UtilClass;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 
 public class Jukebox
 {
     //bot setup
-    private static final String PREFIX = "+";
-    private static final String VERSION = "1.3.4";
     private static long uptime;
+    @Getter
     private static CommandClient client;
-    private static String ownerId;
 
     //logger
+    @Getter
     private static Logger logger;
 
-    //apis
-    private static SpotifyApi spotifyApi;
-    private static TwitchApi twitchApi;
 
-
-    public static void main(String[] args) throws IOException, IllegalArgumentException
+    public static void main(String[] args)
     {
         //logger
         logger = LoggerFactory.getLogger(Jukebox.class);
-
-        //gets tokens and IDs of developers
-        Properties prop = new Properties();
-        FileInputStream propFile = new FileInputStream("config.properties");
-        prop.load(propFile);
-
-        String token = prop.getProperty("bot_token");
-        ownerId = prop.getProperty("angel_id");
-
-        String spClientId = prop.getProperty("spotify_client_id");
-        String spClientSecret = prop.getProperty("spotify_client_secret");
-
-        String twitchClientId = prop.getProperty("twitch_client_id");
-        String twitchClientSecret = prop.getProperty("twitch_client_secret");
 
         //create builder for adding commands and listeners
         CommandClientBuilder clientBuilder = new CommandClientBuilder();
 
         //bot config
         clientBuilder.useHelpBuilder(false)
-                     .setPrefix(PREFIX)
-                     .setOwnerId(ownerId)
-                     .setActivity(Activity.listening("music! | +help"))
+                     .setPrefix(Config.getPrefix())
+                     .setOwnerId(Config.getOwnerId())
+                     .setActivity(Activity.listening("music! | " + Config.getPrefix() + "help"))
                      .setEmojis("✅ | ", "⚠️ | ", "❌ | ");
 
         //add commands
@@ -79,8 +54,7 @@ public class Jukebox
             new Shuffle(),
             new NowPlaying(),
             new Leave(),
-            new Queue(),
-            new Analyze()
+            new Queue()
         );
 
         //admin/hidden commands
@@ -96,26 +70,12 @@ public class Jukebox
             //start tracking uptime
             uptime = System.currentTimeMillis();
 
-            //build spotify api
-
-            spotifyApi = new SpotifyApi.Builder()
-                .setClientId(spClientId)
-                .setClientSecret(spClientSecret)
-                .build();
-
-            logger.info("Finished loading Spotify API.");
-
-            //build twitch api
-            twitchApi = new TwitchApi(twitchClientId, twitchClientSecret);
-            getTwitchApi().updateAccessToken();
-            logger.info("Finished getting Twitch API refresh token.");
-
             //start building bot
-            JDABuilder.createDefault(token)
+            JDABuilder.createDefault(Config.getToken())
                       .setStatus(OnlineStatus.DO_NOT_DISTURB)
                       .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                      .setActivity(Activity.listening("loading!! | !help"))
-                      .addEventListeners(client, new ButtonListener(), new ScheduledTasks())
+                      .setActivity(Activity.listening("loading!! | " + Config.getPrefix() + "help"))
+                      .addEventListeners(client, new ButtonListener())
                       .build();
         }
 
@@ -126,38 +86,8 @@ public class Jukebox
         }
     }
 
-    public static String getVersion()
-    {
-        return VERSION;
-    }
-
-    public static String getPrefix()
-    {
-        return PREFIX;
-    }
-
-    public static Logger getLogger()
-    {
-        return logger;
-    }
-
-    public static CommandClient getClient()
-    {
-        return client;
-    }
-
-    public static String getOwnerId()
-    {
-        return ownerId;
-    }
-
     public static String getUptime()
     {
         return UtilClass.convertLongToDaysLength(System.currentTimeMillis() - uptime);
     }
-
-    public static SpotifyApi getSpotifyApi() { return spotifyApi; }
-
-    public static TwitchApi getTwitchApi() { return twitchApi; }
-
 }

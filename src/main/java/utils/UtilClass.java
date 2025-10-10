@@ -2,8 +2,6 @@ package utils;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import se.michaelthelin.spotify.model_objects.specification.Image;
-import se.michaelthelin.spotify.model_objects.specification.Track;
 import main.Jukebox;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
@@ -12,11 +10,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class UtilClass
 {
+    public static boolean isNullOrEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
     public static String convertLongToTrackTime(long length)
     {
         int hours = (int) (length / (1000 * 60 * 60));
@@ -92,24 +91,7 @@ public class UtilClass
         {
             switch(track.getSourceManager().getSourceName())
             {
-                case "youtube" -> { return String.format("https://img.youtube.com/vi/%s/default.jpg", track.getIdentifier()); }
                 case "soundcloud" -> { return null; } // Unable to sign up for SoundCloud API
-                case "twitch" -> { return Jukebox.getTwitchApi().getURL(track.getInfo().author); }
-                case "spotify" ->
-                {
-                    final String PATTERN = "^(?:http://|https://)?[a-z]+.spotify.com/[a-z]+/([a-z0-9]+).*$";
-                    final Pattern SPOTIFY_REGEX = Pattern.compile(PATTERN, Pattern.CASE_INSENSITIVE);
-                    Matcher m = SPOTIFY_REGEX.matcher(track.getInfo().uri);
-                    if(m.matches())
-                    {
-                        Track spotifyTrack = Jukebox.getSpotifyApi().getTrack(m.group(1)).build().execute();
-                        Image[] images = spotifyTrack.getAlbum().getImages();
-                        return images[0].getUrl();
-                    }
-
-                    else
-                        return null;
-                }
                 default ->
                 {
                     Jukebox.getLogger().warn("Unknown source: {}", track.getSourceManager().getSourceName());

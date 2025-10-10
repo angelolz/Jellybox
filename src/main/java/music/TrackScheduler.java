@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
+import lombok.Setter;
 import main.Jukebox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
@@ -22,7 +23,9 @@ public class TrackScheduler extends AudioEventAdapter
 {
     private final AudioPlayer player;
     private final LinkedList<AudioTrack> queue;
+    @Setter
     private TextChannel notifChannel;
+    @Setter
     private LoopState loopState;
 
     public TrackScheduler(AudioPlayer player)
@@ -70,18 +73,8 @@ public class TrackScheduler extends AudioEventAdapter
              .addField("Requested By", track.getUserData(User.class).getAsMention(), false);
 
         notifChannel.sendMessageEmbeds(embed.build()).queue();
+        e.printStackTrace();
         Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
-    }
-
-
-    public void setNotifChannel(TextChannel channel)
-    {
-        this.notifChannel = channel;
-    }
-
-    public void setLoopState(LoopState loopState)
-    {
-        this.loopState = loopState;
     }
 
     public void nextTrack()

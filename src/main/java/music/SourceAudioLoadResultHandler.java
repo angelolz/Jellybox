@@ -33,11 +33,11 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler
     @Override
     public void trackLoaded(AudioTrack audioTrack)
     {
-        if(!channel.getGuild().getAudioManager().isConnected())
-        {
-            channel.sendMessage("❌ | Track was not loaded due to the bot not being in a voice channel.").queue();
-            return;
-        }
+//        if(!channel.getGuild().getAudioManager().isConnected())
+//        {
+//            channel.sendMessage("❌ | Track was not loaded due to the bot not being in a voice channel.").queue();
+//            return;
+//        }
 
         AudioTrackInfo trackInfo = audioTrack.getInfo();
         TrackScheduler scheduler = guildMusicManager.getScheduler();
@@ -68,7 +68,7 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler
             }
 
             else
-                embed.addField("Time before track plays*", UtilClass.convertLongToTrackTime(totalQueueLength), true);
+                embed.addField("Time before track plays", UtilClass.convertLongToTrackTime(totalQueueLength), true);
         }
 
         else
@@ -139,6 +139,7 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler
     public void loadFailed(FriendlyException e)
     {
         channel.sendMessage("❌ | There was an error trying to play your track.").queue();
+        e.printStackTrace();
         Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
     }
 

@@ -5,11 +5,19 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import music.PlayerManager;
+import music.sources.jellyfin.JellyfinApi;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import structure.jellyfin.JellyfinTrack;
 import utils.Statics;
-import utils.UtilClass;
 
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Play extends Command
 {
@@ -42,10 +50,18 @@ public class Play extends Command
         if(!botJoinedVoiceChannel(commandEvent, selfVoiceState, userVoiceState))
             return;
 
-        if(commandEvent.getArgs().isEmpty() && commandEvent.getMessage().getAttachments().isEmpty())
-            unpauseBot(commandEvent, player, queue);
-        else
-            loadTrack(commandEvent, player);
+        try
+        {
+            if(commandEvent.getArgs().isEmpty())
+                unpauseBot(commandEvent, player, queue);
+            else
+                findTrack(commandEvent, player);
+        }
+
+        catch(IOException e)
+        {
+            commandEvent.replyError("❌ Error finding track!");
+        }
     }
 
     private boolean botJoinedVoiceChannel(CommandEvent commandEvent, GuildVoiceState selfVoiceState, GuildVoiceState userVoiceState)
@@ -90,8 +106,45 @@ public class Play extends Command
         }
     }
 
-    private static void loadTrack(CommandEvent commandEvent, AudioPlayer player)
+    private static void findTrack(CommandEvent commandEvent, AudioPlayer player) throws IOException
     {
+        String[] query = commandEvent.getArgs().split("\\s+", 2);
+
+        List<JellyfinTrack> results = new ArrayList<>();
+        switch(query[0].toLowerCase())
+        {
+            case "artist" -> { }
+            case "song", "track" -> results = JellyfinApi.searchTracks(query[1]);
+            case "album" -> { }
+            default -> results = JellyfinApi.searchTracks(commandEvent.getArgs());
+        }
+
+        if(results.isEmpty())
+        {
+            commandEvent.reply("❌ No tracks found with your query!");
+            return;
+        }
+
+        if(results.size() > 1)
+        {
+            EmbedBuilder embed = new EmbedBuilder()
+                .setColor(Statics.EMBED_COLOR)
+                .setTitle("Multiple tracks found!")
+                .setDescription("Please select a track to play:\n\n" + getTracksForDescription(results));
+
+            StringSelectMenu.Builder menu = StringSelectMenu.create(commandEvent.getAuthor().getId() + ":play:track-selection");
+            for(int i = 0; i < Math.min(10, results.size()); i++)
+            {
+                JellyfinTrack track = results.get(i);
+                menu.addOption(track.getArtist() + " - " + track.getTrackName(), track.getId());
+            }
+
+            commandEvent.getChannel().sendMessageEmbeds(embed.build()).setComponents(ActionRow.of(menu.build())).queue();
+            return;
+        }
+
+        JellyfinTrack track = results.get(0);
+
         if(PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getQueue().size() >= Statics.MAX_QUEUE_ITEMS)
         {
             commandEvent.replyFormatted("❌ | Your request was not loaded due to the queue reaching the maximum size of **%d** tracks.", Statics.MAX_QUEUE_ITEMS);
@@ -101,21 +154,15 @@ public class Play extends Command
         if(player.isPaused())
             commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, then type `!p` or `!play`!");
 
-        //attachments get priority
-        if(!commandEvent.getMessage().getAttachments().isEmpty())
-        {
-            PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), commandEvent.getMessage().getAttachments());
-            return;
+        PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), "jellyfin://" + track.getId());
+    }
+
+    private static String getTracksForDescription(List<JellyfinTrack> tracks) {
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < Math.min(10, tracks.size()); i++) {
+            builder.append(i+1).append(") ").append(tracks.get(i).getArtist()).append(" - ").append(tracks.get(i).getTrackName()).append("\n");
         }
 
-        //there's no attachments, it's either a query or url
-        String query = commandEvent.getArgs().startsWith("<") && commandEvent.getArgs().endsWith(">")
-            ? commandEvent.getArgs().substring(1, commandEvent.getArgs().length() - 1)
-            : commandEvent.getArgs();
-
-        if(UtilClass.isURI(query))
-            PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), query);
-        else
-            PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), "ytmsearch: " + query);
+        return builder.toString();
     }
 }

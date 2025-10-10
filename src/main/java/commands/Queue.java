@@ -4,13 +4,14 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import main.Jukebox;
+import main.Config;
 import music.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import utils.Statics;
 import utils.UtilClass;
 
@@ -52,7 +53,7 @@ public class Queue extends Command
             {
                 EmbedBuilder embed = printEmbed(queue, playingTrack, 1);
                 int maxPages = getMaxPages(queue);
-                event.getChannel().sendMessageEmbeds(embed.build()).setActionRow(getPaginationButtons(event.getAuthor().getId(), event.getGuild().getId(), 1, maxPages)).queue();
+                event.getChannel().sendMessageEmbeds(embed.build()).setComponents(ActionRow.of(getPaginationButtons(event.getAuthor().getId(), event.getGuild().getId(), 1, maxPages))).queue();
             }
         }
     }
@@ -77,7 +78,7 @@ public class Queue extends Command
         if(args.length < 3)
         {
             event.replyFormatted("❌ | You need to specify what position you want to move the track as well! " +
-                "For example: `%squeue move 5 3` will move the track in the 5th position to the 3rd position.", Jukebox.getPrefix());
+                "For example: `%squeue move 5 3` will move the track in the 5th position to the 3rd position.", Config.getPrefix());
             return;
         }
 
@@ -214,6 +215,6 @@ public class Queue extends Command
             pageNum = maxPages;
 
         EmbedBuilder embed = printEmbed(queue, playingTrack, pageNum);
-        event.getHook().editOriginalEmbeds(embed.build()).setActionRow(getPaginationButtons(event.getUser().getId(), args[5], pageNum, maxPages)).queue();
+        event.getHook().editOriginalEmbeds(embed.build()).setComponents(ActionRow.of(getPaginationButtons(event.getUser().getId(), args[5], pageNum, maxPages))).queue();
     }
 }

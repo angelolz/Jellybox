@@ -2,12 +2,14 @@ package commands;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import main.Config;
 import main.Jukebox;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import utils.Statics;
 
 import java.util.*;
@@ -41,7 +43,7 @@ public class Help extends Command
 
                 if(commandMatches(command.getName(), aliases, event.getArgs()))
                 {
-                    embed.setTitle(String.format("Command Info for `%s%s`", Jukebox.getPrefix(), command.getName()))
+                    embed.setTitle(String.format("Command Info for `%s%s`", Config.getPrefix(), command.getName()))
                          .addField("Arguments", command.getArguments() == null ? "*None*" : command.getArguments(), true)
                          .addField("Cooldown Time", String.valueOf(command.getCooldown()), true);
 
@@ -69,7 +71,7 @@ public class Help extends Command
 
             getCommands(embed, "Player");
 
-            channel.sendMessageEmbeds(embed.build()).setActionRow(getCategoryButtons(event.getAuthor().getId(), "player")).queue();
+            channel.sendMessageEmbeds(embed.build()).setComponents(ActionRow.of(getCategoryButtons(event.getAuthor().getId(), "player"))).queue();
         }
     }
 
@@ -96,7 +98,7 @@ public class Help extends Command
             default -> Jukebox.getLogger().error("Unknown embed category name: {}", category);
         }
 
-        event.deferEdit().setEmbeds(embed.build()).setActionRow(getCategoryButtons(event.getMember().getId(), category)).queue();
+        event.deferEdit().setEmbeds(embed.build()).setComponents(ActionRow.of(getCategoryButtons(event.getUser().getId(), "player"))).queue();
 
     }
 
@@ -112,7 +114,7 @@ public class Help extends Command
         {
             if(command.isOwnerCommand() || command.isHidden()) continue;
 
-            String commandName = String.format("%s%s", Jukebox.getPrefix(), command.getName());
+            String commandName = String.format("%s%s", Config.getPrefix(), command.getName());
             if(command.getAliases().length > 0)
             {
                 String[] aliases = command.getAliases();
@@ -121,7 +123,7 @@ public class Help extends Command
             }
             embed.addField(commandName, command.getHelp(), true);
         }
-        embed.setFooter(String.format("Version %s | Uptime: %s", Jukebox.getVersion(), Jukebox.getUptime()));
+        embed.setFooter(String.format("Version %s | Uptime: %s", Config.getVersion(), Jukebox.getUptime()));
     }
 
     private static void getCommandHelp(EmbedBuilder embed, String commandName)
@@ -137,7 +139,7 @@ public class Help extends Command
             case "nowplaying" ->
                 embed.setDescription("Displays information about the current track (if any), as well as the next track in queue.");
             case "pause" -> embed.setDescription(String.format("Pauses the current track (if any). " +
-                "Use the `%splay` command to unpause the track.", Jukebox.getPrefix()));
+                "Use the `%splay` command to unpause the track.", Config.getPrefix()));
             case "ping" -> embed.setDescription("Returns the latency of the Jukebox.");
             case "play" -> embed.setDescription("""
                 Plays a track given through a URL or search query. If no track is given, the Jukebox will continue playback if paused/stopped.
@@ -154,7 +156,7 @@ public class Help extends Command
                                              `%1$squeue move <old position> <new position>` - Moves a track to a new position in queue.
                                              `%1$squeue next <track position>` - Moves a track to the first position in queue.
                                              """
-                                         , Jukebox.getPrefix()),
+                                         , Config.getPrefix()),
                                      true);
             case "repeat" -> embed.setDescription(String.format(
                 """
@@ -164,12 +166,12 @@ public class Help extends Command
                     `%1$srepeat queue` - This will continuously loop all the tracks in the queue. After a track is played, it will be readded at the end of the queue.
                     `%1$srepeat off` - Turns off the repeat functions of the Jukebox.
                     """,
-                Jukebox.getPrefix()));
+                Config.getPrefix()));
             case "skip" ->
                 embed.setDescription("Skips the current track (if any) and plays the next track in the queue.");
             case "shuffle" -> embed.setDescription("Shuffles all the tracks in the queue.");
             case "stop" -> embed.setDescription(String.format("Stops the current track (if any). " +
-                "If the `%splay` command is used, the track will play again from the beginning.", Jukebox.getPrefix()));
+                "If the `%splay` command is used, the track will play again from the beginning.", Config.getPrefix()));
             default -> Jukebox.getLogger().error("Unknown command name: {}", commandName);
         }
 

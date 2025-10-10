@@ -2,20 +2,14 @@ package music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import lombok.Getter;
-import music.sources.spotify.SpotifyAudioSourceManager;
+import music.sources.jellyfin.JellyfinAudioSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PlayerManager
@@ -30,12 +24,8 @@ public class PlayerManager
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
-        audioPlayerManager.registerSourceManager(new dev.lavalink.youtube.YoutubeAudioSourceManager());
-        audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new dev.lavalink.youtube.YoutubeAudioSourceManager()));
-        audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new JellyfinAudioSourceManager());
+//        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
     }
 
     public GuildMusicManager getMusicManager(Guild guild)
@@ -50,23 +40,11 @@ public class PlayerManager
             });
     }
 
-    public void loadAndPlay(TextChannel channel, User requester, List<Message.Attachment> attachments)
-    {
-        final GuildMusicManager guildMusicManager = getMusicManager(channel.getGuild());
-
-        for(Message.Attachment attachment : attachments)
-        {
-            audioPlayerManager.loadItemOrdered(guildMusicManager, attachment.getUrl(),
-                new SourceAudioLoadResultHandler(guildMusicManager, requester, channel));
-        }
-    }
-
     public void loadAndPlay(TextChannel channel, User requester, String trackUrl)
     {
         final GuildMusicManager guildMusicManager = getMusicManager(channel.getGuild());
-
-        audioPlayerManager.loadItemOrdered(guildMusicManager, trackUrl,
-            new SourceAudioLoadResultHandler(guildMusicManager, requester, channel));
+        SourceAudioLoadResultHandler sourceAudioLoadResultHandler = new SourceAudioLoadResultHandler(guildMusicManager, requester, channel);
+        audioPlayerManager.loadItemOrdered(guildMusicManager, trackUrl, sourceAudioLoadResultHandler);
     }
 
     public static PlayerManager getInstance()
