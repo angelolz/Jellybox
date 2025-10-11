@@ -1,5 +1,4 @@
-FROM openjdk:16
-RUN mkdir /opt/jukebox
-COPY target/Jukebox-1.0.2.jar /opt/jukebox
-COPY config.properties .
-ENTRYPOINT ["java", "-jar", "/opt/jukebox/Jukebox-1.0.2.jar"]
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+COPY target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
