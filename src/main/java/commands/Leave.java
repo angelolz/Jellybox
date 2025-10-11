@@ -7,10 +7,9 @@ import music.LoopState;
 import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
-public class Leave extends Command
-{
-    public Leave()
-    {
+public class Leave extends Command {
+
+    public Leave() {
         this.name = "leave";
         this.help = "Leaves the currently joined voice channel.";
         this.cooldown = 3;
@@ -19,12 +18,10 @@ public class Leave extends Command
     }
 
     @Override
-    protected void execute(CommandEvent commandEvent)
-    {
+    protected void execute(CommandEvent commandEvent) {
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
 
-        if(!selfVoiceState.inAudioChannel())
-        {
+        if(!selfVoiceState.inAudioChannel()) {
             commandEvent.replyError("I'm not in a voice channel!");
             return;
         }

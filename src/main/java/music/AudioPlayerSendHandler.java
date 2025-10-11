@@ -6,14 +6,13 @@ import net.dv8tion.jda.api.audio.AudioSendHandler;
 
 import java.nio.ByteBuffer;
 
-public class AudioPlayerSendHandler implements AudioSendHandler
-{
+public class AudioPlayerSendHandler implements AudioSendHandler {
+
     private final AudioPlayer player;
     private final ByteBuffer buffer;
     private final MutableAudioFrame frame;
 
-    public AudioPlayerSendHandler(AudioPlayer audioPlayer)
-    {
+    public AudioPlayerSendHandler(AudioPlayer audioPlayer) {
         this.player = audioPlayer;
         this.buffer = ByteBuffer.allocate(2048);
         this.frame = new MutableAudioFrame();
@@ -26,14 +25,12 @@ public class AudioPlayerSendHandler implements AudioSendHandler
     }
 
     @Override
-    public ByteBuffer provide20MsAudio()
-    {
+    public ByteBuffer provide20MsAudio() {
         return buffer.flip();
     }
 
     @Override
-    public boolean isOpus()
-    {
+    public boolean isOpus() {
         return true;
     }
 }

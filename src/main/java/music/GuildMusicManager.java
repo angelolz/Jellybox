@@ -7,15 +7,14 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 @Getter
-public class GuildMusicManager
-{
+public class GuildMusicManager {
+
     private final TrackScheduler scheduler;
     private final AudioPlayerSendHandler handler;
     private final Timeout timeout;
     private TextChannel notifChannel;
 
-    public GuildMusicManager(AudioPlayerManager manager, AudioManager audioManager)
-    {
+    public GuildMusicManager(AudioPlayerManager manager, AudioManager audioManager) {
         AudioPlayer player = manager.createPlayer();
         this.scheduler = new TrackScheduler(player);
         this.handler = new AudioPlayerSendHandler(player);
@@ -28,17 +27,14 @@ public class GuildMusicManager
         return timeout;
     }
 
-    public void setNotifChannel(TextChannel channel)
-    {
-        if(notifChannel == null)
-        {
+    public void setNotifChannel(TextChannel channel) {
+        if(notifChannel == null) {
             this.notifChannel = channel;
             scheduler.setNotifChannel(notifChannel);
         }
     }
 
-    public void resetNotifChannel()
-    {
+    public void resetNotifChannel() {
         this.notifChannel = null;
         scheduler.setNotifChannel(null);
     }

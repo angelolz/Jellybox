@@ -7,13 +7,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.User;
 
-public class UtilClass
-{
+public class UtilClass {
+
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
     }
-    public static String convertLongToTrackTime(long length)
-    {
+
+    public static String convertLongToTrackTime(long length) {
         int hours = (int) (length / (1000 * 60 * 60));
         int minutes = (int) ((length / (1000 * 60)) % 60);
         int seconds = (int) ((length / 1000) % 60);
@@ -24,8 +24,7 @@ public class UtilClass
             return String.format("%02d:%02d", minutes, seconds);
     }
 
-    public static String convertLongToDaysLength(long ms)
-    {
+    public static String convertLongToDaysLength(long ms) {
         int days;
         int hours;
         int minutes;
@@ -46,22 +45,19 @@ public class UtilClass
         return result.toString();
     }
 
-    public static boolean checkInvalidVoiceState(CommandEvent commandEvent, GuildVoiceState selfVoiceState, GuildVoiceState userVoiceState)
-    {
-        if(!selfVoiceState.inAudioChannel())
-        {
+    public static boolean checkInvalidVoiceState(CommandEvent commandEvent, GuildVoiceState selfVoiceState,
+                                                 GuildVoiceState userVoiceState) {
+        if(!selfVoiceState.inAudioChannel()) {
             commandEvent.replyError("I'm not in a voice channel!");
             return true;
         }
 
-        if(!userVoiceState.inAudioChannel())
-        {
+        if(!userVoiceState.inAudioChannel()) {
             commandEvent.replyError("You need to be in a voice channel to use this command!");
             return true;
         }
 
-        if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-        {
+        if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             commandEvent.replyError("You need to be in the same voice channel as me for this command to work!");
             return true;
         }
@@ -70,15 +66,16 @@ public class UtilClass
     }
 
     public static String getTrackInfoForEmbed(AudioTrackInfo trackInfo) {
-        return String.format("**%s**%n%s%n%s", trackInfo.title, trackInfo.author, trackInfo.isrc == null ? "" : " *" + trackInfo.isrc + "*");
+        return String.format("**%s**%n%s%n%s", trackInfo.title, trackInfo.author, trackInfo.isrc == null ? "" :
+            " *" + trackInfo.isrc + "*");
     }
 
     public static EmbedBuilder getNowPlayingEmbed(AudioTrack track) {
         return new EmbedBuilder().setColor(Statics.EMBED_COLOR)
-            .setTitle("Now Playing")
-            .setThumbnail(track.getInfo().artworkUrl)
-            .setDescription(UtilClass.getTrackInfoForEmbed(track.getInfo()))
-            .addField("Length",  UtilClass.convertLongToTrackTime(track.getInfo().length), true)
-            .addField("Added by", track.getUserData(User.class).getAsMention(), true);
+                                 .setTitle("Now Playing")
+                                 .setThumbnail(track.getInfo().artworkUrl)
+                                 .setDescription(UtilClass.getTrackInfoForEmbed(track.getInfo()))
+                                 .addField("Length", UtilClass.convertLongToTrackTime(track.getInfo().length), true)
+                                 .addField("Added by", track.getUserData(User.class).getAsMention(), true);
     }
 }

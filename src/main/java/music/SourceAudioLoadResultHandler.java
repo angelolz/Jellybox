@@ -46,7 +46,8 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler {
 
             embed.addField("Length", UtilClass.convertLongToTrackTime(trackInfo.length), true)
                  .addField("Requested by:", requester.getAsMention(), true)
-                 .addField("Time before track plays", String.format("#%s - `[%s]` left", queue.size(), UtilClass.convertLongToTrackTime(totalQueueLength)), true);
+                 .addField("Time before track plays", String.format("#%s - `[%s]` left", queue.size(),
+                     UtilClass.convertLongToTrackTime(totalQueueLength)), true);
         }
 
         channel.sendMessageEmbeds(embed.build()).queue();

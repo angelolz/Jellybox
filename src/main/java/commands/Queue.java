@@ -29,7 +29,7 @@ public class Queue extends Command
         this.help = "Returns all the tracks that are in the queue.";
         this.cooldown = 3;
 
-        this.category = new Category("Tools");
+        this.category = new Category("Player");
     }
 
     @Override

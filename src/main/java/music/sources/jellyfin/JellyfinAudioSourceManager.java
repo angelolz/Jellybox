@@ -20,93 +20,84 @@ import java.net.URISyntaxException;
 /**
  * Custom source manager that loads audio items from a Jellyfin server.
  */
-public class JellyfinAudioSourceManager extends HttpAudioSourceManager
-{
+public class JellyfinAudioSourceManager extends HttpAudioSourceManager {
 
     @Override
-    public String getSourceName()
-    {
+    public String getSourceName() {
         return "jellyfin";
     }
 
     @Override
-    public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference)
-    {
-        try
-        {
+    public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
+        try {
             String id = reference.identifier.replace("jellyfin://", "");
 
             JellyfinTrack track = JellyfinApi.getAudioItemMetadata(id);
             String streamUrl = JellyfinApi.getStreamUrl(id);
-            String artworkUrl = JellyfinApi.getAlbumThumbnail(track.getAlbumId() != null ? track.getAlbumId() : track.getId());
+            String artworkUrl = JellyfinApi.getAlbumThumbnail(track.getAlbumId() != null ? track.getAlbumId() :
+                track.getId());
 
             //the isrc field is used to show album name
-            AudioTrackInfo info = new AudioTrackInfo(track.getTrackName(), track.getArtist(), track.getLengthMs(), streamUrl,
-                false, streamUrl, artworkUrl, track.getAlbum());
+            AudioTrackInfo info = new AudioTrackInfo(track.getTrackName(), track.getArtist(), track.getLengthMs(),
+                streamUrl, false, streamUrl, artworkUrl, track.getAlbum());
 
             return new JellyfinAudioTrack(info, this);
 
         }
-        catch(Exception e)
-        {
+        catch(Exception e) {
             throw new FriendlyException("Failed to load Jellyfin track", FriendlyException.Severity.SUSPICIOUS, e);
         }
     }
 
     @Override
-    public boolean isTrackEncodable(AudioTrack track) { return false; }
+    public boolean isTrackEncodable(AudioTrack track) {return false;}
 
     @Override
-    public void encodeTrack(AudioTrack track, DataOutput output) { }
+    public void encodeTrack(AudioTrack track, DataOutput output) {}
 
     @Override
-    public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input)
-    {
+    public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
         return new JellyfinAudioTrack(trackInfo, this);
     }
 
     @Override
-    public void shutdown() { }
+    public void shutdown() {}
 
-    public MediaContainerDetectionResult detectContainer(AudioReference reference)
-    {
-        try(HttpInterface httpInterface = this.getHttpInterface())
-        {
+    public MediaContainerDetectionResult detectContainer(AudioReference reference) {
+        try(HttpInterface httpInterface = this.getHttpInterface()) {
             return this.detectContainerWithClient(httpInterface, reference);
         }
-        catch(IOException e)
-        {
+        catch(IOException e) {
             throw new FriendlyException("Connecting to the URL failed.", FriendlyException.Severity.SUSPICIOUS, e);
         }
     }
 
-    public MediaContainerDetectionResult detectContainerWithClient(HttpInterface httpInterface, AudioReference reference) throws
-        IOException
-    {
-        try(PersistentHttpStream inputStream = new PersistentHttpStream(httpInterface, new URI(reference.identifier), Long.MAX_VALUE))
-        {
+    public MediaContainerDetectionResult detectContainerWithClient(HttpInterface httpInterface,
+                                                                   AudioReference reference) throws IOException {
+        try(PersistentHttpStream inputStream = new PersistentHttpStream(httpInterface, new URI(reference.identifier),
+            Long.MAX_VALUE)) {
             int statusCode = inputStream.checkStatusCode();
-            String redirectUrl = HttpClientTools.getRedirectLocation(reference.identifier, inputStream.getCurrentResponse());
-            if(redirectUrl != null)
-            {
-                return MediaContainerDetectionResult.refer((MediaContainerProbe) null, new AudioReference(redirectUrl, (String) null));
+            String redirectUrl = HttpClientTools.getRedirectLocation(reference.identifier,
+                inputStream.getCurrentResponse());
+            if(redirectUrl != null) {
+                return MediaContainerDetectionResult.refer((MediaContainerProbe) null, new AudioReference(redirectUrl
+                    , (String) null));
             }
-            else if(statusCode == 404)
-            {
+            else if(statusCode == 404) {
                 return null;
             }
-            else if(!HttpClientTools.isSuccessWithContent(statusCode))
-            {
-                throw new FriendlyException("That URL is not playable.", FriendlyException.Severity.COMMON, new IllegalStateException("Status code " + statusCode));
+            else if(!HttpClientTools.isSuccessWithContent(statusCode)) {
+                throw new FriendlyException("That URL is not playable.", FriendlyException.Severity.COMMON,
+                    new IllegalStateException("Status code " + statusCode));
             }
-            else
-            {
-                MediaContainerHints hints = MediaContainerHints.from(HttpClientTools.getHeaderValue(inputStream.getCurrentResponse(), "Content-Type"), (String) null);
+            else {
+                MediaContainerHints hints =
+                    MediaContainerHints.from(HttpClientTools.getHeaderValue(inputStream.getCurrentResponse(),
+                        "Content-Type"), (String) null);
                 return (new MediaContainerDetection(this.containerRegistry, reference, inputStream, hints)).detectContainer();
             }
         }
-        catch(URISyntaxException e)
-        {
+        catch(URISyntaxException e) {
             throw new FriendlyException("Not a valid URL.", FriendlyException.Severity.COMMON, e);
         }
     }

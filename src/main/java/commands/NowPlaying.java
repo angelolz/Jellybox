@@ -9,7 +9,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import music.GuildMusicManager;
 import music.PlayerManager;
 import music.TrackScheduler;
-import music.sources.jellyfin.JellyfinApi;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import utils.Statics;
@@ -23,7 +22,7 @@ public class NowPlaying extends Command {
         this.help = "Displays info about the current playing track.";
         this.cooldown = 3;
 
-        this.category = new Category("Tools");
+        this.category = new Category("Player");
     }
 
     @Override

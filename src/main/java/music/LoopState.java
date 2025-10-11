@@ -1,6 +1,5 @@
 package music;
 
-public enum LoopState
-{
+public enum LoopState {
     DISABLED, TRACK, QUEUE
 }

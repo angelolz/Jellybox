@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 
 public class JellyfinAudioTrack extends DelegatedAudioTrack {
+
     private final JellyfinAudioSourceManager sourceManager;
 
     public JellyfinAudioTrack(AudioTrackInfo trackInfo, JellyfinAudioSourceManager sourceManager) {
@@ -17,7 +18,8 @@ public class JellyfinAudioTrack extends DelegatedAudioTrack {
 
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
-        MediaContainerDetectionResult detection = sourceManager.detectContainer(new AudioReference(trackInfo.uri, trackInfo.title));
+        MediaContainerDetectionResult detection = sourceManager.detectContainer(new AudioReference(trackInfo.uri,
+            trackInfo.title));
         MediaContainerDescriptor container = detection.getContainerDescriptor();
         HttpAudioTrack delegate = new HttpAudioTrack(trackInfo, container, sourceManager);
         processDelegate(delegate, executor);

@@ -19,8 +19,8 @@ import java.awt.*;
 import java.util.LinkedList;
 
 @Getter
-public class TrackScheduler extends AudioEventAdapter
-{
+public class TrackScheduler extends AudioEventAdapter {
+
     private final AudioPlayer player;
     private final LinkedList<AudioTrack> queue;
     @Setter
@@ -28,19 +28,16 @@ public class TrackScheduler extends AudioEventAdapter
     @Setter
     private LoopState loopState;
 
-    public TrackScheduler(AudioPlayer player)
-    {
+    public TrackScheduler(AudioPlayer player) {
         this.player = player;
         this.queue = new LinkedList<>();
         this.loopState = LoopState.DISABLED;
     }
 
-    public boolean queue(AudioTrack track, User requester)
-    {
+    public boolean queue(AudioTrack track, User requester) {
         track.setUserData(requester);
 
-        if(!this.player.startTrack(track, true))
-        {
+        if(!this.player.startTrack(track, true)) {
             queue.offer(track);
             return true;
         }
@@ -50,8 +47,7 @@ public class TrackScheduler extends AudioEventAdapter
     }
 
     @Override
-    public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason)
-    {
+    public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(notifChannel.getGuild());
 
         if(loopState == LoopState.TRACK)
@@ -64,8 +60,7 @@ public class TrackScheduler extends AudioEventAdapter
     }
 
     @Override
-    public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException e)
-    {
+    public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException e) {
         EmbedBuilder embed = new EmbedBuilder().setColor(Color.red);
         embed.setTitle("Error!")
              .setDescription("❌ Couldn't play track!")
@@ -77,10 +72,8 @@ public class TrackScheduler extends AudioEventAdapter
         Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
     }
 
-    public void nextTrack()
-    {
-        if(queue.peek() != null)
-        {
+    public void nextTrack() {
+        if(queue.peek() != null) {
             AudioTrack nextTrack = queue.poll();
             player.startTrack(nextTrack, false);
 

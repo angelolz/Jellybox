@@ -3,8 +3,8 @@ package structure.jellyfin;
 import lombok.Data;
 
 @Data
-public class JellyfinTrack
-{
+public class JellyfinTrack {
+
     private String id;
     private String albumId;
     private String trackName;

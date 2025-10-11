@@ -14,53 +14,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.UtilClass;
 
-public class Jukebox
-{
-    //bot setup
+public class Jukebox {
+
     private static long uptime;
     @Getter
     private static CommandClient client;
-
-    //logger
     @Getter
     private static Logger logger;
 
 
-    public static void main(String[] args)
-    {
-        //logger
+    public static void main(String[] args) {
         logger = LoggerFactory.getLogger(Jukebox.class);
 
-        //create builder for adding commands and listeners
         CommandClientBuilder clientBuilder = new CommandClientBuilder();
 
-        //bot config
         clientBuilder.useHelpBuilder(false)
                      .setPrefix(Config.getPrefix())
                      .setOwnerId(Config.getOwnerId())
                      .setActivity(Activity.listening("music! | " + Config.getPrefix() + "help"))
                      .setEmojis("✅ | ", "⚠️ | ", "❌ | ");
 
-        //add commands
         clientBuilder.addCommands(
-            new Help(),
-            new Ping(),
-            new Join(),
-            new Play(),
-            new Stop(),
-            new Pause(),
-            new Skip(),
-            new Repeat(),
-            new Shuffle(),
-            new NowPlaying(),
-            new Leave(),
-            new Queue()
-        );
+            //player commands
+            new Play(), new Pause(), new Stop(), new Skip(), new Repeat(), new Shuffle(), new Queue(), new NowPlaying(),
+
+            //general bot commands
+            new Help(), new Ping(), new Join(), new Leave());
 
         client = clientBuilder.build();
 
-        try
-        {
+        try {
             //start tracking uptime
             uptime = System.currentTimeMillis();
 
@@ -73,15 +56,13 @@ public class Jukebox
                       .build();
         }
 
-        catch(Exception e)
-        {
+        catch(Exception e) {
             System.out.println("Unable to login with bot token.");
             e.printStackTrace();
         }
     }
 
-    public static String getUptime()
-    {
+    public static String getUptime() {
         return UtilClass.convertLongToDaysLength(System.currentTimeMillis() - uptime);
     }
 }

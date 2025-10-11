@@ -12,44 +12,42 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerManager
-{
+public class PlayerManager {
+
     private static PlayerManager instance;
     @Getter
     private final Map<Long, GuildMusicManager> musicManagers;
     private final AudioPlayerManager audioPlayerManager;
 
-    private PlayerManager()
-    {
+    private PlayerManager() {
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
         audioPlayerManager.registerSourceManager(new JellyfinAudioSourceManager());
-//        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
+        //        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
     }
 
-    public GuildMusicManager getMusicManager(Guild guild)
-    {
-        return musicManagers.computeIfAbsent(guild.getIdLong(),
-            guildId -> {
-                final GuildMusicManager guildMusicManager = new GuildMusicManager(audioPlayerManager, guild.getAudioManager());
+    public GuildMusicManager getMusicManager(Guild guild) {
+        return musicManagers.computeIfAbsent(guild.getIdLong(), guildId -> {
+            final GuildMusicManager guildMusicManager = new GuildMusicManager(audioPlayerManager,
+                guild.getAudioManager());
 
-                guild.getAudioManager().setSendingHandler(guildMusicManager.getHandler());
+            guild.getAudioManager().setSendingHandler(guildMusicManager.getHandler());
 
-                return guildMusicManager;
-            });
+            return guildMusicManager;
+        });
     }
 
-    public void loadAndPlay(TextChannel channel, User requester, String trackUrl)
-    {
+    public void loadAndPlay(TextChannel channel, User requester, String trackUrl) {
         final GuildMusicManager guildMusicManager = getMusicManager(channel.getGuild());
-        SourceAudioLoadResultHandler sourceAudioLoadResultHandler = new SourceAudioLoadResultHandler(guildMusicManager, requester, channel);
+        SourceAudioLoadResultHandler sourceAudioLoadResultHandler =
+            new SourceAudioLoadResultHandler(guildMusicManager, requester, channel);
         audioPlayerManager.loadItemOrdered(guildMusicManager, trackUrl, sourceAudioLoadResultHandler);
     }
 
-    public static PlayerManager getInstance()
-    {
-        if(instance == null) instance = new PlayerManager();
+    public static PlayerManager getInstance() {
+        if(instance == null)
+            instance = new PlayerManager();
         return instance;
     }
 }

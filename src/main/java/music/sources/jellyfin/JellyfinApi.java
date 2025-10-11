@@ -10,26 +10,25 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class JellyfinApi
-{
-    public static List<JellyfinTrack> searchTracks(String query) throws IOException
-    {
+public class JellyfinApi {
+
+    public static List<JellyfinTrack> searchTracks(String query) throws IOException {
         String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8);
-        String url = String.format("%s/Items?api_key=%s&parentId=%s&IncludeItemTypes=Audio&recursive=true&searchTerm=%s", Config.getJellyfinUrl(), Config.getJellyfinApiKey(), Config.getJellyfinLibraryId(), encoded);
+        String url = String.format("%s/Items?api_key=%s&parentId=%s&IncludeItemTypes=Audio&recursive=true&searchTerm" +
+            "=%s", Config.getJellyfinUrl(), Config.getJellyfinApiKey(), Config.getJellyfinLibraryId(), encoded);
 
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestProperty("Accept", "application/json");
 
-        try(InputStreamReader reader = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))
-        {
+        try(InputStreamReader reader = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8)) {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
             JsonArray items = json.getAsJsonArray("Items");
 
             List<JellyfinTrack> results = new ArrayList<>();
-            if(items == null) return results;
+            if(items == null)
+                return results;
 
-            for(JsonElement e : items)
-            {
+            for(JsonElement e : items) {
                 JsonObject o = e.getAsJsonObject();
                 JellyfinTrack track = extractMetadata(o);
                 results.add(track);
@@ -38,28 +37,28 @@ public class JellyfinApi
         }
     }
 
-    public static JellyfinTrack getAudioItemMetadata(String id) throws IOException
-    {
-        if(UtilClass.isNullOrEmpty(id)) return null;
+    public static JellyfinTrack getAudioItemMetadata(String id) throws IOException {
+        if(UtilClass.isNullOrEmpty(id))
+            return null;
 
-        String url = String.format("%s/Items?api_key=%s&ids=%s&", Config.getJellyfinUrl(), Config.getJellyfinApiKey(), id);
+        String url = String.format("%s/Items?api_key=%s&ids=%s&", Config.getJellyfinUrl(), Config.getJellyfinApiKey()
+            , id);
 
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestProperty("Accept", "application/json");
 
-        try(InputStreamReader reader = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))
-        {
+        try(InputStreamReader reader = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8)) {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
             JsonArray items = json.getAsJsonArray("Items");
 
-            if(items == null) return null;
+            if(items == null)
+                return null;
             JsonObject item = items.get(0).getAsJsonObject();
             return extractMetadata(item);
         }
     }
 
-    private static JellyfinTrack extractMetadata(JsonObject item)
-    {
+    private static JellyfinTrack extractMetadata(JsonObject item) {
         JellyfinTrack track = new JellyfinTrack();
         track.setId(item.get("Id").getAsString());
         track.setTrackName(item.get("Name").getAsString());
@@ -74,17 +73,13 @@ public class JellyfinApi
         return track;
     }
 
-    public static String getStreamUrl(String itemId)
-    {
-        return String.format("%s/Items/%s/File?api_key=%s",
-            Config.getJellyfinUrl(),
-            itemId,
-            Config.getJellyfinApiKey()
-        );
+    public static String getStreamUrl(String itemId) {
+        return String.format("%s/Items/%s/File?api_key=%s", Config.getJellyfinUrl(), itemId,
+            Config.getJellyfinApiKey());
     }
 
-    public static String getAlbumThumbnail(String itemId)
-    {
-        return String.format("%s/Items/%s/Images/Primary?api_key%s", Config.getJellyfinUrl(), itemId, Config.getJellyfinApiKey());
+    public static String getAlbumThumbnail(String itemId) {
+        return String.format("%s/Items/%s/Images/Primary?api_key%s", Config.getJellyfinUrl(), itemId,
+            Config.getJellyfinApiKey());
     }
 }

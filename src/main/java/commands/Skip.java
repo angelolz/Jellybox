@@ -7,10 +7,9 @@ import music.TrackScheduler;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import utils.UtilClass;
 
-public class Skip extends Command
-{
-    public Skip()
-    {
+public class Skip extends Command {
+
+    public Skip() {
         this.name = "skip";
         this.help = "Skips the current track.";
         this.cooldown = 3;
@@ -19,16 +18,15 @@ public class Skip extends Command
     }
 
     @Override
-    protected void execute(CommandEvent commandEvent)
-    {
+    protected void execute(CommandEvent commandEvent) {
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
 
-        if(UtilClass.checkInvalidVoiceState(commandEvent, selfVoiceState, userVoiceState)) return;
+        if(UtilClass.checkInvalidVoiceState(commandEvent, selfVoiceState, userVoiceState))
+            return;
 
         TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler();
-        if(scheduler.getPlayer().getPlayingTrack() == null)
-        {
+        if(scheduler.getPlayer().getPlayingTrack() == null) {
             commandEvent.replyError("There's no track playing!");
             return;
         }
