@@ -201,7 +201,7 @@ public class Play extends Command {
                                                    .setDescription("Please select an artist to play from:\n\n" + getArtistForDescription(results));
 
             StringSelectMenu.Builder menu = StringSelectMenu.create(commandEvent.getAuthor()
-                                                                                .getId() + ":play:album-selection");
+                                                                                .getId() + ":play:artist-selection");
             for(int i = 0; i < Math.min(10, results.size()); i++) {
                 JellyfinArtist artist = results.get(i);
                 menu.addOption(artist.getName(), artist.getId());
