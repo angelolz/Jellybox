@@ -4,18 +4,19 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import main.Jukebox;
 import music.PlayerManager;
 import music.sources.jellyfin.JellyfinApi;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import structure.jellyfin.JellyfinAlbum;
+import structure.jellyfin.JellyfinArtist;
 import structure.jellyfin.JellyfinTrack;
 import utils.Statics;
 
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,11 +58,12 @@ public class Play extends Command {
             if(commandEvent.getArgs().isEmpty())
                 unpauseBot(commandEvent, player, queue);
             else
-                findTrack(commandEvent, player);
+                findResults(commandEvent, player);
         }
 
         catch(IOException e) {
-            commandEvent.replyError("❌ Error finding track!");
+            commandEvent.replyError("Sorry, there was an error looking up your query.");
+            Jukebox.getLogger().error("Error looking up query", e);
         }
     }
 
@@ -91,8 +93,8 @@ public class Play extends Command {
             }
 
             if(queue.isEmpty()) {
-                commandEvent.replyError("There's nothing to play because the queue is empty! Add a track by giving a " +
-                    "search query or URL.");
+                commandEvent.replyError("There's nothing to play because the queue is empty! Add a track by giving a "
+                    + "search query or URL.");
                 return;
             }
 
@@ -101,17 +103,19 @@ public class Play extends Command {
         }
     }
 
-    private static void findTrack(CommandEvent commandEvent, AudioPlayer player) throws IOException {
-        String[] query = commandEvent.getArgs().split("\\s+", 2);
+    private static void findResults(CommandEvent commandEvent, AudioPlayer player) throws IOException {
+        String[] query = commandEvent.getArgs().split(":", 2);
 
-        List<JellyfinTrack> results = new ArrayList<>();
         switch(query[0].toLowerCase()) {
-            case "artist" -> {}
-            case "song", "track" -> results = JellyfinApi.searchTracks(query[1]);
-            case "album" -> {}
-            default -> results = JellyfinApi.searchTracks(commandEvent.getArgs());
+            case "song", "track" -> findTracks(commandEvent, player, query[1]);
+            case "album" -> findAlbums(commandEvent, player, query[1]);
+            case "artist" -> findArtists(commandEvent, player, query[1]);
+            default -> findTracks(commandEvent, player, commandEvent.getArgs());
         }
+    }
 
+    private static void findTracks(CommandEvent commandEvent, AudioPlayer player, String query) throws IOException {
+        List<JellyfinTrack> results = JellyfinApi.searchTracks(query);
         if(results.isEmpty()) {
             commandEvent.reply("❌ No tracks found with your query!");
             return;
@@ -138,12 +142,86 @@ public class Play extends Command {
             JellyfinTrack track = results.get(0);
 
             if(player.isPaused())
-                commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, then" +
-                    " type `!p` or `!play`!");
+                commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, " +
+                    "then" + " type `!p` or `!play`!");
 
             PlayerManager.getInstance()
                          .loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(),
-                             "jellyfin://" + track.getId());
+                             "jellyfin://track/" + track.getId());
+        }
+    }
+
+    private static void findAlbums(CommandEvent commandEvent, AudioPlayer player, String query) throws IOException {
+        List<JellyfinAlbum> results = JellyfinApi.searchAlbums(query);
+        if(results.isEmpty()) {
+            commandEvent.reply("❌ No albums found with your query!");
+            return;
+        }
+
+        if(results.size() > 1) {
+            EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR)
+                                                   .setTitle("Multiple albums found!")
+                                                   .setDescription("Please select an album to play:\n\n" + getAlbumsForDescription(results));
+
+            StringSelectMenu.Builder menu = StringSelectMenu.create(commandEvent.getAuthor()
+                                                                                .getId() + ":play:album-selection");
+            for(int i = 0; i < Math.min(10, results.size()); i++) {
+                JellyfinAlbum album = results.get(i);
+                menu.addOption(album.getAlbumArtist() + " - " + album.getAlbumName(), album.getId());
+            }
+
+            commandEvent.getChannel()
+                        .sendMessageEmbeds(embed.build())
+                        .setComponents(ActionRow.of(menu.build()))
+                        .queue();
+        }
+        else {
+            JellyfinAlbum album = results.get(0);
+
+            if(player.isPaused())
+                commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, " +
+                    "then" + " type `!p` or `!play`!");
+
+            PlayerManager.getInstance()
+                         .loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(),
+                             "jellyfin://album/" + album.getId());
+        }
+    }
+
+    private static void findArtists(CommandEvent commandEvent, AudioPlayer player, String query) throws IOException {
+        List<JellyfinArtist> results = JellyfinApi.searchArtists(query);
+        if(results.isEmpty()) {
+            commandEvent.reply("❌ No albums found with your query!");
+            return;
+        }
+
+        if(results.size() > 1) {
+            EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR)
+                                                   .setTitle("Multiple artists found!")
+                                                   .setDescription("Please select an artist to play from:\n\n" + getArtistForDescription(results));
+
+            StringSelectMenu.Builder menu = StringSelectMenu.create(commandEvent.getAuthor()
+                                                                                .getId() + ":play:album-selection");
+            for(int i = 0; i < Math.min(10, results.size()); i++) {
+                JellyfinArtist artist = results.get(i);
+                menu.addOption(artist.getName(), artist.getId());
+            }
+
+            commandEvent.getChannel()
+                        .sendMessageEmbeds(embed.build())
+                        .setComponents(ActionRow.of(menu.build()))
+                        .queue();
+        }
+        else {
+            JellyfinArtist artist = results.get(0);
+
+            if(player.isPaused())
+                commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, " +
+                    "then" + " type `!p` or `!play`!");
+
+            PlayerManager.getInstance()
+                         .loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(),
+                             "jellyfin://artist/" + artist.getId());
         }
     }
 
@@ -151,11 +229,36 @@ public class Play extends Command {
         StringBuilder builder = new StringBuilder();
         for(int i = 0; i < Math.min(10, tracks.size()); i++) {
             builder.append(i + 1)
-                   .append(") ")
+                   .append(". ")
                    .append(tracks.get(i).getArtist())
                    .append(" - ")
                    .append(tracks.get(i).getTrackName())
                    .append("\n");
+        }
+
+        return builder.toString();
+    }
+
+    private static String getAlbumsForDescription(List<JellyfinAlbum> albums) {
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < Math.min(10, albums.size()); i++) {
+            builder.append(i + 1)
+                   .append(". ")
+                   .append(albums.get(i).getAlbumArtist())
+                   .append(" - ")
+                   .append(albums.get(i).getAlbumName())
+                   .append(" (")
+                   .append(albums.get(i).getYear())
+                   .append(")\n");
+        }
+
+        return builder.toString();
+    }
+
+    private static String getArtistForDescription(List<JellyfinArtist> artists) {
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < Math.min(10, artists.size()); i++) {
+            builder.append(i + 1).append(". ").append(artists.get(i).getName()).append("\n");
         }
 
         return builder.toString();

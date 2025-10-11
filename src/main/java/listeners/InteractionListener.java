@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class ButtonListener extends ListenerAdapter {
+public class InteractionListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
@@ -33,11 +33,26 @@ public class ButtonListener extends ListenerAdapter {
 
         event.getInteraction().deferEdit().queue();
         if(args[1].equalsIgnoreCase("play")) {
-            if(args[2].equalsIgnoreCase("track-selection")) {
-                String trackId = event.getValues().get(0);
-                PlayerManager.getInstance()
-                             .loadAndPlay(event.getChannel().asTextChannel(), event.getUser(), "jellyfin://" + trackId);
-                event.getMessage().delete().queue();
+            switch(args[2].toLowerCase()) {
+                case "track-selection" -> {
+                    String trackId = event.getValues().get(0);
+                    PlayerManager.getInstance()
+                                 .loadAndPlay(event.getChannel().asTextChannel(), event.getUser(), "jellyfin://track/" + trackId);
+                }
+                case "album-selection" -> {
+                    String albumId = event.getValues().get(0);
+                    PlayerManager.getInstance()
+                                 .loadAndPlay(event.getChannel().asTextChannel(), event.getUser(), "jellyfin://album/" + albumId);
+                    event.getMessage().delete().queue();
+                    
+                }
+                case "artist-selection" -> {
+                    String artistId = event.getValues().get(0);
+                    PlayerManager.getInstance()
+                                 .loadAndPlay(event.getChannel().asTextChannel(), event.getUser(), "jellyfin://artist/" + artistId);
+                    event.getMessage().delete().queue();
+                }
+                default -> Jukebox.getLogger().error("Unknown action: {} | ID: {}", args[2], event.getComponentId());
             }
         }
     }

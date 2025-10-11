@@ -55,50 +55,23 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
-        //        if(audioPlaylist.isSearchResult())
-        //        {
-        //            trackLoaded(audioPlaylist.getTracks().get(0));
-        //            return;
-        //        }
-        //
-        //        if(!channel.getGuild().getAudioManager().isConnected())
-        //        {
-        //            channel.sendMessageFormat("❌ | Playlist **%d** was not loaded due to the bot not being in a
-        //            voice channel.", audioPlaylist.getName()).queue();
-        //            return;
-        //        }
-        //
-        //        long playlistDuration = 0;
-        //        int tracksAdded = 0;
-        //        boolean limitReached = false;
-        //        for(AudioTrack track : audioPlaylist.getTracks())
-        //        {
-        //            if(guildMusicManager.getScheduler().getQueue().size() < Statics.MAX_QUEUE_ITEMS)
-        //            {
-        //                guildMusicManager.getScheduler().queue(track, requester);
-        //                tracksAdded++;
-        //                playlistDuration += track.getDuration();
-        //            }
-        //
-        //            else
-        //            {
-        //                limitReached = true;
-        //                break;
-        //            }
-        //        }
-        //
-        //        embed.setColor(Statics.EMBED_COLOR)
-        //             .setDescription(String.format("🎶 Added **%d** tracks to the queue from the playlist **%s**!",
-        //             tracksAdded, audioPlaylist.getName()))
-        //             .addField("Total time added:", UtilClass.convertLongToTrackTime(playlistDuration), true)
-        //             .addField("Requested by:", requester.getAsMention(), true);
-        //
-        //        if(limitReached)
-        //            embed.appendDescription(String.format("%n%nOnly the first **%d** tracks of the playlist were
-        //            added to the queue due to the maximum queue size of %d tracks being reached.", tracksAdded,
-        //            Statics.MAX_QUEUE_ITEMS));
-        //
-        //        channel.sendMessageEmbeds(embed.build()).queue();
+        long playlistDuration = 0;
+        int tracksAdded = 0;
+        for(AudioTrack track : audioPlaylist.getTracks()) {
+            if(!guildMusicManager.getScheduler().queue(track, requester))
+                guildMusicManager.getNotifChannel().sendMessageEmbeds(UtilClass.getNowPlayingEmbed(track).build()).queue();
+            tracksAdded++;
+            playlistDuration += track.getDuration();
+        }
+
+        EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR)
+                                               .setTitle("Added to Queue!")
+                                               .setDescription(String.format("🎶 Added **%d** tracks from **%s** to the queue!", tracksAdded, audioPlaylist.getName()))
+                                               .addField("Total time added:",
+                                                   UtilClass.convertLongToTrackTime(playlistDuration), true)
+                                               .addField("Requested by:", requester.getAsMention(), true);
+
+        channel.sendMessageEmbeds(embed.build()).queue();
     }
 
     @Override
@@ -109,8 +82,8 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler {
     @Override
     public void loadFailed(FriendlyException e) {
         channel.sendMessage("❌ | There was an error trying to play your track.").queue();
-        e.printStackTrace();
         Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
+        e.printStackTrace();
     }
 
     private long calculateTotalQueueLength(AudioPlayer player, LinkedList<AudioTrack> queue) {

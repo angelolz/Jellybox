@@ -2,7 +2,6 @@ package music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import lombok.Getter;
 import music.sources.jellyfin.JellyfinAudioSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,7 +23,6 @@ public class PlayerManager {
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
         audioPlayerManager.registerSourceManager(new JellyfinAudioSourceManager());
-        //        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {

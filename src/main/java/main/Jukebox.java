@@ -3,7 +3,7 @@ package main;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import commands.*;
-import listeners.ButtonListener;
+import listeners.InteractionListener;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.JDABuilder;
@@ -52,7 +52,7 @@ public class Jukebox {
                       .setStatus(OnlineStatus.DO_NOT_DISTURB)
                       .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                       .setActivity(Activity.listening("loading!! | " + Config.getPrefix() + "help"))
-                      .addEventListeners(client, new ButtonListener())
+                      .addEventListeners(client, new InteractionListener())
                       .build();
         }
 
