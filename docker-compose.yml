@@ -1,12 +1,13 @@
 services:
-  my-java-app:
-    image: ghcr.io/angelolz/jellybox:latest
+  jellybox:
+    image: ghcr.io/angelolz/jellybox:2.0.0
     container_name: jellybox
     restart: unless-stopped
     environment:
-      BOT_TOKEN:
-      OWNER_ID:
-      JELLYFIN_URL:
-      JELLYFIN_API_KEY:
-      JELLYFIN_USER_ID:
-      JELLYFIN_LIBRARY_ID:
+      - BOT_TOKEN=
+      - OWNER_ID=
+      - JELLYFIN_URL=
+      - JELLYFIN_API_KEY=
+      - JELLYFIN_USER_ID=
+      - JELLYFIN_LIBRARY_ID=
+networks: {}
