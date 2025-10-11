@@ -57,12 +57,6 @@ public class Jukebox
             new Queue()
         );
 
-        //admin/hidden commands
-        clientBuilder.addCommands(
-            new Invite(),
-            new Admin()
-        );
-
         client = clientBuilder.build();
 
         try

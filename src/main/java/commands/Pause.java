@@ -7,7 +7,7 @@ import music.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import utils.UtilClass;
 
-public class     Pause extends Command
+public class Pause extends Command
 {
     public Pause()
     {

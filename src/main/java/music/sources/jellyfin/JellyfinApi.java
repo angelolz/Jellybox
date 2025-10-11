@@ -69,6 +69,8 @@ public class JellyfinApi
         track.setStreamUrl(JellyfinApi.getStreamUrl(item.get("Id").getAsString()));
         if(!UtilClass.isNullOrEmpty(item.get("Album").getAsString()))
             track.setAlbum(item.get("Album").getAsString());
+        if(!UtilClass.isNullOrEmpty(item.get("AlbumId").getAsString()))
+            track.setAlbumId(item.get("AlbumId").getAsString());
         return track;
     }
 
@@ -81,23 +83,8 @@ public class JellyfinApi
         );
     }
 
-    public static String getPlayableStreamUrl(JellyfinTrack track) {
-        // Check if track is in a Lavaplayer-compatible format
-        String container = track.getContainer().toLowerCase();
-
-        if (container.equals("mp3") || container.equals("m4a")) {
-            // Native playback
-            return String.format("%s/Items/%s/file?api_key=%s",
-                Config.getJellyfinUrl(),
-                track.getId(),
-                Config.getJellyfinApiKey());
-        } else {
-            // Unsupported → fallback to MP3 transcoding
-            return String.format("%s/Items/%s/File?api_key=%s&userId=%s",
-                Config.getJellyfinUrl(),
-                track.getId(),
-                Config.getJellyfinApiKey(),
-                Config.getJellyfinUserId());
-        }
+    public static String getAlbumThumbnail(String itemId)
+    {
+        return String.format("%s/Items/%s/Images/Primary?api_key%s", Config.getJellyfinUrl(), itemId, Config.getJellyfinApiKey());
     }
 }

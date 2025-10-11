@@ -82,16 +82,10 @@ public class TrackScheduler extends AudioEventAdapter
         if(queue.peek() != null)
         {
             AudioTrack nextTrack = queue.poll();
-            AudioTrackInfo nextTrackInfo = nextTrack.getInfo();
-
             player.startTrack(nextTrack, false);
 
-            EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
-            embed.setTitle("Now Playing")
-                 .setDescription(String.format("%s `(%s)` [%s]",
-                     nextTrackInfo.title, UtilClass.convertLongToTrackTime(nextTrackInfo.length), nextTrack.getUserData(User.class).getAsMention()));
+            EmbedBuilder embed = UtilClass.getNowPlayingEmbed(nextTrack);
             notifChannel.sendMessageEmbeds(embed.build()).queue();
         }
     }
-
 }

@@ -140,21 +140,14 @@ public class Play extends Command
             }
 
             commandEvent.getChannel().sendMessageEmbeds(embed.build()).setComponents(ActionRow.of(menu.build())).queue();
-            return;
+        } else {
+            JellyfinTrack track = results.get(0);
+
+            if(player.isPaused())
+                commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, then type `!p` or `!play`!");
+
+            PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), "jellyfin://" + track.getId());
         }
-
-        JellyfinTrack track = results.get(0);
-
-        if(PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getScheduler().getQueue().size() >= Statics.MAX_QUEUE_ITEMS)
-        {
-            commandEvent.replyFormatted("❌ | Your request was not loaded due to the queue reaching the maximum size of **%d** tracks.", Statics.MAX_QUEUE_ITEMS);
-            return;
-        }
-
-        if(player.isPaused())
-            commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, then type `!p` or `!play`!");
-
-        PlayerManager.getInstance().loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(), "jellyfin://" + track.getId());
     }
 
     private static String getTracksForDescription(List<JellyfinTrack> tracks) {

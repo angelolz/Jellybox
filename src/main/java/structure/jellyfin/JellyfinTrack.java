@@ -6,6 +6,7 @@ import lombok.Data;
 public class JellyfinTrack
 {
     private String id;
+    private String albumId;
     private String trackName;
     private String artist;
     private String album;

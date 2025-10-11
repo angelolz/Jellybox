@@ -9,15 +9,15 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import music.GuildMusicManager;
 import music.PlayerManager;
 import music.TrackScheduler;
+import music.sources.jellyfin.JellyfinApi;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import utils.Statics;
 import utils.UtilClass;
 
-public class NowPlaying extends Command
-{
-    public NowPlaying()
-    {
+public class NowPlaying extends Command {
+
+    public NowPlaying() {
         this.name = "nowplaying";
         this.aliases = new String[]{ "np" };
         this.help = "Displays info about the current playing track.";
@@ -27,14 +27,12 @@ public class NowPlaying extends Command
     }
 
     @Override
-    protected void execute(CommandEvent commandEvent)
-    {
+    protected void execute(CommandEvent commandEvent) {
         GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild());
         TrackScheduler scheduler = manager.getScheduler();
         AudioTrack track = manager.getScheduler().getPlayer().getPlayingTrack();
 
-        if(track == null)
-        {
+        if(track == null) {
             commandEvent.replyError("There is no track playing!");
             return;
         }
@@ -42,31 +40,22 @@ public class NowPlaying extends Command
         LinkedList<AudioTrack> queue = manager.getScheduler().getQueue();
 
         AudioTrackInfo trackInfo = track.getInfo();
-        EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR);
-
-        embed.setTitle("Now Playing", trackInfo.uri)
-             .addField("Title", trackInfo.title, true);
-
-        if(track.getInfo().isStream)
-            embed.addField("Time Elapsed", String.valueOf(UtilClass.convertLongToTrackTime(track.getPosition())), true);
-        else
-        {
-            embed.addField("Length", String.format("`%s` / `%s`",
-                UtilClass.convertLongToTrackTime(track.getPosition()),
-                UtilClass.convertLongToTrackTime(track.getDuration())), true);
-        }
-
-        embed.addField("Requested by", track.getUserData(User.class).getAsMention(), true)
-             .setThumbnail(UtilClass.getThumbnail(track))
-             .addField("Size of Queue", String.valueOf(queue.size()), true)
-             .addField("Repeat State", scheduler.getLoopState().toString(), true);
-
         AudioTrack nextTrack = manager.getScheduler().getQueue().peek();
+        EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR)
+            .setTitle("Now Playing")
+            .setThumbnail(track.getInfo().artworkUrl)
+            .addField("Current Track", UtilClass.getTrackInfoForEmbed(trackInfo), true)
+                                               .addField("Length", String.format("`%s` / `%s`", UtilClass.convertLongToTrackTime(track.getPosition()),
+                UtilClass.convertLongToTrackTime(track.getDuration())), true)
+            .addField("Requested by", track.getUserData(User.class).getAsMention(), true)
 
-        if(nextTrack != null)
-            embed.addField("Next Track", nextTrack.getInfo().title, true);
-        else
-            embed.addField("Next Track", "*None*", true);
+
+            .addField("Next Track", nextTrack != null ? UtilClass.getTrackInfoForEmbed(nextTrack.getInfo()) : "*None*", true)
+            .addField("Queue Size", queue.isEmpty() ? "*Empty*" : String.format("**%s** tracks%n`%s` playtime",
+                queue.size(), UtilClass.convertLongToTrackTime(queue.stream()
+                .mapToLong(AudioTrack::getDuration)
+                .sum())), true)
+            .addField("Repeat State", scheduler.getLoopState().toString(), true);
 
         commandEvent.reply(embed.build());
     }

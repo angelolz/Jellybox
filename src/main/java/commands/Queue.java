@@ -169,10 +169,7 @@ public class Queue extends Command
             String trackFormat = "**%d)** %s - %s %s (%s)%n";
             String duration = UtilClass.convertLongToTrackTime(track.getDuration());
 
-            if(!track.getInfo().isStream)
-                queueString.append(String.format(trackFormat, trackNumber, track.getInfo().author, track.getInfo().title, "`[" + duration + "]`", track.getUserData(User.class).getAsMention()));
-            else
-                queueString.append(String.format(trackFormat, trackNumber, track.getInfo().author, track.getInfo().title, "", track.getUserData(User.class).getAsMention()));
+            queueString.append(String.format(trackFormat, trackNumber, track.getInfo().author, track.getInfo().title, "`[" + duration + "]`", track.getUserData(User.class).getAsMention()));
 
             trackNumber++;
         }

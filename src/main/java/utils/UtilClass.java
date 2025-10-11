@@ -2,14 +2,10 @@ package utils;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.Jukebox;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import net.dv8tion.jda.api.entities.User;
 
 public class UtilClass
 {
@@ -50,64 +46,6 @@ public class UtilClass
         return result.toString();
     }
 
-    public static boolean isURI(String urlString)
-    {
-        try
-        {
-            URL url = new URL(urlString);
-            url.toURI();
-            return true;
-        }
-
-        catch(Exception e)
-        {
-            return false;
-        }
-    }
-
-    public static String readURL(String string) throws IOException
-    {
-        URL url = new URL(string);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0");
-        con.connect();
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream())))
-        {
-            StringBuilder buffer = new StringBuilder();
-            int read;
-            char[] chars = new char[1024];
-            while((read = reader.read(chars)) != -1)
-            {
-                buffer.append(chars, 0, read);
-            }
-
-            return buffer.toString();
-        }
-    }
-
-    public static String getThumbnail(AudioTrack track)
-    {
-        try
-        {
-            switch(track.getSourceManager().getSourceName())
-            {
-                case "soundcloud" -> { return null; } // Unable to sign up for SoundCloud API
-                default ->
-                {
-                    Jukebox.getLogger().warn("Unknown source: {}", track.getSourceManager().getSourceName());
-                    return null;
-                }
-            }
-        }
-
-        catch(Exception e)
-        {
-            Jukebox.getLogger().error("Error getting thumbnail: {}", e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static boolean checkInvalidVoiceState(CommandEvent commandEvent, GuildVoiceState selfVoiceState, GuildVoiceState userVoiceState)
     {
         if(!selfVoiceState.inAudioChannel())
@@ -129,5 +67,18 @@ public class UtilClass
         }
 
         return false;
+    }
+
+    public static String getTrackInfoForEmbed(AudioTrackInfo trackInfo) {
+        return String.format("**%s**%n%s%n%s", trackInfo.title, trackInfo.author, trackInfo.isrc == null ? "" : " *" + trackInfo.isrc + "*");
+    }
+
+    public static EmbedBuilder getNowPlayingEmbed(AudioTrack track) {
+        return new EmbedBuilder().setColor(Statics.EMBED_COLOR)
+            .setTitle("Now Playing")
+            .setThumbnail(track.getInfo().artworkUrl)
+            .setDescription(UtilClass.getTrackInfoForEmbed(track.getInfo()))
+            .addField("Length",  UtilClass.convertLongToTrackTime(track.getInfo().length), true)
+            .addField("Added by", track.getUserData(User.class).getAsMention(), true);
     }
 }

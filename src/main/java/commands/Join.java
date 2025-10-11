@@ -23,13 +23,13 @@ public class Join extends Command
         GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
         GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
 
-        if(selfVoiceState.inAudioChannel())
+        if(selfVoiceState != null && selfVoiceState.inAudioChannel())
         {
             commandEvent.replyError("I'm already in a voice channel!");
             return;
         }
 
-        if(!userVoiceState.inAudioChannel())
+        if(userVoiceState != null && !userVoiceState.inAudioChannel())
         {
             commandEvent.replyError("You must be in a voice channel in order to use this command!");
             return;
