@@ -4,7 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.Jukebox;
+import main.Jellybox;
 import music.PlayerManager;
 import music.sources.jellyfin.JellyfinApi;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -63,7 +63,7 @@ public class Play extends Command {
 
         catch(IOException e) {
             commandEvent.replyError("Sorry, there was an error looking up your query.");
-            Jukebox.getLogger().error("Error looking up query", e);
+            Jellybox.getLogger().error("Error looking up query", e);
         }
     }
 

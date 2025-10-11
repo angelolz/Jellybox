@@ -2,7 +2,7 @@ package listeners;
 
 import commands.Help;
 import commands.Queue;
-import main.Jukebox;
+import main.Jellybox;
 import music.PlayerManager;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -20,7 +20,7 @@ public class InteractionListener extends ListenerAdapter {
             switch(args[2].toLowerCase()) {
                 case "queue" -> Queue.paginate(event, args);
                 case "help" -> Help.getEmbed(event, args[3]);
-                default -> Jukebox.getLogger().error("Unknown action: {} | ID: {}", args[2], event.getComponentId());
+                default -> Jellybox.getLogger().error("Unknown action: {} | ID: {}", args[2], event.getComponentId());
             }
         }
     }
@@ -52,7 +52,7 @@ public class InteractionListener extends ListenerAdapter {
                                  .loadAndPlay(event.getChannel().asTextChannel(), event.getUser(), "jellyfin://artist/" + artistId);
                     event.getMessage().delete().queue();
                 }
-                default -> Jukebox.getLogger().error("Unknown action: {} | ID: {}", args[2], event.getComponentId());
+                default -> Jellybox.getLogger().error("Unknown action: {} | ID: {}", args[2], event.getComponentId());
             }
         }
     }

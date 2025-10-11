@@ -9,7 +9,7 @@ import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
 import com.sedmelluq.discord.lavaplayer.tools.io.PersistentHttpStream;
 import com.sedmelluq.discord.lavaplayer.track.*;
 
-import main.Jukebox;
+import main.Jellybox;
 import structure.jellyfin.JellyfinAlbum;
 import structure.jellyfin.JellyfinArtist;
 import structure.jellyfin.JellyfinTrack;
@@ -19,7 +19,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +41,7 @@ public class JellyfinAudioSourceManager extends HttpAudioSourceManager {
                 case "track" -> { return loadTrack(params[1]); }
                 case "album" -> { return loadAlbum(params[1]); }
                 case "artist" -> { return loadArtist(params[1]); }
-                default -> Jukebox.getLogger().error("Unknown handler: {} | type: {}", params[1], reference.identifier);
+                default -> Jellybox.getLogger().error("Unknown handler: {} | type: {}", params[1], reference.identifier);
             }
         }
         catch(Exception e) {

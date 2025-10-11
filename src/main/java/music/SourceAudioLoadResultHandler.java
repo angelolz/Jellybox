@@ -6,7 +6,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import main.Jukebox;
+import main.Jellybox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -82,7 +82,7 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler {
     @Override
     public void loadFailed(FriendlyException e) {
         channel.sendMessage("❌ | There was an error trying to play your track.").queue();
-        Jukebox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
+        Jellybox.getLogger().error("Error occurred when playing track: {}: {}", e.getClass().getName(), e.getMessage());
         e.printStackTrace();
     }
 

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.angelolz</groupId>
-    <artifactId>jellyfin-jukebox</artifactId>
+    <artifactId>Jellybox</artifactId>
     <version>2.0.0</version>
 
     <properties>
@@ -103,7 +103,7 @@
                 <configuration>
                     <transformers>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>main.Jukebox</mainClass>
+                            <mainClass>main.Jellybox</mainClass>
                         </transformer>
                     </transformers>
                     <createDependencyReducedPom>false</createDependencyReducedPom>

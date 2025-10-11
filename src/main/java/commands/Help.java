@@ -3,7 +3,7 @@ package commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import main.Config;
-import main.Jukebox;
+import main.Jellybox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -82,7 +82,7 @@ public class Help extends Command {
                 embed.setTitle("Other Tools");
                 getCommands(embed, "Tools");
             }
-            default -> Jukebox.getLogger().error("Unknown embed category name: {}", category);
+            default -> Jellybox.getLogger().error("Unknown embed category name: {}", category);
         }
 
         event.deferEdit()
@@ -98,11 +98,11 @@ public class Help extends Command {
     }
 
     private static void getCommands(EmbedBuilder embed, String category) {
-        List<Command> commandsInCategory = Jukebox.getClient()
-                                                  .getCommands()
-                                                  .stream()
-                                                  .filter(c -> c.getCategory().getName().equals(category))
-                                                  .toList();
+        List<Command> commandsInCategory = Jellybox.getClient()
+                                                   .getCommands()
+                                                   .stream()
+                                                   .filter(c -> c.getCategory().getName().equals(category))
+                                                   .toList();
         for(Command command : commandsInCategory) {
             if(command.isOwnerCommand() || command.isHidden())
                 continue;
@@ -115,7 +115,7 @@ public class Help extends Command {
             }
             embed.addField(commandName, command.getHelp(), true);
         }
-        embed.setFooter(String.format("Version %s | Uptime: %s", Config.getVersion(), Jukebox.getUptime()));
+        embed.setFooter(String.format("Version %s | Uptime: %s", Config.getVersion(), Jellybox.getUptime()));
     }
 
     private static void getCommandHelp(EmbedBuilder embed, String commandName) {
@@ -127,16 +127,16 @@ public class Help extends Command {
             case "join" ->
                 embed.setDescription("Joins the same voice channel that you are in. " + "Requires the `Connect` " +
                     "permission in the voice channel's permission settings.");
-            case "leave" -> embed.setDescription("Leaves any voice channel that the Jukebox is in.");
+            case "leave" -> embed.setDescription("Leaves any voice channel that Jellybox is in.");
             case "nowplaying" ->
                 embed.setDescription("Displays information about the current track (if any), as well as the next " +
                     "track in queue.");
             case "pause" ->
                 embed.setDescription(String.format("Pauses the current track (if any). " + "Use the `%splay` command " +
                     "to unpause the track.", Config.getPrefix()));
-            case "ping" -> embed.setDescription("Returns the latency of the Jukebox.");
+            case "ping" -> embed.setDescription("Returns the latency of Jellybox.");
             case "play" -> embed.setDescription("""
-                Plays a track given through a URL or search query. If no track is given, the Jukebox will continue playback if paused/stopped.
+                Plays a track given through a URL or search query. If no track is given, Jellybox will continue playback if paused/stopped.
                 The bot currently **supports** playing from these streaming services:
                 - YouTube (videos/playlists)
                 - Soundcloud (tracks only)
@@ -149,11 +149,11 @@ public class Help extends Command {
                                      `%1$squeue next <track position>` - Moves a track to the first position in queue.
                                      """, Config.getPrefix()), true);
             case "repeat" -> embed.setDescription(String.format("""
-                Changes the repeat state of the Jukebox.
+                Changes the repeat state of Jellybox.
                 There are three states that the player can be set to:
                 `%1$srepeat track` - This will continuously loop the current track.
                 `%1$srepeat queue` - This will continuously loop all the tracks in the queue. After a track is played, it will be readded at the end of the queue.
-                `%1$srepeat off` - Turns off the repeat functions of the Jukebox.
+                `%1$srepeat off` - Turns off the repeat functions of Jellybox.
                 """, Config.getPrefix()));
             case "skip" ->
                 embed.setDescription("Skips the current track (if any) and plays the next track in the queue.");
@@ -161,7 +161,7 @@ public class Help extends Command {
             case "stop" ->
                 embed.setDescription(String.format("Stops the current track (if any). " + "If the `%splay` command is" +
                     " used, the track will play again from the beginning.", Config.getPrefix()));
-            default -> Jukebox.getLogger().error("Unknown command name: {}", commandName);
+            default -> Jellybox.getLogger().error("Unknown command name: {}", commandName);
         }
     }
 
