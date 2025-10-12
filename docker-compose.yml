@@ -1,6 +1,6 @@
 services:
   jellybox:
-    image: ghcr.io/angelolz/jellybox:2.0.0
+    image: ghcr.io/angelolz/jellybox
     container_name: jellybox
     restart: unless-stopped
     environment:
