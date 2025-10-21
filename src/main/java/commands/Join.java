@@ -49,7 +49,7 @@ public class Join extends Command {
 
         PlayerManager.getInstance()
                      .getMusicManager(commandEvent.getGuild())
-                     .setNotifChannel(userVoiceState.getChannel().asVoiceChannel());
+                     .setNotifChannel(commandEvent.getTextChannel());
         PlayerManager.getInstance().getMusicManager(commandEvent.getGuild()).getTimer().startTimer();
     }
 }

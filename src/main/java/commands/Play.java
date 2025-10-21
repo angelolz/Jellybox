@@ -69,7 +69,7 @@ public class Play extends Command {
 
     private boolean botJoinedVoiceChannel(CommandEvent commandEvent, GuildVoiceState selfVoiceState,
                                           GuildVoiceState userVoiceState) {
-        if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel().asVoiceChannel())) {
+        if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             commandEvent.replyError("I'm already in another voice channel!");
             return false;
         }

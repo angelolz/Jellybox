@@ -3,7 +3,7 @@ package music;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import lombok.Getter;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 @Getter
@@ -12,7 +12,7 @@ public class GuildMusicManager {
     private final TrackScheduler scheduler;
     private final AudioPlayerSendHandler handler;
     private final Timeout timeout;
-    private VoiceChannel notifChannel;
+    private TextChannel notifChannel;
 
     public GuildMusicManager(AudioPlayerManager manager, AudioManager audioManager) {
         AudioPlayer player = manager.createPlayer();
@@ -27,7 +27,7 @@ public class GuildMusicManager {
         return timeout;
     }
 
-    public void setNotifChannel(VoiceChannel channel) {
+    public void setNotifChannel(TextChannel channel) {
         if(notifChannel == null) {
             this.notifChannel = channel;
             scheduler.setNotifChannel(notifChannel);

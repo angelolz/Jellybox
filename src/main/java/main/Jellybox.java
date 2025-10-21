@@ -23,6 +23,7 @@ public class Jellybox
     @Getter
     private static Logger logger;
 
+
     public static void main(String[] args) {
         logger = LoggerFactory.getLogger(Jellybox.class);
 
