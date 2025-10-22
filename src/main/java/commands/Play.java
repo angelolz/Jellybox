@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lombok.SneakyThrows;
 import main.Jellybox;
 import music.PlayerManager;
 import music.sources.jellyfin.JellyfinApi;
@@ -15,12 +16,19 @@ import structure.jellyfin.JellyfinAlbum;
 import structure.jellyfin.JellyfinArtist;
 import structure.jellyfin.JellyfinTrack;
 import utils.Statics;
+import utils.ThrowingFunction;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 public class Play extends Command {
+
+    private static final String TRACK = "track";
+    private static final String ARTIST = "artist";
+    private static final String ALBUM = "album";
+    private static final String SONG = "song";
 
     public Play() {
         this.name = "play";
@@ -34,49 +42,35 @@ public class Play extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        GuildVoiceState selfVoiceState = commandEvent.getSelfMember().getVoiceState();
-        GuildVoiceState userVoiceState = commandEvent.getMember().getVoiceState();
+        GuildVoiceState botState = commandEvent.getSelfMember().getVoiceState();
+        GuildVoiceState userState = commandEvent.getMember().getVoiceState();
 
-        if(!userVoiceState.inAudioChannel()) {
+        if(userState == null || !userState.inAudioChannel()) {
             commandEvent.replyError("You need to be in a voice channel to use this command!");
             return;
         }
 
-        AudioPlayer player = PlayerManager.getInstance()
-                                          .getMusicManager(commandEvent.getGuild())
-                                          .getScheduler()
-                                          .getPlayer();
-        LinkedList<AudioTrack> queue = PlayerManager.getInstance()
-                                                    .getMusicManager(commandEvent.getGuild())
-                                                    .getScheduler()
-                                                    .getQueue();
+        var manager = PlayerManager.getInstance().getMusicManager(commandEvent.getGuild());
+        var player = manager.getScheduler().getPlayer();
+        var queue = manager.getScheduler().getQueue();
 
-        if(!botJoinedVoiceChannel(commandEvent, selfVoiceState, userVoiceState))
+        if(!joinIfNeeded(commandEvent, botState, userState))
             return;
 
-        try {
-            if(commandEvent.getArgs().isEmpty())
-                unpauseBot(commandEvent, player, queue);
-            else
-                findResults(commandEvent, player);
-        }
-
-        catch(IOException e) {
-            commandEvent.replyError("Sorry, there was an error looking up your query.");
-            Jellybox.getLogger().error("Error looking up query", e);
-        }
+        if(commandEvent.getArgs().isEmpty())
+            unpauseBot(commandEvent, player, queue);
+        else
+            handleQuery(commandEvent, player);
     }
 
-    private boolean botJoinedVoiceChannel(CommandEvent commandEvent, GuildVoiceState selfVoiceState,
-                                          GuildVoiceState userVoiceState) {
-        if(selfVoiceState.inAudioChannel() && !userVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            commandEvent.replyError("I'm already in another voice channel!");
+    private boolean joinIfNeeded(CommandEvent event, GuildVoiceState self, GuildVoiceState user) {
+        if((self != null && self.inAudioChannel()) && (user.getChannel() != null && !user.getChannel().equals(self.getChannel()))) {
+            event.replyError("I'm already in another voice channel!");
             return false;
         }
 
-        if(!selfVoiceState.inAudioChannel())
-            Join.joinVoiceChannel(commandEvent, userVoiceState);
-
+        if(self != null && !self.inAudioChannel())
+            Join.joinVoiceChannel(event, user);
         return true;
     }
 
@@ -88,13 +82,12 @@ public class Play extends Command {
 
         else {
             if(player.getPlayingTrack() != null) {
-                commandEvent.replyError("There's already a track playing! If you want to add a track to the queue, " + "please give me a search query or URL!");
+                commandEvent.replyError("There's already a track playing! Add one to the queue using a query or URL.");
                 return;
             }
 
             if(queue.isEmpty()) {
-                commandEvent.replyError("There's nothing to play because the queue is empty! Add a track by giving a "
-                    + "search query or URL.");
+                commandEvent.replyError("There's nothing to play! Add a track with a search query or URL.");
                 return;
             }
 
@@ -103,164 +96,125 @@ public class Play extends Command {
         }
     }
 
-    private static void findResults(CommandEvent commandEvent, AudioPlayer player) throws IOException {
-        String[] query = commandEvent.getArgs().split(":", 2);
+    @SneakyThrows
+    private void handleQuery(CommandEvent event, AudioPlayer player) {
+        String[] parts = event.getArgs().split(":", 2);
+        String type = parts[0].toLowerCase();
+        String query = (parts.length > 1) ? parts[1] : event.getArgs();
 
-        switch(query[0].toLowerCase()) {
-            case "song", "track" -> findTracks(commandEvent, player, query[1]);
-            case "album" -> findAlbums(commandEvent, player, query[1]);
-            case "artist" -> findArtists(commandEvent, player, query[1]);
-            default -> findTracks(commandEvent, player, commandEvent.getArgs());
+        switch(type) {
+            case SONG, TRACK ->
+                handleResults(event, player, query, JellyfinApi::searchTracks, this::describeTracks, TRACK);
+            case ALBUM -> handleResults(event, player, query, JellyfinApi::searchAlbums, this::describeAlbums, ALBUM);
+            case ARTIST ->
+                handleResults(event, player, query, JellyfinApi::searchArtists, this::describeArtists, ARTIST);
+            default ->
+                handleResults(event, player, event.getArgs(), JellyfinApi::searchTracks, this::describeTracks, TRACK);
         }
     }
 
-    private static void findTracks(CommandEvent commandEvent, AudioPlayer player, String query) throws IOException {
-        List<JellyfinTrack> results = JellyfinApi.searchTracks(query);
-        if(results.isEmpty()) {
-            commandEvent.reply("❌ No tracks found with your query!");
+    private <T> void handleResults(CommandEvent event, AudioPlayer player, String query, ThrowingFunction<String,
+        List<T>, IOException> searchFunc, Function<List<T>, String> describeFunc, String type) {
+        try {
+
+            List<T> results = searchFunc.apply(query);
+            if(results.isEmpty()) {
+                event.reply("❌ No " + type + "s found with your query!");
+                return;
+            }
+
+            if(results.size() == 1) {
+                playSingle(event, player, results.get(0), type);
+                return;
+            }
+
+            EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR)
+                                                   .setTitle("Multiple " + type + "s found!")
+                                                   .setDescription("Please select a " + type + " to play:\n\n" + describeFunc.apply(results));
+
+            StringSelectMenu.Builder menu = StringSelectMenu.create(event.getAuthor()
+                                                                         .getId() + ":play:" + type + "-selection");
+            for(int i = 0; i < Math.min(10, results.size()); i++) {
+                T item = results.get(i);
+                String label;
+                String id;
+
+                if(item instanceof JellyfinTrack t) {
+                    label = t.getArtist() + " - " + t.getTrackName();
+                    id = t.getId();
+                }
+                else if(item instanceof JellyfinAlbum a) {
+                    label = a.getAlbumArtist() + " - " + a.getAlbumName();
+                    id = a.getId();
+                }
+                else if(item instanceof JellyfinArtist a) {
+                    label = a.getName();
+                    id = a.getId();
+                }
+                else {
+                    continue;
+                }
+
+                menu.addOption(label, id);
+            }
+
+            event.getChannel().sendMessageEmbeds(embed.build()).setComponents(ActionRow.of(menu.build())).queue();
+        }
+
+        catch(IOException e) {
+            event.replyError("Sorry, there was an error looking up your query.");
+            Jellybox.getLogger().error("Error looking up query", e);
+        }
+    }
+
+    private <T> void playSingle(CommandEvent event, AudioPlayer player, T item, String type) {
+        if(player.isPaused()) {
+            event.reply(":pause_button: | The player is still paused! Type `!p` or `!play` to resume.");
             return;
         }
 
-        if(results.size() > 1) {
-            EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR)
-                                                   .setTitle("Multiple tracks found!")
-                                                   .setDescription("Please select a track to play:\n\n" + getTracksForDescription(results));
+        String id = switch(type) {
+            case TRACK -> ((JellyfinTrack) item).getId();
+            case ALBUM -> ((JellyfinAlbum) item).getId();
+            case ARTIST -> ((JellyfinArtist) item).getId();
+            default -> null;
+        };
 
-            StringSelectMenu.Builder menu = StringSelectMenu.create(commandEvent.getAuthor()
-                                                                                .getId() + ":play:track-selection");
-            for(int i = 0; i < Math.min(10, results.size()); i++) {
-                JellyfinTrack track = results.get(i);
-                menu.addOption(track.getArtist() + " - " + track.getTrackName(), track.getId());
-            }
-
-            commandEvent.getChannel()
-                        .sendMessageEmbeds(embed.build())
-                        .setComponents(ActionRow.of(menu.build()))
-                        .queue();
-        }
-        else {
-            JellyfinTrack track = results.get(0);
-
-            if(player.isPaused())
-                commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, " +
-                    "then" + " type `!p` or `!play`!");
-
+        if(id != null)
             PlayerManager.getInstance()
-                         .loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(),
-                             "jellyfin://track/" + track.getId());
-        }
+                         .loadAndPlay(event.getGuildChannel(), event.getAuthor(), "jellyfin://" + type + "/" + id);
     }
 
-    private static void findAlbums(CommandEvent commandEvent, AudioPlayer player, String query) throws IOException {
-        List<JellyfinAlbum> results = JellyfinApi.searchAlbums(query);
-        if(results.isEmpty()) {
-            commandEvent.reply("❌ No albums found with your query!");
-            return;
+    private String describeTracks(List<JellyfinTrack> list) {
+        StringBuilder b = new StringBuilder();
+        for(int i = 0; i < Math.min(10, list.size()); i++) {
+            JellyfinTrack t = list.get(i);
+            b.append(i + 1).append(". ").append(t.getArtist()).append(" - ").append(t.getTrackName()).append("\n");
         }
-
-        if(results.size() > 1) {
-            EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR)
-                                                   .setTitle("Multiple albums found!")
-                                                   .setDescription("Please select an album to play:\n\n" + getAlbumsForDescription(results));
-
-            StringSelectMenu.Builder menu = StringSelectMenu.create(commandEvent.getAuthor()
-                                                                                .getId() + ":play:album-selection");
-            for(int i = 0; i < Math.min(10, results.size()); i++) {
-                JellyfinAlbum album = results.get(i);
-                menu.addOption(album.getAlbumArtist() + " - " + album.getAlbumName(), album.getId());
-            }
-
-            commandEvent.getChannel()
-                        .sendMessageEmbeds(embed.build())
-                        .setComponents(ActionRow.of(menu.build()))
-                        .queue();
-        }
-        else {
-            JellyfinAlbum album = results.get(0);
-
-            if(player.isPaused())
-                commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, " +
-                    "then" + " type `!p` or `!play`!");
-
-            PlayerManager.getInstance()
-                         .loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(),
-                             "jellyfin://album/" + album.getId());
-        }
+        return b.toString();
     }
 
-    private static void findArtists(CommandEvent commandEvent, AudioPlayer player, String query) throws IOException {
-        List<JellyfinArtist> results = JellyfinApi.searchArtists(query);
-        if(results.isEmpty()) {
-            commandEvent.reply("❌ No albums found with your query!");
-            return;
+    private String describeAlbums(List<JellyfinAlbum> list) {
+        StringBuilder b = new StringBuilder();
+        for(int i = 0; i < Math.min(10, list.size()); i++) {
+            JellyfinAlbum a = list.get(i);
+            b.append(i + 1)
+             .append(". ")
+             .append(a.getAlbumArtist())
+             .append(" - ")
+             .append(a.getAlbumName())
+             .append(" (")
+             .append(a.getYear())
+             .append(")\n");
         }
-
-        if(results.size() > 1) {
-            EmbedBuilder embed = new EmbedBuilder().setColor(Statics.EMBED_COLOR)
-                                                   .setTitle("Multiple artists found!")
-                                                   .setDescription("Please select an artist to play from:\n\n" + getArtistForDescription(results));
-
-            StringSelectMenu.Builder menu = StringSelectMenu.create(commandEvent.getAuthor()
-                                                                                .getId() + ":play:artist-selection");
-            for(int i = 0; i < Math.min(10, results.size()); i++) {
-                JellyfinArtist artist = results.get(i);
-                menu.addOption(artist.getName(), artist.getId());
-            }
-
-            commandEvent.getChannel()
-                        .sendMessageEmbeds(embed.build())
-                        .setComponents(ActionRow.of(menu.build()))
-                        .queue();
-        }
-        else {
-            JellyfinArtist artist = results.get(0);
-
-            if(player.isPaused())
-                commandEvent.reply(":pause_button: | The player is still paused! If you want to resume playback, " +
-                    "then" + " type `!p` or `!play`!");
-
-            PlayerManager.getInstance()
-                         .loadAndPlay(commandEvent.getTextChannel(), commandEvent.getAuthor(),
-                             "jellyfin://artist/" + artist.getId());
-        }
+        return b.toString();
     }
 
-    private static String getTracksForDescription(List<JellyfinTrack> tracks) {
-        StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < Math.min(10, tracks.size()); i++) {
-            builder.append(i + 1)
-                   .append(". ")
-                   .append(tracks.get(i).getArtist())
-                   .append(" - ")
-                   .append(tracks.get(i).getTrackName())
-                   .append("\n");
+    private String describeArtists(List<JellyfinArtist> list) {
+        StringBuilder b = new StringBuilder();
+        for(int i = 0; i < Math.min(10, list.size()); i++) {
+            b.append(i + 1).append(". ").append(list.get(i).getName()).append("\n");
         }
-
-        return builder.toString();
-    }
-
-    private static String getAlbumsForDescription(List<JellyfinAlbum> albums) {
-        StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < Math.min(10, albums.size()); i++) {
-            builder.append(i + 1)
-                   .append(". ")
-                   .append(albums.get(i).getAlbumArtist())
-                   .append(" - ")
-                   .append(albums.get(i).getAlbumName())
-                   .append(" (")
-                   .append(albums.get(i).getYear())
-                   .append(")\n");
-        }
-
-        return builder.toString();
-    }
-
-    private static String getArtistForDescription(List<JellyfinArtist> artists) {
-        StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < Math.min(10, artists.size()); i++) {
-            builder.append(i + 1).append(". ").append(artists.get(i).getName()).append("\n");
-        }
-
-        return builder.toString();
+        return b.toString();
     }
 }

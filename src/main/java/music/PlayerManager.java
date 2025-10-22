@@ -6,7 +6,7 @@ import lombok.Getter;
 import music.sources.jellyfin.JellyfinAudioSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +36,8 @@ public class PlayerManager {
         });
     }
 
-    public void loadAndPlay(TextChannel channel, User requester, String trackUrl) {
+    public void loadAndPlay(GuildMessageChannel channel, User requester, String trackUrl) {
+
         final GuildMusicManager guildMusicManager = getMusicManager(channel.getGuild());
         SourceAudioLoadResultHandler sourceAudioLoadResultHandler =
             new SourceAudioLoadResultHandler(guildMusicManager, requester, channel);

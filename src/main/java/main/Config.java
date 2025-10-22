@@ -50,7 +50,7 @@ public class Config {
         token = getConfigValue(isDocker, "BOT_TOKEN", "bot_token", prop);
         ownerId = getConfigValue(isDocker, "OWNER_ID", "owner_id", prop);
         prefix = getConfigValue(isDocker, "PREFIX", "prefix", prop, "+");
-        version = getConfigValue(isDocker, "VERSION", "version", prop, "2.0.0");
+        version = getConfigValue(isDocker, "VERSION", "version", prop, "2.0.1");
         jellyfinUrl = getConfigValue(isDocker, "JELLYFIN_URL", "jellyfin_url", prop);
         jellyfinApiKey = getConfigValue(isDocker, "JELLYFIN_API_KEY", "jellyfin_api_key", prop);
         jellyfinUserId = getConfigValue(isDocker, "JELLYFIN_USER_ID", "jellyfin_user_id", prop);

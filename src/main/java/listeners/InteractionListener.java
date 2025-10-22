@@ -20,7 +20,7 @@ public class InteractionListener extends ListenerAdapter {
             switch(args[2].toLowerCase()) {
                 case "queue" -> Queue.paginate(event, args);
                 case "help" -> Help.getEmbed(event, args[3]);
-                default -> Jellybox.getLogger().error("Unknown action: {} | ID: {}", args[2], event.getComponentId());
+                default -> Jellybox.getLogger().error("Unknown button interaction: {} | ID: {}", args[2], event.getComponentId());
             }
         }
     }
@@ -37,22 +37,22 @@ public class InteractionListener extends ListenerAdapter {
                 case "track-selection" -> {
                     String trackId = event.getValues().get(0);
                     PlayerManager.getInstance()
-                                 .loadAndPlay(event.getChannel().asTextChannel(), event.getUser(), "jellyfin://track/" + trackId);
+                                 .loadAndPlay(event.getGuildChannel(), event.getUser(), "jellyfin://track/" + trackId);
                 }
                 case "album-selection" -> {
                     String albumId = event.getValues().get(0);
                     PlayerManager.getInstance()
-                                 .loadAndPlay(event.getChannel().asTextChannel(), event.getUser(), "jellyfin://album/" + albumId);
+                                 .loadAndPlay(event.getGuildChannel(), event.getUser(), "jellyfin://album/" + albumId);
                     event.getMessage().delete().queue();
                     
                 }
                 case "artist-selection" -> {
                     String artistId = event.getValues().get(0);
                     PlayerManager.getInstance()
-                                 .loadAndPlay(event.getChannel().asTextChannel(), event.getUser(), "jellyfin://artist/" + artistId);
+                                 .loadAndPlay(event.getGuildChannel(), event.getUser(), "jellyfin://artist/" + artistId);
                     event.getMessage().delete().queue();
                 }
-                default -> Jellybox.getLogger().error("Unknown action: {} | ID: {}", args[2], event.getComponentId());
+                default -> Jellybox.getLogger().error("Unknown string select interaction: {} | ID: {}", args[2], event.getComponentId());
             }
         }
     }

@@ -9,7 +9,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.Jellybox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import utils.Statics;
 import utils.UtilClass;
 
@@ -19,9 +20,9 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler {
 
     private final GuildMusicManager guildMusicManager;
     private final User requester;
-    private final TextChannel channel;
+    private final GuildMessageChannel channel;
 
-    public SourceAudioLoadResultHandler(GuildMusicManager guildMusicManager, User requester, TextChannel channel) {
+    public SourceAudioLoadResultHandler(GuildMusicManager guildMusicManager, User requester, GuildMessageChannel channel) {
         this.guildMusicManager = guildMusicManager;
         this.requester = requester;
         this.channel = channel;
@@ -48,6 +49,12 @@ public class SourceAudioLoadResultHandler implements AudioLoadResultHandler {
                  .addField("Requested by:", requester.getAsMention(), true)
                  .addField("Time before track plays", String.format("#%s - `[%s]` left", queue.size(),
                      UtilClass.convertLongToTrackTime(totalQueueLength)), true);
+
+
+        }
+
+        if(channel.getType() == ChannelType.TEXT) {
+            embed.setFooter("Future track notifications will appear in the voice text channel.");
         }
 
         channel.sendMessageEmbeds(embed.build()).queue();

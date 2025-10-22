@@ -11,6 +11,7 @@ import main.Jellybox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import utils.UtilClass;
 
 import java.awt.*;
@@ -22,7 +23,7 @@ public class TrackScheduler extends AudioEventAdapter {
     private final AudioPlayer player;
     private final LinkedList<AudioTrack> queue;
     @Setter
-    private TextChannel notifChannel;
+    private VoiceChannel notifChannel;
     @Setter
     private LoopState loopState;
 
